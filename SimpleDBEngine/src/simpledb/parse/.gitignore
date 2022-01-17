@@ -1,0 +1,16 @@
+/BadSyntaxException.class
+/CreateIndexData.class
+/CreateTableData.class
+/CreateViewData.class
+/DeleteData.class
+/InsertData.class
+/Lexer.class
+/LexerTest.class
+/ModifyData.class
+/Parser.class
+/ParserTest.class
+/ParserTestActions.class
+/PredParser.class
+/PredParserTest.class
+/QueryData.class
+/TokenizerTest.class
