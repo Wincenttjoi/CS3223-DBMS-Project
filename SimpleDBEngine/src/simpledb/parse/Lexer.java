@@ -9,6 +9,7 @@ import java.io.*;
  */
 public class Lexer {
    private Collection<String> keywords;
+   private Collection<Character> operators;
    private StreamTokenizer tok;
    
    /**
@@ -17,6 +18,7 @@ public class Lexer {
     */
    public Lexer(String s) {
       initKeywords();
+      initOperators();
       tok = new StreamTokenizer(new StringReader(s));
       tok.ordinaryChar('.');   //disallow "." in identifiers
       tok.wordChars('_', '_'); //allow "_" in identifiers
@@ -112,6 +114,58 @@ public class Lexer {
    }
    
    /**
+    * Throws an exception if the incoming tokens do not form a valid
+    * a operator. 
+    * Otherwise, returns that operator string and moves to the next token.
+    * @return the string value of the current token
+    */
+   public String eatOpr() {
+	   char currOp = (char)tok.ttype;
+	   if (!operators.contains(currOp)) {
+	         throw new BadSyntaxException();
+	   }
+	   
+	   List<Character> chars = new ArrayList<Character>();
+	   chars.add(currOp);
+	   nextToken();
+	   char nextOp = (char)tok.ttype;
+
+	   switch(currOp)
+	   {
+       case '!':
+    	   if (nextOp == '=') {
+    		   chars.add('=');
+    		   break;
+    	   }
+  	       throw new BadSyntaxException();
+       case '<':
+    	   if (nextOp == '=' || nextOp == '>') {
+    		   chars.add(nextOp);
+    	   } else {
+    		   tok.pushBack();
+    	   }
+    	   break;
+       case '>':
+    	   if (nextOp == '=') {
+    		   chars.add(nextOp);
+    	   } else {
+    		   tok.pushBack();
+    	   }
+	   default:
+		   tok.pushBack();
+	   }
+	   
+	   nextToken();
+	   
+	   StringBuilder sb = new StringBuilder();
+       for (Character ch : chars) {
+           sb.append(ch);
+       }
+       return sb.toString();
+   }
+   
+   
+   /**
     * Throws an exception if the current token is not the
     * specified keyword. 
     * Otherwise, moves to the next token.
@@ -151,5 +205,9 @@ public class Lexer {
       keywords = Arrays.asList("select", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
                                "create", "table", "int", "varchar", "view", "as", "index", "on");
+   }
+   
+   private void initOperators() {
+	   operators = Arrays.asList('<', '>', '!', '=');
    }
 }
