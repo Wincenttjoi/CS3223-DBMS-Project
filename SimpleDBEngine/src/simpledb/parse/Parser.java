@@ -38,8 +38,9 @@ public class Parser {
    
    public Term term() {
       Expression lhs = expression();
-      lex.eatDelim('=');
+      String opr = lex.eatOpr();
       Expression rhs = expression();
+      // TODO: term to contain opr as field
       return new Term(lhs, rhs);
    }
    

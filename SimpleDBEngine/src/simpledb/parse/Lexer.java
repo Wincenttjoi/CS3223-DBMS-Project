@@ -9,7 +9,8 @@ import java.io.*;
  */
 public class Lexer {
    private Collection<String> keywords;
-   private Collection<String> equality_keywords;
+   private Collection<Character> equality_keywords;
+   private Collection<String> equality_validation;
    private StreamTokenizer tok;
    
    /**
@@ -19,6 +20,7 @@ public class Lexer {
    public Lexer(String s) {
       initKeywords();
       initOperators();
+      equality_validation();
       tok = new StreamTokenizer(new StringReader(s));
       tok.ordinaryChar('.');   //disallow "." in identifiers
       tok.wordChars('_', '_'); //allow "_" in identifiers
@@ -64,13 +66,21 @@ public class Lexer {
    }
    
    /**
+    * Returns true if the current token is the specified keyword.
+    * @param w the keyword string
+    * @return true if that keyword is the current token
+    */
+   public boolean matchOpr(char c) {
+      return equality_keywords.contains(c);
+   }
+   
+   /**
     * Returns true if the current token is a legal identifier.
     * @return true if the current token is an identifier
     */
    public boolean matchId() {
       return  tok.ttype==StreamTokenizer.TT_WORD && 
-    		  !keywords.contains(tok.sval) && 
-    		  !equality_keywords.contains(tok.sval);
+    		  !keywords.contains(tok.sval);
    }
    
    
@@ -134,13 +144,25 @@ public class Lexer {
     * specified equality keyword. 
     * Otherwise, moves to the next token.
     * @param w the keyword string
+    * @return the string value of the equality token
     */
-   public String eatOpr(String w) {
-      if (!matchKeyword(w))
-         throw new BadSyntaxException();
-      String s = tok.sval;
-      nextToken();
-      return s;
+   public String eatOpr() {
+	  String opr = "";
+	  char c1 = (char) tok.ttype;
+	  if (matchOpr(c1)) {
+		  opr += c1;
+	  }
+	  nextToken();
+	  char c2 = (char) tok.ttype;
+	  if (matchOpr(c2)) {
+		  opr += c2;
+		  nextToken();
+	  }
+	  if (!equality_validation.contains(opr)) {
+		  throw new BadSyntaxException();
+	  }
+	  return opr;
+	  
    }
    
    /**
@@ -174,6 +196,10 @@ public class Lexer {
    }
    
    private void initOperators() {
-	   equality_keywords = Arrays.asList("<", "<=", ">", ">=", "!=", "<>");
+	   equality_keywords = Arrays.asList('=', '>', '<', '!');
+   }
+   
+   private void equality_validation() {
+	   equality_validation = Arrays.asList("=", "<", ">", ">=", "<=", "!=", "<>");
    }
 }
