@@ -55,8 +55,6 @@ public class Term {
     	  // throw some exception instead?
     	  return false;
       }
-      
-//      return rhsval.equals(lhsval);
    }
    
    /**

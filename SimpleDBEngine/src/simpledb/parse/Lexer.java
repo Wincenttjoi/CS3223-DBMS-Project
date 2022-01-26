@@ -135,9 +135,8 @@ public class Lexer {
        case '!':
     	   if (nextOp == '=') {
     		   chars.add(nextOp);
-    		   break;
     	   }
-  	       throw new BadSyntaxException();
+		   break;
        case '<':
     	   if (nextOp == '=' || nextOp == '>') {
     		   chars.add(nextOp);
