@@ -1,1 +1,7 @@
 /.metadata/
+/SimpleDBEngine/bin/
+/SimpleDBClients/studentdb/
+*.class
+*.tbl
+SimpleDBClients/studentdb/simpledb.log
+SimpleDBClients/src/embedded/studentdb/simpledb.log
