@@ -9,6 +9,7 @@ import java.io.*;
  */
 public class Lexer {
    private Collection<String> keywords;
+   private Collection<String> equality_keywords;
    private StreamTokenizer tok;
    
    /**
@@ -17,6 +18,7 @@ public class Lexer {
     */
    public Lexer(String s) {
       initKeywords();
+      initOperators();
       tok = new StreamTokenizer(new StringReader(s));
       tok.ordinaryChar('.');   //disallow "." in identifiers
       tok.wordChars('_', '_'); //allow "_" in identifiers
@@ -66,8 +68,12 @@ public class Lexer {
     * @return true if the current token is an identifier
     */
    public boolean matchId() {
-      return  tok.ttype==StreamTokenizer.TT_WORD && !keywords.contains(tok.sval);
+      return  tok.ttype==StreamTokenizer.TT_WORD && 
+    		  !keywords.contains(tok.sval) && 
+    		  !equality_keywords.contains(tok.sval);
    }
+   
+   
    
 //Methods to "eat" the current token
    
@@ -124,6 +130,20 @@ public class Lexer {
    }
    
    /**
+    * Throws an exception if the current token is not the
+    * specified equality keyword. 
+    * Otherwise, moves to the next token.
+    * @param w the keyword string
+    */
+   public String eatOpr(String w) {
+      if (!matchKeyword(w))
+         throw new BadSyntaxException();
+      String s = tok.sval;
+      nextToken();
+      return s;
+   }
+   
+   /**
     * Throws an exception if the current token is not 
     * an identifier. 
     * Otherwise, returns the identifier string 
@@ -151,5 +171,9 @@ public class Lexer {
       keywords = Arrays.asList("select", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
                                "create", "table", "int", "varchar", "view", "as", "index", "on");
+   }
+   
+   private void initOperators() {
+	   equality_keywords = Arrays.asList("<", "<=", ">", ">=", "!=", "<>");
    }
 }
