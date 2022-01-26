@@ -10,7 +10,6 @@ import java.io.*;
 public class Lexer {
    private Collection<String> keywords;
    private Collection<Character> equality_keywords;
-   private Collection<String> equality_validation;
    private StreamTokenizer tok;
    
    /**
@@ -20,7 +19,6 @@ public class Lexer {
    public Lexer(String s) {
       initKeywords();
       initOperators();
-      equality_validation();
       tok = new StreamTokenizer(new StringReader(s));
       tok.ordinaryChar('.');   //disallow "." in identifiers
       tok.wordChars('_', '_'); //allow "_" in identifiers
@@ -158,9 +156,7 @@ public class Lexer {
 		  opr += c2;
 		  nextToken();
 	  }
-	  if (!equality_validation.contains(opr)) {
-		  throw new BadSyntaxException();
-	  }
+	  validate_equality(opr);
 	  return opr;
 	  
    }
@@ -199,7 +195,10 @@ public class Lexer {
 	   equality_keywords = Arrays.asList('=', '>', '<', '!');
    }
    
-   private void equality_validation() {
-	   equality_validation = Arrays.asList("=", "<", ">", ">=", "<=", "!=", "<>");
+   private void validate_equality(String opr) {
+	   Collection<String> is_equality = Arrays.asList("=", "<", ">", ">=", "<=", "!=", "<>");
+	   if (!is_equality.contains(opr)) {
+		   throw new BadSyntaxException();
+	   }
    }
 }
