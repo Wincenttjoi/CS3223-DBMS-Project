@@ -34,29 +34,29 @@ public class Term {
    public boolean isSatisfied(Scan s) {
       Constant lhsval = lhs.evaluate(s);
       Constant rhsval = rhs.evaluate(s);
-//      boolean lhsLesser = (rhsval.compareTo(rhsval) == -1);
-//      boolean equal = rhsval.equals(lhsval);
-//      
-//      switch(op) {
-//      case("="):
-//          return equal;
-//      case("<"):
-//    	  return lhsLesser;
-//      case("<="):
-//    	  return equal || lhsLesser;
-//      case(">"):
-//    	  return !(equal || lhsLesser);
-//      case(">="):
-//    	  return !lhsLesser;
-//      case("<>"):
-//      case("!="):
-//    	  return !equal;
-//      default:
-//    	  // throw some exception instead?
-//    	  return false;
-//      }
+      boolean lhsLesser = (lhsval.compareTo(rhsval) == -1);
+      boolean equal = rhsval.equals(lhsval);
       
-      return rhsval.equals(lhsval);
+      switch(op) {
+      case("="):
+          return equal;
+      case("<"):
+    	  return lhsLesser;
+      case("<="):
+    	  return lhsLesser || equal;
+      case(">"):
+    	  return !(equal || lhsLesser);
+      case(">="):
+    	  return !lhsLesser;
+      case("<>"):
+      case("!="):
+    	  return !equal;
+      default:
+    	  // throw some exception instead?
+    	  return false;
+      }
+      
+//      return rhsval.equals(lhsval);
    }
    
    /**

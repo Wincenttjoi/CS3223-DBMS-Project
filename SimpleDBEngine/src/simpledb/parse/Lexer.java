@@ -134,7 +134,7 @@ public class Lexer {
 	   {
        case '!':
     	   if (nextOp == '=') {
-    		   chars.add('=');
+    		   chars.add(nextOp);
     		   break;
     	   }
   	       throw new BadSyntaxException();
@@ -151,6 +151,7 @@ public class Lexer {
     	   } else {
     		   tok.pushBack();
     	   }
+    	   break;
 	   default:
 		   tok.pushBack();
 	   }
