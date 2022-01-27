@@ -76,12 +76,12 @@ public class Lexer {
 	}
 
 	/**
-	 * Returns true if the current token is a comparison operator.
+	 * Returns true if the current token is a valid first character of comparison operator.
 	 * 
-	 * @return true if the comparison operator is the current token
+	 * @return true if the current token is a valid first character of comparison operator
 	 */
 	public boolean matchOpr() {
-		return matchDelim('>') || matchDelim('<') || matchDelim('=') || matchDelim('!');
+		return matchDelim('<') || matchDelim('>') || matchDelim('!') || matchDelim('=');
 	}
 
 //Methods to "eat" the current token
