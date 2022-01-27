@@ -27,19 +27,6 @@ public class Term {
 	}
 
 	/**
-	 * Return true if both of the term's expressions evaluate to the same constant,
-	 * with respect to the specified scan.
-	 * 
-	 * @param s the scan
-	 * @return true if both expressions have the same value in the scan
-	 */
-//   public boolean isSatisfied(Scan s) {
-//      Constant lhsval = lhs.evaluate(s);
-//      Constant rhsval = rhs.evaluate(s);
-//      return rhsval.equals(lhsval);
-//   }
-
-	/**
     * Return true if both of the term's expressions
     * evaluate true to the comparison operation,
     * with respect to the specified scan.
@@ -49,7 +36,7 @@ public class Term {
    public boolean isSatisfied(Scan s) {
       Constant lhsval = lhs.evaluate(s);
       Constant rhsval = rhs.evaluate(s);
-      int cmpRes = rhsval.compareTo(lhsval);
+      int cmpRes = lhsval.compareTo(rhsval);
       if (opr.equals("<")) {
     	  if (cmpRes < 0)
     		  return true;

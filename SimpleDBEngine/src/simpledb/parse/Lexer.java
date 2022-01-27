@@ -170,7 +170,7 @@ public class Lexer {
 
 		StringBuilder opr = new StringBuilder();
 		opr.append(oprFirstChar);
-
+		
 		switch (oprFirstChar) {
 		case '<':
 			switch (oprSecondChar) {
@@ -182,6 +182,7 @@ public class Lexer {
 				pushBack();
 				break;
 			}
+			break;
 		case '>':
 			switch (oprSecondChar) {
 			case '=':
@@ -191,6 +192,7 @@ public class Lexer {
 				pushBack();
 				break;
 			}
+			break;
 		case '!':
 			switch (oprSecondChar) {
 			case '=':
@@ -200,11 +202,11 @@ public class Lexer {
 				pushBack();
 				break;
 			}
+			break;
 		case '=':
 			pushBack();
 			break;
 		} 
-
 		nextToken();
 		return opr.toString();
 
