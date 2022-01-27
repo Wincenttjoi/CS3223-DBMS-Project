@@ -39,9 +39,6 @@ public class Parser {
    public Term term() {
       Expression lhs = expression();
       String opr = lex.eatOpr();
-      System.out.println("==========");
-      System.out.println(opr);
-      System.out.println("==========");
       Expression rhs = expression();
       return new Term(lhs, rhs, opr);
    }
