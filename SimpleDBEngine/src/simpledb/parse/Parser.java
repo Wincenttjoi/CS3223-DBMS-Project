@@ -40,8 +40,7 @@ public class Parser {
       Expression lhs = expression();
       String opr = lex.eatOpr();
       Expression rhs = expression();
-      // TODO: term to contain opr as field
-      return new Term(lhs, rhs);
+      return new Term(lhs, rhs, opr);
    }
    
    public Predicate predicate() {
