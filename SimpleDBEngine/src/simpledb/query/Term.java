@@ -43,7 +43,8 @@ public class Term {
           case "=" -> { return isEqual; }
           case "<" -> { return isLhsSmaller; }
           case "<=" -> { return isLhsSmaller || isEqual; }
-          case ">" -> { return !isLhsSmaller; }
+          case ">" -> { return !isLhsSmaller && !isEqual; }
+
           case ">=" -> { return !isLhsSmaller || isEqual; }
           case "!=", "<>" -> { return !isEqual; }
           default -> { return false; }
