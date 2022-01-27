@@ -10,29 +10,45 @@ import simpledb.record.*;
  */
 public class Term {
    private Expression lhs, rhs;
+   private String opr;
    
    /**
     * Create a new term that compares two expressions
     * for equality.
     * @param lhs  the LHS expression
     * @param rhs  the RHS expression
+    * @param opr  the operator in relation to both expressions
     */
-   public Term(Expression lhs, Expression rhs) {
+   public Term(Expression lhs, Expression rhs, String opr) {
       this.lhs = lhs;
       this.rhs = rhs;
+      this.opr = opr;
    }
    
    /**
     * Return true if both of the term's expressions
-    * evaluate to the same constant,
+    * satisfies the condition of the term's operator,
     * with respect to the specified scan.
     * @param s the scan
-    * @return true if both expressions have the same value in the scan
+    * @return true if both expressions satisfies the condition of operator
     */
    public boolean isSatisfied(Scan s) {
       Constant lhsval = lhs.evaluate(s);
       Constant rhsval = rhs.evaluate(s);
-      return rhsval.equals(lhsval);
+      
+      boolean isLhsSmaller = lhsval.compareTo(rhsval) == -1;
+      boolean isEqual = rhsval.equals(lhsval); 
+      
+      switch (opr) {
+          case "=" -> { return isEqual; }
+          case "<" -> { return isLhsSmaller; }
+          case "<=" -> { return isLhsSmaller || isEqual; }
+          case ">" -> { return !isLhsSmaller && !isEqual; }
+
+          case ">=" -> { return !isLhsSmaller || isEqual; }
+          case "!=", "<>" -> { return !isEqual; }
+          default -> { return false; }
+      }
    }
    
    /**
@@ -119,6 +135,6 @@ public class Term {
    }
    
    public String toString() {
-      return lhs.toString() + "=" + rhs.toString();
+      return lhs.toString() + opr + rhs.toString();
    }
 }

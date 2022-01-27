@@ -9,6 +9,7 @@ import java.io.*;
  */
 public class Lexer {
    private Collection<String> keywords;
+   private Collection<Character> equality_keywords;
    private StreamTokenizer tok;
    
    /**
@@ -17,6 +18,7 @@ public class Lexer {
     */
    public Lexer(String s) {
       initKeywords();
+      initOperators();
       tok = new StreamTokenizer(new StringReader(s));
       tok.ordinaryChar('.');   //disallow "." in identifiers
       tok.wordChars('_', '_'); //allow "_" in identifiers
@@ -62,12 +64,24 @@ public class Lexer {
    }
    
    /**
+    * Returns true if the current token is the specified keyword.
+    * @param w the keyword string
+    * @return true if that keyword is the current token
+    */
+   public boolean matchOpr(char c) {
+      return equality_keywords.contains(c);
+   }
+   
+   /**
     * Returns true if the current token is a legal identifier.
     * @return true if the current token is an identifier
     */
    public boolean matchId() {
-      return  tok.ttype==StreamTokenizer.TT_WORD && !keywords.contains(tok.sval);
+      return  tok.ttype==StreamTokenizer.TT_WORD && 
+    		  !keywords.contains(tok.sval);
    }
+   
+   
    
 //Methods to "eat" the current token
    
@@ -124,6 +138,30 @@ public class Lexer {
    }
    
    /**
+    * Throws an exception if the current token is not the
+    * specified equality keyword. 
+    * Otherwise, moves to the next token.
+    * @param w the keyword string
+    * @return the string value of the equality token
+    */
+   public String eatOpr() {
+	  String opr = "";
+	  char c1 = (char) tok.ttype;
+	  if (matchOpr(c1)) {
+		  opr += c1;
+	  }
+	  nextToken();
+	  char c2 = (char) tok.ttype;
+	  if (matchOpr(c2)) {
+		  opr += c2;
+		  nextToken();
+	  }
+	  validate_equality(opr);
+	  return opr;
+	  
+   }
+   
+   /**
     * Throws an exception if the current token is not 
     * an identifier. 
     * Otherwise, returns the identifier string 
@@ -151,5 +189,16 @@ public class Lexer {
       keywords = Arrays.asList("select", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
                                "create", "table", "int", "varchar", "view", "as", "index", "on");
+   }
+   
+   private void initOperators() {
+	   equality_keywords = Arrays.asList('=', '>', '<', '!');
+   }
+   
+   private void validate_equality(String opr) {
+	   Collection<String> is_equality = Arrays.asList("=", "<", ">", ">=", "<=", "!=", "<>");
+	   if (!is_equality.contains(opr)) {
+		   throw new BadSyntaxException();
+	   }
    }
 }

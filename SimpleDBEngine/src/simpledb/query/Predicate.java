@@ -1,5 +1,6 @@
 package simpledb.query;
 
+import java.io.IOException;
 import java.util.*;
 
 import simpledb.plan.Plan;
