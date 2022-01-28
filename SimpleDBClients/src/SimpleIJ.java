@@ -10,9 +10,8 @@ public class SimpleIJ {
       
       // REVERT FOR SUBMISSION
 //      String s = sc.nextLine();
-      String s = "jdbc:simpledb:studentdb";
-//      Driver d = (s.contains("//")) ? new NetworkDriver() : new EmbeddedDriver();
-      Driver d = new EmbeddedDriver();
+      String s = "jdbc:simpledb://localhost";
+      Driver d = (s.contains("//")) ? new NetworkDriver() : new EmbeddedDriver();
       
       try (Connection conn = d.connect(s, null);
            Statement stmt = conn.createStatement()) {

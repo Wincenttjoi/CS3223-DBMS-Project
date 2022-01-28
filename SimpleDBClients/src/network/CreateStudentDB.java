@@ -83,6 +83,15 @@ public class CreateStudentDB {
          for (int i=0; i<enrollvals.length; i++)
             stmt.executeUpdate(s + enrollvals[i]);
          System.out.println("ENROLL records inserted.");
+         
+         // Create index
+         s = "create index majorid_idx on student (majorid)";
+         stmt.executeUpdate(s);
+         System.out.println("Majorid index created");
+         
+         s = "create index studentid_idx on enroll (studentid)";
+         stmt.executeUpdate(s);
+         System.out.println("studentid index created");
 
       }
       catch(SQLException e) {
