@@ -85,6 +85,11 @@ public class CreateStudentDB {
          System.out.println("ENROLL records inserted.");
          
          
+         // Create index
+         s = "create index majorid_idx on student (majorid) using hashhh";
+         stmt.executeUpdate(s);
+         System.out.println("Majorid index created");
+         
       }
       catch(SQLException e) {
          e.printStackTrace();
