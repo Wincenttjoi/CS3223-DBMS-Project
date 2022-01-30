@@ -241,8 +241,8 @@ public class Parser {
       String fldname = field();
       lex.eatDelim(')');
       lex.eatKeyword("using");
-      String idxType = lex.eatIdxType();
-      return new CreateIndexData(idxname, tblname, fldname);
+      String idxtype = lex.eatIdxType();
+      return new CreateIndexData(idxname, idxtype, tblname, fldname);
    }
 }
 

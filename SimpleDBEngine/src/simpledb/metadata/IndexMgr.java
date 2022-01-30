@@ -45,13 +45,18 @@ class IndexMgr {
     * @param fldname the name of the indexed field
     * @param tx the calling transaction
     */
-   public void createIndex(String idxname, String tblname, String fldname, Transaction tx) {
+   public void createIndex(String idxname, String idxtype, String tblname, String fldname, Transaction tx) {
       TableScan ts = new TableScan(tx, "idxcat", layout);
       ts.insert();
       ts.setString("indexname", idxname);
       ts.setString("tablename", tblname);
       ts.setString("fieldname", fldname);
       ts.close();
+      
+      Layout tblLayout = tblmgr.getLayout(tblname, tx);
+      StatInfo tblsi = statmgr.getStatInfo(tblname, tblLayout, tx);
+      IndexInfo ii = new IndexInfo(idxname, fldname, tblLayout.schema(), tx, tblsi);
+      ii.setIdxType(idxtype);
    }
    
    /**

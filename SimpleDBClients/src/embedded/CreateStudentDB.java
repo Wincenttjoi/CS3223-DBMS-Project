@@ -86,7 +86,7 @@ public class CreateStudentDB {
          
          
          // Create index
-         s = "create index majorid_idx on student (majorid) using hashhh";
+         s = "create index majorid_idx on student (majorid) using hash";
          stmt.executeUpdate(s);
          System.out.println("Majorid index created");
          
