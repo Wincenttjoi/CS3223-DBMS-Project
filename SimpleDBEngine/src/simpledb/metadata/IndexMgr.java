@@ -29,6 +29,7 @@ class IndexMgr {
          sch.addStringField("indexname", MAX_NAME);
          sch.addStringField("tablename", MAX_NAME);
          sch.addStringField("fieldname", MAX_NAME);
+         sch.addStringField("indextype", MAX_NAME);
          tblmgr.createTable("idxcat", sch, tx);
       }
       this.tblmgr = tblmgr;
@@ -51,12 +52,8 @@ class IndexMgr {
       ts.setString("indexname", idxname);
       ts.setString("tablename", tblname);
       ts.setString("fieldname", fldname);
+      ts.setString("indextype", idxtype);
       ts.close();
-      
-      Layout tblLayout = tblmgr.getLayout(tblname, tx);
-      StatInfo tblsi = statmgr.getStatInfo(tblname, tblLayout, tx);
-      IndexInfo ii = new IndexInfo(idxname, fldname, tblLayout.schema(), tx, tblsi);
-      ii.setIdxType(idxtype);
    }
    
    /**
@@ -73,9 +70,11 @@ class IndexMgr {
          if (ts.getString("tablename").equals(tblname)) {
          String idxname = ts.getString("indexname");
          String fldname = ts.getString("fieldname");
+         String idxtype = ts.getString("indextype");
          Layout tblLayout = tblmgr.getLayout(tblname, tx);
          StatInfo tblsi = statmgr.getStatInfo(tblname, tblLayout, tx);
          IndexInfo ii = new IndexInfo(idxname, fldname, tblLayout.schema(), tx, tblsi);
+         ii.setIdxType(idxtype);
          result.put(fldname, ii);
       }
       ts.close();

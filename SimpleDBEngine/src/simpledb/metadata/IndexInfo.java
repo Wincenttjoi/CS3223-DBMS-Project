@@ -71,8 +71,11 @@ public class IndexInfo {
    public int blocksAccessed() {
       int rpb = tx.blockSize() / idxLayout.slotSize();
       int numblocks = si.recordsOutput() / rpb;
-      return HashIndex.searchCost(numblocks, rpb);
-//    return BTreeIndex.searchCost(numblocks, rpb);
+      switch (idxtype) {
+		  case "hash" -> { return HashIndex.searchCost(numblocks, rpb); }
+		  case "btree" -> { return BTreeIndex.searchCost(numblocks, rpb); }
+		  default -> throw new RuntimeException();
+      }
    }
    
    /**
