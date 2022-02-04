@@ -7,23 +7,36 @@ public class SimpleIJ {
    public static void main(String[] args) {
       Scanner sc = new Scanner(System.in);
       System.out.println("Connect> ");
-      String s = sc.nextLine();
+      
+      // REVERT FOR SUBMISSION
+//      String s = sc.nextLine();
+      String s = "jdbc:simpledb://localhost";
       Driver d = (s.contains("//")) ? new NetworkDriver() : new EmbeddedDriver();
-
+      
       try (Connection conn = d.connect(s, null);
            Statement stmt = conn.createStatement()) {
-         System.out.print("\nSQL> ");
-         while (sc.hasNextLine()) {
-            // process one line of input
-            String cmd = sc.nextLine().trim();
-            if (cmd.startsWith("exit"))
-               break;
-            else if (cmd.startsWith("select"))
-               doQuery(stmt, cmd);
-            else
-               doUpdate(stmt, cmd);
-            System.out.print("\nSQL> ");
-         }
+         
+         // ORIGINAL CODE, UNCOMMENT FOR SUBMISSION
+//    	  System.out.print("\nSQL> ");
+//         while (sc.hasNextLine()) {
+//            // process one line of input
+//            String cmd = sc.nextLine().trim();
+//            if (cmd.startsWith("exit"))
+//               break;
+//            else if (cmd.startsWith("select"))
+//               doQuery(stmt, cmd);
+//            else
+//               doUpdate(stmt, cmd);
+//            System.out.print("\nSQL> ");
+//         }
+         
+          // TODO: Insert query for testing here
+          String cmd = "select sname, majorid from student";
+	      if (cmd.startsWith("select")) {
+	         doQuery(stmt, cmd);
+	      } else {
+	         doUpdate(stmt, cmd);
+	      }
       }
       catch (SQLException e) {
          e.printStackTrace();

@@ -10,6 +10,7 @@ import java.io.*;
 public class Lexer {
    private Collection<String> keywords;
    private Collection<Character> equality_keywords;
+   private Collection<String> idxType;
    private StreamTokenizer tok;
    
    /**
@@ -19,6 +20,7 @@ public class Lexer {
    public Lexer(String s) {
       initKeywords();
       initOperators();
+      initIdxType();
       tok = new StreamTokenizer(new StringReader(s));
       tok.ordinaryChar('.');   //disallow "." in identifiers
       tok.wordChars('_', '_'); //allow "_" in identifiers
@@ -70,6 +72,15 @@ public class Lexer {
     */
    public boolean matchOpr(char c) {
       return equality_keywords.contains(c);
+   }
+   
+   /**
+    * Returns true if the current token is the specified keyword.
+    * @param w the keyword string
+    * @return true if that keyword is the current token
+    */
+   public boolean matchIdxType(String w) {
+      return idxType.contains(w);
    }
    
    /**
@@ -158,8 +169,23 @@ public class Lexer {
 	  }
 	  validate_equality(opr);
 	  return opr;
-	  
    }
+   
+   /**
+    * Throws an exception if the current token is not the
+    * specified index type. 
+    * Otherwise, moves to the next token.
+    * @param w the keyword string
+    * @return the string value of the equality token
+    */
+   public String eatIdxType() {
+       String s = tok.sval;
+       if (!matchIdxType(s))
+    	   throw new BadSyntaxException();
+       nextToken();
+       return s;
+   }
+   
    
    /**
     * Throws an exception if the current token is not 
@@ -188,11 +214,15 @@ public class Lexer {
    private void initKeywords() {
       keywords = Arrays.asList("select", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
-                               "create", "table", "int", "varchar", "view", "as", "index", "on");
+                               "create", "table", "int", "varchar", "view", "as", "index", "using", "on");
    }
    
    private void initOperators() {
 	   equality_keywords = Arrays.asList('=', '>', '<', '!');
+   }
+   
+   private void initIdxType() {
+	   idxType = Arrays.asList("hash", "btree");
    }
    
    private void validate_equality(String opr) {
