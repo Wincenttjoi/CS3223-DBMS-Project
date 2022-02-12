@@ -53,8 +53,12 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       // Step 5. Add sort plan as the top-most node in the query tree (Lab3)
       Plan resultplan = projectplan;
       
-      if (data.sortfields() != null)
-    	  resultplan = new SortPlan(tx, projectplan, data.sortfields());
+      if (data.sortPairs().isEmpty()) {
+    	  // TODO : modify SortPlan to take in the specified sortFields from sortPairs
+    	  // TODO : implement different orderings for each sort fields with priority given in the order of sortFields
+    	  Map<String, Boolean> temp = data.sortPairs();
+    	  resultplan = new SortPlan(tx, projectplan, null);
+      }
       
       return resultplan;
    }

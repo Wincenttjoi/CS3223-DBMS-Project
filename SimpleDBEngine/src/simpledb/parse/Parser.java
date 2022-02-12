@@ -56,10 +56,6 @@ public class Parser {
       return lex.eatId();
    }
    
-   public String sortorder() {
-      return lex.eatId();
-   }
-   
 // Methods for parsing queries
    
    public QueryData query() {
@@ -68,7 +64,7 @@ public class Parser {
       lex.eatKeyword("from");
       Collection<String> tables = tableList();
       Predicate pred = new Predicate();
-      List<String> sfields = null;
+      Map<String,Boolean> sortPairs = new LinkedHashMap<>();
       if (lex.matchKeyword("where")) {
          lex.eatKeyword("where");
          pred = predicate();
@@ -78,10 +74,10 @@ public class Parser {
           if (lex.matchKeyword("by")) {
               lex.eatKeyword("by");
               // parse order by clause
-              sfields = sortList();
+              sortPairs = sortList();
           }
        }
-      return new QueryData(fields, tables, pred, sfields);
+      return new QueryData(fields, tables, pred, sortPairs);
    }
    
    private List<String> selectList() {
@@ -104,18 +100,19 @@ public class Parser {
       return L;
    }
    
-   private List<String> sortList() {
-      List<String> L = new ArrayList<String>();
-      L.add(sortfield());
-      if (lex.matchId()) {
-    	  // TODO : parse sorting type
-    	  lex.eatId();
+   private Map<String,Boolean> sortList() {
+	  Map<String,Boolean> M = new LinkedHashMap<>(); 
+	  String sField = sortfield();
+	  Boolean sType = true; // sort type is ascending by default
+      if (lex.matchSortType()) {
+    	  sType = lex.eatSortType();
       }
+      M.put(sField, sType);
       if (lex.matchDelim(',')) {
          lex.eatDelim(',');
-         L.addAll(sortList());
+         M.putAll(sortList());
       }
-      return L;
+      return M;
    }
    
 // Methods for parsing the various update commands

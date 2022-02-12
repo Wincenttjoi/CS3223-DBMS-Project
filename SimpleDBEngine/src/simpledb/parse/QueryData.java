@@ -12,16 +12,16 @@ public class QueryData {
    private List<String> fields;
    private Collection<String> tables;
    private Predicate pred;
-   private List<String> sortfields;
+   private Map<String,Boolean> sortPairs;
    
    /**
     * Saves the field and table list and predicate.
     */
-   public QueryData(List<String> fields, Collection<String> tables, Predicate pred, List<String> sortfields) {
+   public QueryData(List<String> fields, Collection<String> tables, Predicate pred, Map<String,Boolean> sortPairs) {
       this.fields = fields;
       this.tables = tables;
       this.pred = pred;
-      this.sortfields = sortfields;
+      this.sortPairs = sortPairs;
    }
    
    /**
@@ -53,8 +53,8 @@ public class QueryData {
     * Returns the fields mentioned in the order by clause.
     * @return a list of field names to be sorted on
     */
-   public List<String> sortfields() {
-      return sortfields;
+   public Map<String,Boolean> sortPairs() {
+      return sortPairs;
    }
    
    public String toString() {
@@ -69,10 +69,10 @@ public class QueryData {
       String predstring = pred.toString();
       if (!predstring.equals(""))
          result += " where " + predstring;
-      if (sortfields != null)
+      if (!sortPairs.isEmpty())
     	  result += " order by ";
-	      for (String sortfldname : sortfields)
-	          result += sortfldname + ", ";
+      	  for (Map.Entry<String, Boolean> pair : sortPairs.entrySet())
+      		  result += pair.getKey() + (pair.getValue() ? " asc " : " desc ") + ", ";
 	      result = result.substring(0, result.length()-2); //remove final comma
       return result;
    }

@@ -95,12 +95,12 @@ public class Lexer {
    }
    
    /**
-    * Returns true if the current token is the specified keyword for sorting type.
-    * @param w the keyword string
-    * @return true if that keyword is the current token
+    * Returns true if the current token is a legal sort type.
+    * @return true if the current token is a sort type
     */
-   public boolean matchSortType(String w) {
-      return sortType.contains(w);
+   public boolean matchSortType() {
+      return  tok.ttype==StreamTokenizer.TT_WORD && 
+    		  !sortType.contains(tok.sval);
    }
    
    
@@ -212,18 +212,18 @@ public class Lexer {
    }
    
    /**
-    * Throws an exception if the current token is not the
-    * specified index type. 
-    * Otherwise, moves to the next token.
-    * @param w the keyword string
-    * @return the string value of the equality token
+    * Throws an exception if the current token is not 
+    * a sort type. 
+    * Otherwise, returns the sort type boolean 
+    * and moves to the next token.
+    * @return the string value of the current token
     */
-   public String eatSortType() {
-       String s = tok.sval;
-       if (!matchSortType(s))
-    	   throw new BadSyntaxException();
-       nextToken();
-       return s;
+   public Boolean eatSortType() {
+      if (!matchSortType())
+         throw new BadSyntaxException();
+      String s = tok.sval;
+      nextToken();
+      return s == "ast";
    }
    
    private void nextToken() {
@@ -251,7 +251,7 @@ public class Lexer {
    }
    
    private void initSortType() {
-	   idxType = Arrays.asList("asc", "desc");
+	   sortType = Arrays.asList("asc", "desc");
    }
    
    private void validate_equality(String opr) {
