@@ -99,8 +99,7 @@ public class Lexer {
     * @return true if the current token is a sort type
     */
    public boolean matchSortType() {
-      return  tok.ttype==StreamTokenizer.TT_WORD && 
-    		  !sortType.contains(tok.sval);
+      return  tok.ttype==StreamTokenizer.TT_WORD && sortType.contains(tok.sval);
    }
    
    
@@ -223,7 +222,7 @@ public class Lexer {
          throw new BadSyntaxException();
       String s = tok.sval;
       nextToken();
-      return s == "ast";
+      return s == "asc";
    }
    
    private void nextToken() {

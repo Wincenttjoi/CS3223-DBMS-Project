@@ -31,7 +31,7 @@ public class SimpleIJ {
          }
          
           // TODO: Insert query for testing here
-//          String cmd = "select sname, majorid from student";
+//          String cmd = "select sid, sname, gradyear, majorid from student order by majorid";
 //	      if (cmd.startsWith("select")) {
 //	         doQuery(stmt, cmd);
 //	      } else {

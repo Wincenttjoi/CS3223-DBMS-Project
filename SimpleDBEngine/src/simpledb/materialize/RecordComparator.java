@@ -41,7 +41,7 @@ public class RecordComparator implements Comparator<Scan> {
          Boolean sortType = sortPairs.get(fldname);
          int result = val1.compareTo(val2);
          if (result != 0)
-            return sortType ? result : - 1 * result;
+        	 return sortType ? result : - 1 * result;
       }
       return 0;
    }
