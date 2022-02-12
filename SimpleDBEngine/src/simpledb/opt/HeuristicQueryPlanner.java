@@ -28,6 +28,8 @@ public class HeuristicQueryPlanner implements QueryPlanner {
     * results in the smallest output.
     */
    public Plan createPlan(QueryData data, Transaction tx) {
+	   
+	   System.out.println(data.toString());
       
       // Step 1:  Create a TablePlanner object for each mentioned table
       for (String tblname : data.tables()) {
@@ -50,14 +52,12 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       // Step 4.  Project on the field names and return
       Plan projectplan = new ProjectPlan(currentplan, data.fields());
       
-      // Step 5. Add sort plan as the top-most node in the query tree (Lab3)
       Plan resultplan = projectplan;
-      
-      if (data.sortPairs().isEmpty()) {
-    	  // TODO : modify SortPlan to take in the specified sortFields from sortPairs
+
+   // Step 5. Add sort plan as the top-most node in the query tree (Lab3)
+      if (!data.sortPairs().isEmpty()) {
     	  // TODO : implement different orderings for each sort fields with priority given in the order of sortFields
-    	  Map<String, Boolean> temp = data.sortPairs();
-    	  resultplan = new SortPlan(tx, projectplan, null);
+    	  resultplan = new SortPlan(tx, projectplan, data.sortPairs());
       }
       
       return resultplan;

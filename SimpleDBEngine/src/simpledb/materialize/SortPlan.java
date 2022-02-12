@@ -19,14 +19,31 @@ public class SortPlan implements Plan {
    /**
     * Create a sort plan for the specified query.
     * @param p the plan for the underlying query
-    * @param sortfields the fields to sort by
+    * @param sortPairs the pairs of (sortField, sortType) to sort by
     * @param tx the calling transaction
     */
-   public SortPlan(Transaction tx, Plan p, List<String> sortfields) {
+   public SortPlan(Transaction tx, Plan p, Map<String, Boolean> sortPairs) {
       this.tx = tx;
       this.p = p;
       sch = p.schema();
-      comp = new RecordComparator(sortfields);
+      comp = new RecordComparator(sortPairs);
+   }
+   
+   /**
+    * Create a sort plan for the specified query.
+    * @param p the plan for the underlying query
+    * @param sortPairs the pairs of (sortField, sortType) to sort by
+    * @param tx the calling transaction
+    */
+   public SortPlan(Transaction tx, Plan p,List<String> sortfields) {
+      this.tx = tx;
+      this.p = p;
+      sch = p.schema();
+      Map<String, Boolean> sortPairs = new LinkedHashMap<>();
+      for (String f : sortfields) {
+    	  sortPairs.put(f, true);
+      }
+      comp = new RecordComparator(sortPairs);
    }
    
    /**

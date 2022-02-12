@@ -17,7 +17,7 @@ public class SimpleIJ {
            Statement stmt = conn.createStatement()) {
          
          // ORIGINAL CODE, UNCOMMENT FOR SUBMISSION
-    	  System.out.print("\nSQL> ");
+    	 System.out.print("\nSQL> ");
          while (sc.hasNextLine()) {
             // process one line of input
             String cmd = sc.nextLine().trim();

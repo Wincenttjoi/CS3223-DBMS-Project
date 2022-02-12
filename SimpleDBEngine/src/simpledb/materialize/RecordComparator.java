@@ -9,15 +9,17 @@ import simpledb.query.*;
  * @author Edward Sciore
  */
 public class RecordComparator implements Comparator<Scan> {
+   private Map<String, Boolean> sortPairs;
    private List<String> fields;
    
    /**
     * Create a comparator using the specified fields,
     * using the ordering implied by its iterator.
-    * @param fields a list of field names
+    * @param sortPairs a map of <sortField, sortType>
     */
-   public RecordComparator(List<String> fields) {
-      this.fields = fields;
+   public RecordComparator(Map<String, Boolean> sortPairs) {
+      this.sortPairs = sortPairs;
+      this.fields = new ArrayList<> (sortPairs.keySet());
    }
    
    /**
@@ -36,9 +38,10 @@ public class RecordComparator implements Comparator<Scan> {
       for (String fldname : fields) {
          Constant val1 = s1.getVal(fldname);
          Constant val2 = s2.getVal(fldname);
+         Boolean sortType = sortPairs.get(fldname);
          int result = val1.compareTo(val2);
          if (result != 0)
-            return result;
+            return sortType ? result : - 1 * result;
       }
       return 0;
    }
