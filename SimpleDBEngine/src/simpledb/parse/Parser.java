@@ -64,7 +64,7 @@ public class Parser {
       lex.eatKeyword("from");
       Collection<String> tables = tableList();
       Predicate pred = new Predicate();
-      Map<String,Boolean> sortPairs = new LinkedHashMap<>();
+      Map<String,Boolean> sortMap = new LinkedHashMap<>();
       if (lex.matchKeyword("where")) {
          lex.eatKeyword("where");
          pred = predicate();
@@ -74,10 +74,10 @@ public class Parser {
           if (lex.matchKeyword("by")) {
               lex.eatKeyword("by");
               // parse order by clause
-              sortPairs = sortList();
+              sortMap = sortList();
           }
        }
-      return new QueryData(fields, tables, pred, sortPairs);
+      return new QueryData(fields, tables, pred, sortMap);
    }
    
    private List<String> selectList() {
