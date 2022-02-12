@@ -12,14 +12,16 @@ public class QueryData {
    private List<String> fields;
    private Collection<String> tables;
    private Predicate pred;
+   private List<String> sortfields;
    
    /**
     * Saves the field and table list and predicate.
     */
-   public QueryData(List<String> fields, Collection<String> tables, Predicate pred) {
+   public QueryData(List<String> fields, Collection<String> tables, Predicate pred, List<String> sortfields) {
       this.fields = fields;
       this.tables = tables;
       this.pred = pred;
+      this.sortfields = sortfields;
    }
    
    /**
@@ -47,6 +49,14 @@ public class QueryData {
       return pred;
    }
    
+   /**
+    * Returns the fields mentioned in the order by clause.
+    * @return a list of field names to be sorted on
+    */
+   public List<String> sortfields() {
+      return sortfields;
+   }
+   
    public String toString() {
       String result = "select ";
       for (String fldname : fields)
@@ -59,6 +69,11 @@ public class QueryData {
       String predstring = pred.toString();
       if (!predstring.equals(""))
          result += " where " + predstring;
+      if (sortfields != null)
+    	  result += " order by ";
+	      for (String sortfldname : sortfields)
+	          result += sortfldname + ", ";
+	      result = result.substring(0, result.length()-2); //remove final comma
       return result;
    }
 }

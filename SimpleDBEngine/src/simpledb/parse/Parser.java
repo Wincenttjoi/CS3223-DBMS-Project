@@ -52,6 +52,14 @@ public class Parser {
       return pred;
    }
    
+   public String sortfield() {
+      return lex.eatId();
+   }
+   
+   public String sortorder() {
+      return lex.eatId();
+   }
+   
 // Methods for parsing queries
    
    public QueryData query() {
@@ -60,11 +68,20 @@ public class Parser {
       lex.eatKeyword("from");
       Collection<String> tables = tableList();
       Predicate pred = new Predicate();
+      List<String> sfields = null;
       if (lex.matchKeyword("where")) {
          lex.eatKeyword("where");
          pred = predicate();
       }
-      return new QueryData(fields, tables, pred);
+      if (lex.matchKeyword("order")) {
+          lex.eatKeyword("order");
+          if (lex.matchKeyword("by")) {
+              lex.eatKeyword("by");
+              // parse order by clause
+              sfields = sortList();
+          }
+       }
+      return new QueryData(fields, tables, pred, sfields);
    }
    
    private List<String> selectList() {
@@ -83,6 +100,20 @@ public class Parser {
       if (lex.matchDelim(',')) {
          lex.eatDelim(',');
          L.addAll(tableList());
+      }
+      return L;
+   }
+   
+   private List<String> sortList() {
+      List<String> L = new ArrayList<String>();
+      L.add(sortfield());
+      if (lex.matchId()) {
+    	  // TODO : parse sorting type
+    	  lex.eatId();
+      }
+      if (lex.matchDelim(',')) {
+         lex.eatDelim(',');
+         L.addAll(sortList());
       }
       return L;
    }

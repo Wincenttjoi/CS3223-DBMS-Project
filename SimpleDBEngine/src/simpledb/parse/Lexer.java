@@ -11,6 +11,7 @@ public class Lexer {
    private Collection<String> keywords;
    private Collection<Character> equality_keywords;
    private Collection<String> idxType;
+   private Collection<String> sortType;
    private StreamTokenizer tok;
    
    /**
@@ -21,6 +22,7 @@ public class Lexer {
       initKeywords();
       initOperators();
       initIdxType();
+      initSortType();
       tok = new StreamTokenizer(new StringReader(s));
       tok.ordinaryChar('.');   //disallow "." in identifiers
       tok.wordChars('_', '_'); //allow "_" in identifiers
@@ -66,6 +68,15 @@ public class Lexer {
    }
    
    /**
+    * Returns true if the current token is a legal identifier.
+    * @return true if the current token is an identifier
+    */
+   public boolean matchId() {
+      return  tok.ttype==StreamTokenizer.TT_WORD && 
+    		  !keywords.contains(tok.sval);
+   }
+   
+   /**
     * Returns true if the current token is the specified keyword.
     * @param w the keyword string
     * @return true if that keyword is the current token
@@ -75,7 +86,7 @@ public class Lexer {
    }
    
    /**
-    * Returns true if the current token is the specified keyword.
+    * Returns true if the current token is the specified keyword for indexing type.
     * @param w the keyword string
     * @return true if that keyword is the current token
     */
@@ -84,14 +95,13 @@ public class Lexer {
    }
    
    /**
-    * Returns true if the current token is a legal identifier.
-    * @return true if the current token is an identifier
+    * Returns true if the current token is the specified keyword for sorting type.
+    * @param w the keyword string
+    * @return true if that keyword is the current token
     */
-   public boolean matchId() {
-      return  tok.ttype==StreamTokenizer.TT_WORD && 
-    		  !keywords.contains(tok.sval);
+   public boolean matchSortType(String w) {
+      return sortType.contains(w);
    }
-   
    
    
 //Methods to "eat" the current token
@@ -149,6 +159,21 @@ public class Lexer {
    }
    
    /**
+    * Throws an exception if the current token is not 
+    * an identifier. 
+    * Otherwise, returns the identifier string 
+    * and moves to the next token.
+    * @return the string value of the current token
+    */
+   public String eatId() {
+      if (!matchId())
+         throw new BadSyntaxException();
+      String s = tok.sval;
+      nextToken();
+      return s;
+   }
+   
+   /**
     * Throws an exception if the current token is not the
     * specified equality keyword. 
     * Otherwise, moves to the next token.
@@ -186,20 +211,19 @@ public class Lexer {
        return s;
    }
    
-   
    /**
-    * Throws an exception if the current token is not 
-    * an identifier. 
-    * Otherwise, returns the identifier string 
-    * and moves to the next token.
-    * @return the string value of the current token
+    * Throws an exception if the current token is not the
+    * specified index type. 
+    * Otherwise, moves to the next token.
+    * @param w the keyword string
+    * @return the string value of the equality token
     */
-   public String eatId() {
-      if (!matchId())
-         throw new BadSyntaxException();
-      String s = tok.sval;
-      nextToken();
-      return s;
+   public String eatSortType() {
+       String s = tok.sval;
+       if (!matchSortType(s))
+    	   throw new BadSyntaxException();
+       nextToken();
+       return s;
    }
    
    private void nextToken() {
@@ -214,7 +238,8 @@ public class Lexer {
    private void initKeywords() {
       keywords = Arrays.asList("select", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
-                               "create", "table", "int", "varchar", "view", "as", "index", "using", "on");
+                               "create", "table", "int", "varchar", "view", "as", "index", "using", "on",
+                               "order", "by");
    }
    
    private void initOperators() {
@@ -223,6 +248,10 @@ public class Lexer {
    
    private void initIdxType() {
 	   idxType = Arrays.asList("hash", "btree");
+   }
+   
+   private void initSortType() {
+	   idxType = Arrays.asList("asc", "desc");
    }
    
    private void validate_equality(String opr) {
