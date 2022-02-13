@@ -29,6 +29,9 @@ public class HeuristicQueryPlanner implements QueryPlanner {
     */
    public Plan createPlan(QueryData data, Transaction tx) {
       
+	  // for debugging
+	  // System.out.println(data.toString());
+	   
       // Step 1:  Create a TablePlanner object for each mentioned table
       for (String tblname : data.tables()) {
          TablePlanner tp = new TablePlanner(tblname, data.pred(), tx, mdm);

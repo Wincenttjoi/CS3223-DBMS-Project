@@ -11,6 +11,7 @@ import simpledb.record.*;
  */
 public class Parser {
    private Lexer lex;
+   private Boolean firstOrderBy = true;
    
    public Parser(String s) {
       lex = new Lexer(s);
@@ -52,10 +53,6 @@ public class Parser {
       return pred;
    }
    
-   public String sortfield() {
-      return lex.eatId();
-   }
-   
 // Methods for parsing queries
    
    public QueryData query() {
@@ -71,11 +68,7 @@ public class Parser {
       }
       if (lex.matchKeyword("order")) {
           lex.eatKeyword("order");
-          if (lex.matchKeyword("by")) {
-              lex.eatKeyword("by");
-              // parse order by clause
-              sortMap = sortList();
-          }
+          sortMap = sortList();
        }
       return new QueryData(fields, tables, pred, sortMap);
    }
@@ -101,11 +94,18 @@ public class Parser {
    }
    
    private Map<String,Boolean> sortList() {
+	  // parse order by clause
+	  if (firstOrderBy) {
+	  	  lex.eatKeyword("by");
+		  firstOrderBy = false;
+	  }
 	  Map<String,Boolean> M = new LinkedHashMap<>(); 
-	  String sField = sortfield();
+	  String sField = field();
 	  Boolean sType = true; // sort type is ascending by default
       if (lex.matchSortType()) {
     	  sType = lex.eatSortType();
+      } else if (!lex.matchDelim(',') && !lex.matchEnd()) {
+    	  throw new BadSyntaxException();
       }
       M.put(sField, sType);
       if (lex.matchDelim(',')) {

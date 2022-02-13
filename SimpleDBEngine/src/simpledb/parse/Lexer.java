@@ -102,6 +102,13 @@ public class Lexer {
       return  tok.ttype==StreamTokenizer.TT_WORD && sortType.contains(tok.sval);
    }
    
+   /**
+    * Returns true if the current token is a legal terminal token.
+    * @return true if the current token is a terminal token
+    */
+   public boolean matchEnd() {
+      return  tok.ttype==StreamTokenizer.TT_EOF;
+   }
    
 //Methods to "eat" the current token
    
@@ -222,7 +229,7 @@ public class Lexer {
          throw new BadSyntaxException();
       String s = tok.sval;
       nextToken();
-      return s == "asc";
+      return s.equals("asc");
    }
    
    private void nextToken() {

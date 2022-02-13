@@ -72,7 +72,7 @@ public class QueryData {
       if (!sortMap.isEmpty())
     	  result += " order by ";
       	  for (Map.Entry<String, Boolean> e : sortMap.entrySet())
-      		  result += e.getKey() + (e.getValue() ? " asc " : " desc ") + ", ";
+      		  result += e.getKey() + (e.getValue() ? " asc" : " desc") + ", ";
 	      result = result.substring(0, result.length()-2); //remove final comma
       return result;
    }
