@@ -53,14 +53,13 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       // Step 4.  Project on the field names and return
       Plan projectplan = new ProjectPlan(currentplan, data.fields());
       
-      Plan resultplan = projectplan;
-
       // Step 5. Add sort plan as the top-most node in the query tree (Lab3)
       if (!data.sortMap().isEmpty()) {
-    	  resultplan = new SortPlan(tx, projectplan, data.sortMap());
+    	  projectplan = new SortPlan(tx, projectplan, data.sortMap());
       }
       
-      return resultplan;
+      return projectplan;
+
    }
    
    private Plan getLowestSelectPlan() {
