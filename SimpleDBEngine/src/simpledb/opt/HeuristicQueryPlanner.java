@@ -5,6 +5,7 @@ import simpledb.tx.Transaction;
 import simpledb.metadata.MetadataMgr;
 import simpledb.parse.QueryData;
 import simpledb.plan.*;
+import simpledb.materialize.*;
 
 /**
  * A query planner that optimizes using a heuristic-based algorithm.
@@ -28,6 +29,9 @@ public class HeuristicQueryPlanner implements QueryPlanner {
     */
    public Plan createPlan(QueryData data, Transaction tx) {
       
+	  // for debugging
+	  // System.out.println(data.toString());
+	   
       // Step 1:  Create a TablePlanner object for each mentioned table
       for (String tblname : data.tables()) {
          TablePlanner tp = new TablePlanner(tblname, data.pred(), tx, mdm);
@@ -47,7 +51,15 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       }
       
       // Step 4.  Project on the field names and return
-      return new ProjectPlan(currentplan, data.fields());
+      Plan projectplan = new ProjectPlan(currentplan, data.fields());
+      
+      // Step 5. Add sort plan as the top-most node in the query tree (Lab3)
+      if (!data.sortMap().isEmpty()) {
+    	  projectplan = new SortPlan(tx, projectplan, data.sortMap());
+      }
+      
+      return projectplan;
+
    }
    
    private Plan getLowestSelectPlan() {
