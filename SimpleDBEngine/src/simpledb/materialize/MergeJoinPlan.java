@@ -98,5 +98,10 @@ public class MergeJoinPlan implements Plan {
    public Schema schema() {
       return sch;
    }
+   
+   @Override
+   public String toString() {
+	      return "Merge join on " + fldname1 + " = " + fldname2;
+   }
 }
 

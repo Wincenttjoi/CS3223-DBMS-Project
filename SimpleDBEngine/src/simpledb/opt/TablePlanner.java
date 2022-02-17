@@ -1,11 +1,16 @@
 package simpledb.opt;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import simpledb.tx.Transaction;
 import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.metadata.*;
 import simpledb.index.planner.*;
+import simpledb.materialize.MergeJoinPlan;
 import simpledb.multibuffer.MultibufferProductPlan;
 import simpledb.plan.*;
 
@@ -64,10 +69,19 @@ class TablePlanner {
       Predicate joinpred = mypred.joinSubPred(myschema, currsch);
       if (joinpred == null)
          return null;
-      Plan p = makeIndexJoin(current, currsch);
-      if (p == null)
-         p = makeProductJoin(current, currsch);
-      return p;
+     
+     Plan indexJoinPlan = makeIndexJoin(current, currsch);
+ 	 Plan mergeJoinPlan = makeMergeJoin(current, currsch);
+     Plan nestedJoinPlan = makeProductJoin(current, currsch);
+
+//     Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan)
+//    		 .filter((p) -> p != null)
+//    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()))
+//    	     .peek(x -> System.out.println(x.toString() + ". Blocks accessed: " + x.blocksAccessed()));
+//     List<Plan> res = plans.collect(Collectors.toList());
+//     
+//     Plan bestPlan = res.get(0);
+     return mergeJoinPlan;
    }
    
    /**
@@ -92,7 +106,7 @@ class TablePlanner {
       }
       return null;
    }
-   
+      
    private Plan makeIndexJoin(Plan current, Schema currsch) {
       for (String fldname : indexes.keySet()) {
          String outerfield = mypred.equatesWithField(fldname);
@@ -104,6 +118,14 @@ class TablePlanner {
          }
       }
       return null;
+   }
+   
+   private Plan makeMergeJoin(Plan current, Schema currsch) {
+	   Predicate joinpred = mypred.joinSubPred(currsch, myschema);
+	   Term joinTerm = joinpred.getTerms().get(0);
+	   Plan p = new MergeJoinPlan(tx, current, myplan, joinTerm.getLHS().asFieldName(), joinTerm.getRHS().asFieldName());
+	   
+	   return p;
    }
    
    private Plan makeProductJoin(Plan current, Schema currsch) {
