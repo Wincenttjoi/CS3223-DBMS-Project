@@ -74,14 +74,14 @@ class TablePlanner {
  	 Plan mergeJoinPlan = makeMergeJoin(current, currsch);
      Plan nestedJoinPlan = makeProductJoin(current, currsch);
 
-//     Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan)
-//    		 .filter((p) -> p != null)
-//    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()))
-//    	     .peek(x -> System.out.println(x.toString() + ". Blocks accessed: " + x.blocksAccessed()));
-//     List<Plan> res = plans.collect(Collectors.toList());
-//     
-//     Plan bestPlan = res.get(0);
-     return nestedJoinPlan;
+     Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan)
+    		 .filter((p) -> p != null)
+    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()))
+    	     .peek(x -> System.out.println(x.toString() + ". Blocks accessed: " + x.blocksAccessed()));
+     List<Plan> res = plans.collect(Collectors.toList());
+     
+     Plan bestPlan = res.get(0);
+     return bestPlan;
    }
    
    /**
