@@ -81,7 +81,7 @@ class TablePlanner {
 //     List<Plan> res = plans.collect(Collectors.toList());
 //     
 //     Plan bestPlan = res.get(0);
-     return mergeJoinPlan;
+     return nestedJoinPlan;
    }
    
    /**
@@ -123,9 +123,13 @@ class TablePlanner {
    private Plan makeMergeJoin(Plan current, Schema currsch) {
 	   Predicate joinpred = mypred.joinSubPred(currsch, myschema);
 	   Term joinTerm = joinpred.getTerms().get(0);
-	   Plan p = new MergeJoinPlan(tx, current, myplan, joinTerm.getLHS().asFieldName(), joinTerm.getRHS().asFieldName());
-	   
-	   return p;
+	   String joinValLHS = joinTerm.getLHS().asFieldName();
+	   String joinValRHS = joinTerm.getRHS().asFieldName();
+	   if (current.schema().fields().contains(joinValRHS)) {
+		   return new MergeJoinPlan(tx, current, myplan, joinValRHS, joinValLHS);
+	   } else {
+		   return new MergeJoinPlan(tx, current, myplan, joinValLHS, joinValRHS);
+	   }
    }
    
    private Plan makeProductJoin(Plan current, Schema currsch) {
