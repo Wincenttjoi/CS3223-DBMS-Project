@@ -7,9 +7,12 @@ import simpledb.jdbc.embedded.EmbeddedDriver;
 // Note: Currently only works with basic planner, to be integrated in lab 7
 // using heuristic planner.
 public class Lab1Test {
+   private static final String DIVIDER = "=========================================";
+   private static int testNumber = 0;
+   
    public static void main(String[] args) {
-	  final String DIVIDER = "=========================================";
-      Scanner sc = new Scanner(System.in);
+	  
+	  Scanner sc = new Scanner(System.in);
       System.out.println("Connect> ");
      
       String s = "jdbc:simpledb:studentdb"; // embedded
@@ -18,20 +21,16 @@ public class Lab1Test {
       try (Connection conn = d.connect(s, null);
           Statement stmt = conn.createStatement()) {
 
-    	  System.out.println("TEST1");
-    	  String cmd1 = "select sname, sid, majorid from student where majorid = 10";
-    	  doQuery(stmt, cmd1);
-    	  System.out.println(DIVIDER);
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid = 10");
+// TEST1
 //          sname    sid majorid
 //          --------------------------
 //                  joe      1      10
 //                  max      3      10
 //                  lee      9      10
     	  
-    	  System.out.println("TEST2");
-    	  String cmd2 = "select sname, sid, majorid from student where majorid <> 20";
-    	  doQuery(stmt, cmd2);
-    	  System.out.println(DIVIDER);
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid <> 20");
+// TEST2
 //          sname    sid majorid
 //          --------------------------
 //                  joe      1      10
@@ -39,11 +38,9 @@ public class Lab1Test {
 //                  bob      5      30
 //                  art      7      30
 //                  lee      9      10
-    	  
-    	  System.out.println("TEST3");
-    	  String cmd3 = "select sname, sid, majorid from student where majorid > 10";
-    	  doQuery(stmt, cmd3);
-    	  System.out.println(DIVIDER);
+
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid > 10");
+// TEST3
 //          sname    sid majorid
 //          --------------------------
 //                  amy      2      20
@@ -53,10 +50,8 @@ public class Lab1Test {
 //                  art      7      30
 //                  pat      8      20
     	  
-    	  System.out.println("TEST4");
-    	  String cmd4 = "select sname, sid, majorid from student where majorid >= 10";
-    	  doQuery(stmt, cmd4);
-    	  System.out.println(DIVIDER);
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 10");
+// TEST4
 //          sname    sid majorid
 //          --------------------------
 //                  joe      1      10
@@ -69,10 +64,8 @@ public class Lab1Test {
 //                  pat      8      20
 //                  lee      9      10
     	  
-    	  System.out.println("TEST5");
-    	  String cmd5 = "select sname, sid, majorid from student where majorid >= 20 and sid > 4";
-    	  doQuery(stmt, cmd5);
-    	  System.out.println(DIVIDER);
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 20 and sid > 4");
+// TEST5
 //          sname    sid majorid
 //          --------------------------
 //                  bob      5      30
@@ -80,10 +73,8 @@ public class Lab1Test {
 //                  art      7      30
 //                  pat      8      20
     	  
-    	  System.out.println("TEST6");
-    	  String cmd6 = "select sname, sid, majorid from student where majorid >= 20 and sid > 4 and sname != 'bob'";
-    	  doQuery(stmt, cmd6);
-    	  System.out.println(DIVIDER);
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 20 and sid > 4 and sname != 'bob'");
+// TEST6
 //          sname    sid majorid
 //          --------------------------
 //                  kim      6      20
@@ -94,6 +85,18 @@ public class Lab1Test {
          e.printStackTrace();
       }
       sc.close();
+   }
+   
+   private static void doTest(Statement stmt, String cmd) {
+	  testNumber++;
+ 	  System.out.println("TEST" + testNumber);
+ 	  if (cmd.startsWith("select")) {
+ 		  doQuery(stmt, cmd);
+ 	  } else {
+ 		  doUpdate(stmt, cmd);
+ 	  }
+ 	  
+ 	  System.out.println(DIVIDER);
    }
 
    private static void doQuery(Statement stmt, String cmd) {
@@ -139,6 +142,7 @@ public class Lab1Test {
    }
 
    private static void doUpdate(Statement stmt, String cmd) {
+	  testNumber++;
       try {
          int howmany = stmt.executeUpdate(cmd);
          System.out.println(howmany + " records processed");
