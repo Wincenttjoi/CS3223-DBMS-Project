@@ -1,8 +1,11 @@
 import java.sql.*;
 import java.util.Scanner;
 import simpledb.jdbc.embedded.EmbeddedDriver;
-import simpledb.jdbc.network.NetworkDriver;
 
+// 1. Recreate studentdb using embedded driver.
+// 2. Run Lab1Test, check if expected output is similar to commented code.
+// Note: Currently only works with basic planner, to be integrated in lab 7
+// using heuristic planner.
 public class Lab1Test {
    public static void main(String[] args) {
 	  final String DIVIDER = "=========================================";
