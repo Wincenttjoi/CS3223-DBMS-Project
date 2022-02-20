@@ -12,6 +12,7 @@ import simpledb.record.*;
 public class Parser {
    private Lexer lex;
    private Boolean firstOrderBy = true;
+   private Predicate currPred = new Predicate();
    
    public Parser(String s) {
       lex = new Lexer(s);
@@ -59,12 +60,16 @@ public class Parser {
       lex.eatKeyword("select");
       List<String> fields = selectList();
       lex.eatKeyword("from");
-      Collection<String> tables = tableList();
       Predicate pred = new Predicate();
+      
+      Collection<String> tables = tableList();
+      pred.conjoinWith(currPred);
+      currPred = new Predicate();
+      
       Map<String,Boolean> sortMap = new LinkedHashMap<>();
       if (lex.matchKeyword("where")) {
          lex.eatKeyword("where");
-         pred = predicate();
+         pred.conjoinWith(predicate());
       }
       if (lex.matchKeyword("order")) {
           lex.eatKeyword("order");
@@ -86,6 +91,14 @@ public class Parser {
    private Collection<String> tableList() {
       Collection<String> L = new ArrayList<String>();
       L.add(lex.eatId());
+      
+      while (lex.matchKeyword("join")) {
+          lex.eatKeyword("join");
+    	  L.add(lex.eatId());
+    	  lex.eatKeyword("on");
+    	  currPred.conjoinWith(predicate());
+       }
+      
       if (lex.matchDelim(',')) {
          lex.eatDelim(',');
          L.addAll(tableList());
