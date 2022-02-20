@@ -11,11 +11,11 @@ import simpledb.record.*;
  */
 public class Parser {
    private Lexer lex;
-   private Boolean firstOrderBy = true;
-   private Predicate currPred = new Predicate();
+   private Predicate currPred;
    
    public Parser(String s) {
       lex = new Lexer(s);
+      currPred = new Predicate();
    }
    
 // Methods for parsing predicates, terms, expressions, constants, and fields
@@ -73,6 +73,7 @@ public class Parser {
       }
       if (lex.matchKeyword("order")) {
           lex.eatKeyword("order");
+          lex.eatKeyword("by");
           sortMap = sortList();
        }
       return new QueryData(fields, tables, pred, sortMap);
@@ -108,10 +109,6 @@ public class Parser {
    
    private Map<String,Boolean> sortList() {
 	  // parse order by clause
-	  if (firstOrderBy) {
-	  	  lex.eatKeyword("by");
-		  firstOrderBy = false;
-	  }
 	  Map<String,Boolean> M = new LinkedHashMap<>(); 
 	  String sField = field();
 	  Boolean sType = true; // sort type is ascending by default
