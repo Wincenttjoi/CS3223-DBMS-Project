@@ -10,7 +10,8 @@ public class SimpleIJ {
       
       // REVERT FOR SUBMISSION
 //      String s = sc.nextLine();
-      String s = "jdbc:simpledb://localhost";
+      String s = "jdbc:simpledb://localhost"; //network
+//      String s = "jdbc:simpledb:studentdb"; // embedded
       Driver d = (s.contains("//")) ? new NetworkDriver() : new EmbeddedDriver();
       
       try (Connection conn = d.connect(s, null);
@@ -31,7 +32,7 @@ public class SimpleIJ {
          }
          
           // TODO: Insert query for testing here
-//          String cmd = "select sid, sname, gradyear, majorid from student order by majorid";
+//          String cmd = "select sname, sid, sectionid from enroll join student on sid = studentid";
 //	      if (cmd.startsWith("select")) {
 //	         doQuery(stmt, cmd);
 //	      } else {

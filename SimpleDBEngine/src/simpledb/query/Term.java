@@ -125,6 +125,20 @@ public class Term {
    }
    
    /**
+    * @return LHS expression
+    */
+   public Expression getLHS() {
+      return lhs;
+   }
+   
+   /**
+    * @return RHS expression
+    */
+   public Expression getRHS() {
+      return rhs;
+   }
+   
+   /**
     * Return true if both of the term's expressions
     * apply to the specified schema.
     * @param sch the schema

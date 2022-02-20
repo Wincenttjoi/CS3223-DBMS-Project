@@ -19,6 +19,10 @@ public class CreateStudentDB {
          stmt.executeUpdate(s);
          System.out.println("Majorid index created");
          
+         s = "create index studentid_idx on student (Sid) using btree";
+         stmt.executeUpdate(s);
+         System.out.println("sid index created");
+         
          s = "insert into STUDENT(SId, SName, MajorId, GradYear) values ";
          String[] studvals = {"(1, 'joe', 10, 2021)",
                "(2, 'amy', 20, 2020)",

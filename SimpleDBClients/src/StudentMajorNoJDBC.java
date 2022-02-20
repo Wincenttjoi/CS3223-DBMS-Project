@@ -23,18 +23,18 @@ public class StudentMajorNoJDBC {
          Planner planner = db.planner();
          
          // analogous to the statement
-         String qry = "select SName, DName "
-               + "from DEPT, STUDENT "
-               + "where MajorId = DId";
+         String qry = "select sname, grade "
+               + "from enroll join student "
+               + "on majorid = sid";
          Plan p = planner.createQueryPlan(qry, tx);
          
          // analogous to the result set
          Scan s = p.open();
          
-         System.out.println("Name\tMajor");
+         System.out.println("Name\tGrade");
          while (s.next()) {
             String sname = s.getString("sname"); //SimpleDB stores field names
-            String dname = s.getString("dname"); //in lower case
+            String dname = s.getString("grade"); //in lower case
             System.out.println(sname + "\t" + dname);
          }
          s.close();

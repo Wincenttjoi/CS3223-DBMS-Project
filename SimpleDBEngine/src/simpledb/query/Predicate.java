@@ -137,6 +137,15 @@ public class Predicate {
       }
       return null;
    }
+   
+   /**
+    * Return all terms in this predicate.
+    * @param fldname the name of the field
+    * @return the terms
+    */
+   public List<Term> getTerms() {
+      return terms;
+   }
 
    public String toString() {
       Iterator<Term> iter = terms.iterator();
