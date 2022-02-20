@@ -29,7 +29,7 @@ public class Lab6Test {
 //    	        10
 //    	        10
     	  
-    	  doTest(stmt, "select sname, majorid from student order by majorid desc, sname");
+    	  doTest(stmt, "select distinct majorid from student where majorid = 10");
 // TEST1
 //    	  majorid
 //    	  --------

@@ -10,15 +10,17 @@ import simpledb.query.*;
  */
 public class QueryData {
    private List<String> fields;
+   private boolean isDistinct;
    private Collection<String> tables;
    private Predicate pred;
    private Map<String,Boolean> sortMap;
    
    /**
-    * Saves the field and table list and predicate.
+    * Saves the field, distinct, table list and predicate.
     */
-   public QueryData(List<String> fields, Collection<String> tables, Predicate pred, Map<String,Boolean> sortMap) {
+   public QueryData(List<String> fields, boolean isDistinct, Collection<String> tables, Predicate pred, Map<String,Boolean> sortMap) {
       this.fields = fields;
+      this.isDistinct = isDistinct;
       this.tables = tables;
       this.pred = pred;
       this.sortMap = sortMap;
@@ -30,6 +32,14 @@ public class QueryData {
     */
    public List<String> fields() {
       return fields;
+   }
+   
+   /**
+    * Returns the distinct mentioned in the select clause.
+    * @return boolean whether the query is distinct
+    */
+   public boolean isDistinct() {
+      return isDistinct;
    }
    
    /**
@@ -59,6 +69,9 @@ public class QueryData {
    
    public String toString() {
       String result = "select ";
+      if (isDistinct) {
+    	  result += "distinct ";
+      }
       for (String fldname : fields)
          result += fldname + ", ";
       result = result.substring(0, result.length()-2); //remove final comma
