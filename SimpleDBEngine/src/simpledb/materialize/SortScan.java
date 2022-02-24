@@ -76,12 +76,15 @@ public class SortScan implements Scan {
          else
             currentscan = s2;
       }
-      else if (hasmore1)
-         currentscan = s1;
-      else if (hasmore2)
-         currentscan = s2;
-      
-	  return true;
+      else if (hasmore1) {
+    	  currentscan = s1;    	  
+      } else if (hasmore2) {
+    	  currentscan = s2;    	  
+      }
+     
+      return true;  
+
+
 
    }
    
