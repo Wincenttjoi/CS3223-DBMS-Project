@@ -1,5 +1,9 @@
 package simpledb.materialize;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import simpledb.plan.Plan;
 import simpledb.query.Scan;
 import simpledb.record.Schema;
@@ -7,14 +11,20 @@ import simpledb.record.Schema;
 public class DistinctPlan implements Plan {
     private Plan p;
     private Schema sch = new Schema();
+    private RecordComparator comp;
 	   
-    public DistinctPlan(Plan p) {
+    public DistinctPlan(Plan p, List<String> sortfields) {
     	this.p = p;
+        Map<String, Boolean> sortPairs = new LinkedHashMap<>();
+        for (String f : sortfields) {
+    	    sortPairs.put(f, true);
+        }
+        comp = new RecordComparator(sortPairs);
     }
 	   
 	public Scan open() {
         Scan s = p.open();
-        return new DistinctScan(s);
+        return new DistinctScan(s, comp);
 	}
 	
    /**

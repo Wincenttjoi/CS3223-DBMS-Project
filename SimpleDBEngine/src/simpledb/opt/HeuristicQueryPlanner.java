@@ -55,7 +55,7 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       
       if (data.isDistinct()) {
     	  projectplan = new SortPlan(tx, projectplan, data.fields());
-//    	  projectplan = new DistinctPlan(projectplan);
+    	  projectplan = new DistinctPlan(projectplan, data.fields());
       }
       
       // Step 5. Add sort plan as the top-most node in the query tree (Lab3)

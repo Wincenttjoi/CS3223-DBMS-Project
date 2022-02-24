@@ -5,21 +5,44 @@ import simpledb.query.Scan;
 
 public class DistinctScan implements Scan {
 	private Scan s;
+	private RecordComparator comp;
+	private Scan currentscan = null;
 	
-	public DistinctScan(Scan s) {
+	public DistinctScan(Scan s, RecordComparator comp) {
 		this.s = s;
+		this.comp = comp;
+		this.currentscan = null;
 	}
 	
 	public void beforeFirst() {
 		s.beforeFirst();
-		
 	}
 
 	public boolean next() {
-		while (s.next()) {
+		if (currentscan != null) {
+			if (comp.compare(currentscan, s) != 0) {
+				currentscan = s;
+				s.next();
+				return true;
+			}
+		} else {
+			currentscan = s;
+			s.next();
 			return true;
 		}
-
+//		while (s.next()) {
+//			if (currentscan == null) {
+//				currentscan = s;
+//				return true;
+//			}
+//			else if (comp.compare(s, currentscan) == 0) {
+//				currentscan = s;
+//				return false;
+//			} else {
+//				currentscan = s;
+//				return true;
+//			}
+//		}
 		return false;
 	}
 
