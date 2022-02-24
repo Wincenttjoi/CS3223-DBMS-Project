@@ -15,6 +15,7 @@ public class DistinctPlan implements Plan {
    private Plan p;
    private Schema sch;
    private RecordComparator comp;
+   private Scan currentscan = null;
    
    /**
     * Create a sort plan for the specified query.
@@ -45,7 +46,8 @@ public class DistinctPlan implements Plan {
       src.close();
       while (runs.size() > 1)
          runs = doAMergeIteration(runs);
-      return new DistinctScan(runs, comp);
+      return new DistinctScan(runs, comp, sch);
+//      return filterDistinct(ds);
    }
    
    /**
@@ -155,4 +157,22 @@ public class DistinctPlan implements Plan {
          dest.setVal(fldname, src.getVal(fldname));
       return src.next();
    }
+   
+   private Scan filterDistinct(Scan src) {
+	  UpdateScan dest = null;
+	  if (currentscan != null && comp.compare(src, currentscan) != 0) {
+		  dest.insert();
+	      for (String fldname : sch.fields())
+	          dest.setVal(fldname, src.getVal(fldname));
+	  } else {
+		  dest.insert();
+	      for (String fldname : sch.fields())
+	          dest.setVal(fldname, src.getVal(fldname));
+	  	  currentscan = src;
+	  	  src.next();
+	  }
+
+	  return dest;
+   }
+  
 }

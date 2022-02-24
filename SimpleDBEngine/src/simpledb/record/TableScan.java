@@ -47,20 +47,20 @@ public class TableScan implements UpdateScan {
       return true;
    }
    
-   public boolean nextDistinct() {
-	  List<String> fieldname = layout.schema().fields();
-       
-      
-      currentslot = rp.nextAfter(currentslot);
-      while (currentslot < 0) {
-         if (atLastBlock())
-            return false;
-         moveToBlock(rp.block().number()+1);
-         currentslot = rp.nextAfter(currentslot);
-      }
-
-      return true;
-   }
+//   public boolean nextDistinct() {
+//	  List<String> fieldname = layout.schema().fields();
+//       
+//      
+//      currentslot = rp.nextAfter(currentslot);
+//      while (currentslot < 0) {
+//         if (atLastBlock())
+//            return false;
+//         moveToBlock(rp.block().number()+1);
+//         currentslot = rp.nextAfter(currentslot);
+//      }
+//
+//      return true;
+//   }
 
    public int getInt(String fldname) {
       return rp.getInt(currentslot, fldname);

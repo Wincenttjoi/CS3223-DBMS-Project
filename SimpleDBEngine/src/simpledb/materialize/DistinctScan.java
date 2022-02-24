@@ -18,6 +18,7 @@ public class DistinctScan implements Scan {
    private RecordComparator comp;
    private boolean hasmore1, hasmore2=false;
    private List<RID> savedposition;
+   private Schema schema;
    
    /**
     * Create a sort scan, given a list of 1 or 2 runs.
@@ -26,15 +27,21 @@ public class DistinctScan implements Scan {
     * @param runs the list of runs
     * @param comp the record comparator
     */
-   public DistinctScan(List<TempTable> runs, RecordComparator comp) {
+   public DistinctScan(List<TempTable> runs, RecordComparator comp, Schema schema) {
       this.comp = comp;
+      this.schema = schema;
       s1 = (UpdateScan) runs.get(0).open();
       hasmore1 = s1.next();
       if (runs.size() > 1) {
          s2 = (UpdateScan) runs.get(1).open();
          hasmore2 = s2.next();
       }
+//      filterDistinct();
    }
+   
+//   private void filterDistinct() {
+//	   schema.fields();
+//   }
    
    /**
     * Position the scan before the first record in sorted order.
@@ -77,14 +84,14 @@ public class DistinctScan implements Scan {
             currentscan = s2;
       }
       else if (hasmore1) {
-          if (currentscan != null && comp.compare(s1, currentscan) == 0) {
-        	  return false;
-          } 
+//          if (currentscan != null && comp.compare(s1, currentscan) == 0) {
+//        	  return false;
+//          } 
     	  currentscan = s1;    	  
       } else if (hasmore2) {
-          if (currentscan != null && comp.compare(s2, currentscan) == 0) {
-        	  return false;
-          } 
+//          if (currentscan != null && comp.compare(s2, currentscan) == 0) {
+//        	  return false;
+//          } 
     	  currentscan = s2;    	  
       }
      
