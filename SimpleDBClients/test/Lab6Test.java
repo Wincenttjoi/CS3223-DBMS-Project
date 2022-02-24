@@ -21,7 +21,7 @@ public class Lab6Test {
       try (Connection conn = d.connect(s, null);
           Statement stmt = conn.createStatement()) {
 
-    	  doTest(stmt, "select majorid from student where majorid = 10");
+//    	  doTest(stmt, "select majorid from student where majorid = 10");
 // TEST1
 //    	  majorid
 //    	  --------
@@ -29,7 +29,7 @@ public class Lab6Test {
 //    	        10
 //    	        10
     	  
-    	  doTest(stmt, "select distinct majorid from student where majorid = 10");
+    	  doTest(stmt, "select distinct sname, gradyear from student where gradyear = 2021");
 // TEST1
 //    	  majorid
 //    	  --------

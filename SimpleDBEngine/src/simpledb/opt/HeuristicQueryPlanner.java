@@ -30,7 +30,7 @@ public class HeuristicQueryPlanner implements QueryPlanner {
    public Plan createPlan(QueryData data, Transaction tx) {
       
 	  // for debugging
-	  // System.out.println(data.toString());
+//	   System.out.println(data.toString());
 	   
       // Step 1:  Create a TablePlanner object for each mentioned table
       for (String tblname : data.tables()) {
@@ -52,6 +52,11 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       
       // Step 4.  Project on the field names and return
       Plan projectplan = new ProjectPlan(currentplan, data.fields());
+      
+      if (data.isDistinct()) {
+    	  projectplan = new SortPlan(tx, projectplan, data.fields());
+//    	  projectplan = new DistinctPlan(projectplan);
+      }
       
       // Step 5. Add sort plan as the top-most node in the query tree (Lab3)
       if (!data.sortMap().isEmpty()) {

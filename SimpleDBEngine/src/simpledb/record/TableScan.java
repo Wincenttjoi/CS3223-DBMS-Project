@@ -1,6 +1,9 @@
 package simpledb.record;
 
 import static java.sql.Types.INTEGER;
+
+import java.util.List;
+
 import simpledb.file.BlockId;
 import simpledb.query.*;
 import simpledb.tx.Transaction;
@@ -41,6 +44,21 @@ public class TableScan implements UpdateScan {
          moveToBlock(rp.block().number()+1);
          currentslot = rp.nextAfter(currentslot);
       }
+      return true;
+   }
+   
+   public boolean nextDistinct() {
+	  List<String> fieldname = layout.schema().fields();
+       
+      
+      currentslot = rp.nextAfter(currentslot);
+      while (currentslot < 0) {
+         if (atLastBlock())
+            return false;
+         moveToBlock(rp.block().number()+1);
+         currentslot = rp.nextAfter(currentslot);
+      }
+
       return true;
    }
 
