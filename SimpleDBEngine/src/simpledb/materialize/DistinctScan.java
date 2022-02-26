@@ -35,46 +35,59 @@ public class DistinctScan implements Scan {
 	public boolean next() {
 		boolean notLast = true;
 		while (s.next()) {
-			boolean isDifferentRecord = false;
-			while (!isDifferentRecord && notLast) {
-				if (curr != null) {
-					curr.clear();
-				}
-				
-				for (String fieldname : fields) {
-					Constant value = s.getVal(fieldname);
-					curr.add(value);
-				}
-				
-				if (prev.isEmpty()) {
-					prev.addAll(curr);
-					return true;
-				}
-				
-				
-				for (int i = 0; i < curr.size(); i++) {
-					if (!prev.get(i).equals(curr.get(i))) {
-						isDifferentRecord = true;
-						break;
-					}
-					
-				}
-				
-				this.prev.clear();
-				this.prev.addAll(curr);
-		
-				if (!isDifferentRecord) {
-					notLast = s.next();
-				}
-			}
-			
-			if (notLast) {
-				return true;
-			} else {
-				return false;
-			}
+			return nextDistinct(notLast);
 		}
 		return false;
+	}
+	
+	/**
+	 * Finds the next distinct record and return true.
+	 * This method isDifferentRecord and notLast to keep track of 
+	 * whether the record should be returned. Every column fields 
+	 * will be checked to ensure that there is no full record of
+	 * that is equal to the previous record.
+	 * @param notLast boolean whether the record is last
+	 * @return boolean true when next distinct record is found
+	 */
+	private boolean nextDistinct(boolean notLast) {
+		boolean isDifferentRecord = false;
+		while (!isDifferentRecord && notLast) {
+			if (curr != null) {
+				curr.clear();
+			}
+			
+			for (String fieldname : fields) {
+				Constant value = s.getVal(fieldname);
+				curr.add(value);
+			}
+			
+			if (prev.isEmpty()) {
+				prev.addAll(curr);
+				return true;
+			}
+			
+			
+			for (int i = 0; i < curr.size(); i++) {
+				if (!prev.get(i).equals(curr.get(i))) {
+					isDifferentRecord = true;
+					break;
+				}
+				
+			}
+		
+			if (!isDifferentRecord) {
+				notLast = s.next();
+			} else {
+				this.prev.clear();
+				this.prev.addAll(curr);
+			}
+		}
+		
+		if (notLast) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public int getInt(String fldname) {
