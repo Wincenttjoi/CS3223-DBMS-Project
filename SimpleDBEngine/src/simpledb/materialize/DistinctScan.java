@@ -42,10 +42,10 @@ public class DistinctScan implements Scan {
 	
 	/**
 	 * Finds the next distinct record and return true.
-	 * This method isDifferentRecord and notLast to keep track of 
-	 * whether the record should be returned. Every column fields 
-	 * will be checked to ensure that there is no full record of
+	 * Every column fields will be checked to ensure that there is no record
 	 * that is equal to the previous record.
+	 * If the last record is reached and is a duplication, nextDistinct
+	 * will return false.
 	 * @param notLast boolean whether the record is last
 	 * @return boolean true when next distinct record is found
 	 */
@@ -56,25 +56,27 @@ public class DistinctScan implements Scan {
 				curr.clear();
 			}
 			
+			// Store all record contents
 			for (String fieldname : fields) {
 				Constant value = s.getVal(fieldname);
 				curr.add(value);
 			}
 			
+			// First record means no duplication is possible
 			if (prev.isEmpty()) {
 				prev.addAll(curr);
 				return true;
 			}
 			
-			
+			// Check each field if previous record = current record
 			for (int i = 0; i < curr.size(); i++) {
 				if (!prev.get(i).equals(curr.get(i))) {
 					isDifferentRecord = true;
 					break;
 				}
-				
 			}
 		
+			// Iterate to next record if current record is the same as previous
 			if (!isDifferentRecord) {
 				notLast = s.next();
 			} else {
@@ -83,11 +85,7 @@ public class DistinctScan implements Scan {
 			}
 		}
 		
-		if (notLast) {
-			return true;
-		} else {
-			return false;
-		}
+		return notLast;
 	}
 
 	public int getInt(String fldname) {
