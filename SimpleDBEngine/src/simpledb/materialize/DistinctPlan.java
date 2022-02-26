@@ -12,7 +12,7 @@ import simpledb.query.*;
  */
 public class DistinctPlan implements Plan {
    private Plan p;
-   private Schema sch;
+   private List<String> fields; 
    private RecordComparator comp;
 
    /**
@@ -23,7 +23,7 @@ public class DistinctPlan implements Plan {
     */
    public DistinctPlan(Plan p, List<String> fields) {
       this.p = p;
-      sch = p.schema();
+      this.fields = p.schema().fields();
       Map<String, Boolean> sortPairs = new LinkedHashMap<>();
       for (String f : fields) {
     	  sortPairs.put(f, true);
@@ -37,7 +37,7 @@ public class DistinctPlan implements Plan {
     */
    public Scan open() {
       Scan s = p.open();
-	  return new DistinctScan(s, sch, comp);
+	  return new DistinctScan(s, fields, comp);
    }
    
    /**

@@ -15,29 +15,56 @@ import simpledb.record.*;
  */
 public class DistinctScan implements Scan {
 	private Scan s, currentscan;
-	private Schema sch;
+	private List<String> fields;
 	private RecordComparator comp;
+	private List<Constant> prev = new ArrayList<>();
+	private List<Constant> curr = new ArrayList<>();
 	
-	public DistinctScan(Scan s, Schema sch, RecordComparator comp) {
+	
+	public DistinctScan(Scan s, List<String> fields, RecordComparator comp) {
 		this.s = s;
 		this.currentscan = s;
-		this.sch = sch;
+		this.fields = fields;
 		this.comp = comp;
 	}
 
 	public void beforeFirst() {
 		s.beforeFirst();
+		currentscan.beforeFirst();
 	}
 
+	
 	public boolean next() {
 		while (s.next()) {
-			if (comp.compare(s, currentscan) != 0) {
-				currentscan = s;
-				return true;
-			} else {
-				currentscan = s;
-				return false;
+			
+			if (curr != null) {
+				curr.clear();
 			}
+			
+			for (String fieldname : fields) {
+				Constant value = s.getVal(fieldname);
+				curr.add(value);
+			}
+			
+			if (prev.isEmpty()) {
+				prev.addAll(curr);
+				return true;
+			}
+			
+			boolean isDifferentRecord = false;
+			for (int i = 0; i < curr.size(); i++) {
+				if (!prev.get(i).equals(curr.get(i))) {
+					isDifferentRecord = true;
+				}
+				
+			}
+			this.prev.clear();
+			this.prev.addAll(curr);
+	
+			if (!isDifferentRecord) {
+				s.next();
+			}
+			return true;
 		}
 		return false;
 	}

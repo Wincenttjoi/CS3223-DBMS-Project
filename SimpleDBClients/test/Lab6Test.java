@@ -48,7 +48,7 @@ public class Lab6Test {
 //    	  -----------------
 //    	       2021      10
     	  
-    	  doTest(stmt, "select distinct sname, gradyear, majorid from student");
+    	  doTest(stmt, "select distinct gradyear, majorid from student");
 
 
       }
