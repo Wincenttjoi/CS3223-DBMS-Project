@@ -13,7 +13,6 @@ import simpledb.query.*;
 public class DistinctPlan implements Plan {
    private Plan p;
    private List<String> fields; 
-   private RecordComparator comp;
 
    /**
     * Creates a new select node in the query tree,
@@ -21,14 +20,9 @@ public class DistinctPlan implements Plan {
     * @param p the subquery
     * @param pred the predicate
     */
-   public DistinctPlan(Plan p, List<String> fields) {
+   public DistinctPlan(Plan p) {
       this.p = p;
       this.fields = p.schema().fields();
-      Map<String, Boolean> sortPairs = new LinkedHashMap<>();
-      for (String f : fields) {
-    	  sortPairs.put(f, true);
-      }
-      comp = new RecordComparator(sortPairs);
    }
    
    /**
@@ -37,7 +31,7 @@ public class DistinctPlan implements Plan {
     */
    public Scan open() {
       Scan s = p.open();
-	  return new DistinctScan(s, fields, comp);
+	  return new DistinctScan(s, fields);
    }
    
    /**

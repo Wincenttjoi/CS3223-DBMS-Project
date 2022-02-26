@@ -16,16 +16,15 @@ import simpledb.record.*;
 public class DistinctScan implements Scan {
 	private Scan s, currentscan;
 	private List<String> fields;
-	private RecordComparator comp;
-	private List<Constant> prev = new ArrayList<>();
-	private List<Constant> curr = new ArrayList<>();
+	private List<Constant> prev, curr;
 	
 	
-	public DistinctScan(Scan s, List<String> fields, RecordComparator comp) {
+	public DistinctScan(Scan s, List<String> fields) {
 		this.s = s;
 		this.currentscan = s;
 		this.fields = fields;
-		this.comp = comp;
+		this.prev = new ArrayList<>();
+		this.curr = new ArrayList<>();
 	}
 
 	public void beforeFirst() {
@@ -58,6 +57,7 @@ public class DistinctScan implements Scan {
 				}
 				
 			}
+			
 			this.prev.clear();
 			this.prev.addAll(curr);
 	

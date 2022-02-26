@@ -43,14 +43,24 @@ public class Lab6Test {
 //    	       2021      10
     	  
 //    	  doTest(stmt, "select distinct gradyear, majorid from student where gradyear = 2021 and majorid = 10");
-// TEST3
+// TEST4
 //    	  gradyear majorid
 //    	  -----------------
 //    	       2021      10
     	  
     	  doTest(stmt, "select distinct gradyear, majorid from student");
+// TEST5
+//    	  gradyear majorid
+//    	  -----------------
+//    	       2019      20
+//    	       2020      20
+//    	       2020      30
+//    	       2021      10
+//    	       2021      30
+//    	       2022      10
+//    	       2022      20
 
-
+    	  doTest(stmt, "select distinct majorid from student");
       }
       catch (SQLException e) {
          e.printStackTrace();
