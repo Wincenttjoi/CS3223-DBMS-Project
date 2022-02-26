@@ -11,62 +11,48 @@ import simpledb.query.*;
  * @author Edward Sciore
  */
 public class DistinctPlan implements Plan {
-   private Transaction tx;
    private Plan p;
    private Schema sch;
    private RecordComparator comp;
-   private Scan currentscan = null;
-   
+
    /**
-    * Create a sort plan for the specified query.
-    * @param p the plan for the underlying query
-    * @param sortfields the list of fields to sort by
-    * @param tx the calling transaction
+    * Creates a new select node in the query tree,
+    * having the specified subquery and predicate.
+    * @param p the subquery
+    * @param pred the predicate
     */
-   public DistinctPlan(Transaction tx, Plan p, List<String> sortfields) {
-      this.tx = tx;
+   public DistinctPlan(Plan p, List<String> fields) {
       this.p = p;
       sch = p.schema();
       Map<String, Boolean> sortPairs = new LinkedHashMap<>();
-      for (String f : sortfields) {
+      for (String f : fields) {
     	  sortPairs.put(f, true);
       }
       comp = new RecordComparator(sortPairs);
    }
    
    /**
-    * This method is where most of the action is.
-    * Up to 2 sorted temporary tables are created,
-    * and are passed into SortScan for final merging.
+    * Creates a select scan for this query.
     * @see simpledb.plan.Plan#open()
     */
    public Scan open() {
-      Scan src = p.open();
-      List<TempTable> runs = splitIntoRuns(src);
-      src.close();
-      while (runs.size() > 1)
-         runs = doAMergeIteration(runs);
-      return new DistinctScan(runs, comp, sch);
-//      return filterDistinct(ds);
+      Scan s = p.open();
+	  return new DistinctScan(s, sch, comp);
    }
    
    /**
-    * Return the number of blocks in the sorted table,
-    * which is the same as it would be in a
-    * materialized table.
-    * It does <i>not</i> include the one-time cost
-    * of materializing and sorting the records.
+    * Estimates the number of block accesses in the selection,
+    * which is the same as in the underlying query.
     * @see simpledb.plan.Plan#blocksAccessed()
     */
    public int blocksAccessed() {
-      // does not include the one-time cost of sorting
-      Plan mp = new MaterializePlan(tx, p); // not opened; just for analysis
-      return mp.blocksAccessed();
+      return p.blocksAccessed();
    }
    
    /**
-    * Return the number of records in the sorted table,
-    * which is the same as in the underlying query.
+    * Estimates the number of output records in the selection,
+    * which is determined by the 
+    * reduction factor of the predicate.
     * @see simpledb.plan.Plan#recordsOutput()
     */
    public int recordsOutput() {
@@ -74,9 +60,13 @@ public class DistinctPlan implements Plan {
    }
    
    /**
-    * Return the number of distinct field values in
-    * the sorted table, which is the same as in
-    * the underlying query.
+    * Estimates the number of distinct field values
+    * in the projection.
+    * If the predicate contains a term equating the specified 
+    * field to a constant, then this value will be 1.
+    * Otherwise, it will be the number of the distinct values
+    * in the underlying query 
+    * (but not more than the size of the output table).
     * @see simpledb.plan.Plan#distinctValues(java.lang.String)
     */
    public int distinctValues(String fldname) {
@@ -84,95 +74,13 @@ public class DistinctPlan implements Plan {
    }
    
    /**
-    * Return the schema of the sorted table, which
-    * is the same as in the underlying query.
+    * Returns the schema of the selection,
+    * which is the same as in the underlying query.
     * @see simpledb.plan.Plan#schema()
     */
    public Schema schema() {
-      return sch;
+      return p.schema();
    }
    
-   private List<TempTable> splitIntoRuns(Scan src) {
-      List<TempTable> temps = new ArrayList<>();
-      src.beforeFirst();
-      if (!src.next())
-         return temps;
-      TempTable currenttemp = new TempTable(tx, sch);
-      temps.add(currenttemp);
-      UpdateScan currentscan = currenttemp.open();
-      while (copy(src, currentscan))
-         if (comp.compare(src, currentscan) < 0) {
-         // start a new run
-         currentscan.close();
-         currenttemp = new TempTable(tx, sch);
-         temps.add(currenttemp);
-         currentscan = (UpdateScan) currenttemp.open();
-      }
-      currentscan.close();
-      return temps;
-   }
-   
-   private List<TempTable> doAMergeIteration(List<TempTable> runs) {
-      List<TempTable> result = new ArrayList<>();
-      while (runs.size() > 1) {
-         TempTable p1 = runs.remove(0);
-         TempTable p2 = runs.remove(0);
-         result.add(mergeTwoRuns(p1, p2));
-      }
-      if (runs.size() == 1)
-         result.add(runs.get(0));
-      return result;
-   }
-   
-   private TempTable mergeTwoRuns(TempTable p1, TempTable p2) {
-      Scan src1 = p1.open();
-      Scan src2 = p2.open();
-      TempTable result = new TempTable(tx, sch);
-      UpdateScan dest = result.open();
-      
-      boolean hasmore1 = src1.next();
-      boolean hasmore2 = src2.next();
-    	 while (hasmore1 && hasmore2)
-         if (comp.compare(src1, src2) < 0)
-         hasmore1 = copy(src1, dest);
-      else
-         hasmore2 = copy(src2, dest);
-      
-      if (hasmore1)
-         while (hasmore1)
-         hasmore1 = copy(src1, dest);
-      else
-         while (hasmore2)
-         hasmore2 = copy(src2, dest);
 
-      src1.close();
-      src2.close();
-      dest.close();
-      return result;
-   }
-   
-   private boolean copy(Scan src, UpdateScan dest) {
-      dest.insert();
-      for (String fldname : sch.fields())
-         dest.setVal(fldname, src.getVal(fldname));
-      return src.next();
-   }
-   
-   private Scan filterDistinct(Scan src) {
-	  UpdateScan dest = null;
-	  if (currentscan != null && comp.compare(src, currentscan) != 0) {
-		  dest.insert();
-	      for (String fldname : sch.fields())
-	          dest.setVal(fldname, src.getVal(fldname));
-	  } else {
-		  dest.insert();
-	      for (String fldname : sch.fields())
-	          dest.setVal(fldname, src.getVal(fldname));
-	  	  currentscan = src;
-	  	  src.next();
-	  }
-
-	  return dest;
-   }
-  
 }
