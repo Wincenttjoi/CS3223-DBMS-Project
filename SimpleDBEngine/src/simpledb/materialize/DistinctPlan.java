@@ -1,7 +1,6 @@
 package simpledb.materialize;
 
 import java.util.*;
-import simpledb.tx.Transaction;
 import simpledb.record.*;
 import simpledb.plan.Plan;
 import simpledb.query.*;

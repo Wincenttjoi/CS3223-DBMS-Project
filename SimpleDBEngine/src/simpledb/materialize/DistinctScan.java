@@ -3,7 +3,6 @@ package simpledb.materialize;
 import java.util.*;
 
 import simpledb.query.*;
-import simpledb.record.*;
 
 /**
  * The Scan class for the <i>sort</i> operator.
