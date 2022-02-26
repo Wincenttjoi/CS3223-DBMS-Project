@@ -21,7 +21,7 @@ public class Lab6Test {
       try (Connection conn = d.connect(s, null);
           Statement stmt = conn.createStatement()) {
 
-//    	  doTest(stmt, "select majorid from student where majorid = 10");
+    	  doTest(stmt, "select majorid from student where majorid = 10");
 // TEST1
 //    	  majorid
 //    	  --------
@@ -29,20 +29,20 @@ public class Lab6Test {
 //    	        10
 //    	        10
     	  
-//    	  doTest(stmt, "select distinct majorid from student where majorid = 10");
+    	  doTest(stmt, "select distinct majorid from student where majorid = 10");
 // TEST2
 //    	  majorid
 //    	  --------
 //    	        10	  
     	  
-//    	  doTest(stmt, "select gradyear, majorid from student where gradyear = 2021 and majorid = 10");
+    	  doTest(stmt, "select gradyear, majorid from student where gradyear = 2021 and majorid = 10");
 // TEST3
 //    	  gradyear majorid
 //    	  -----------------
 //    	       2021      10
 //    	       2021      10
     	  
-//    	  doTest(stmt, "select distinct gradyear, majorid from student where gradyear = 2021 and majorid = 10");
+    	  doTest(stmt, "select distinct gradyear, majorid from student where gradyear = 2021 and majorid = 10");
 // TEST4
 //    	  gradyear majorid
 //    	  -----------------
@@ -61,6 +61,12 @@ public class Lab6Test {
 //    	       2022      20
 
     	  doTest(stmt, "select distinct majorid from student");
+//TEST6  	  
+//    	   majorid
+//    	  --------
+//    	        10
+//    	        20
+//    	        30
       }
       catch (SQLException e) {
          e.printStackTrace();

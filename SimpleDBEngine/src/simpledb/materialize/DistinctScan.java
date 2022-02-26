@@ -18,7 +18,6 @@ public class DistinctScan implements Scan {
 	private List<String> fields;
 	private List<Constant> prev, curr;
 	
-	
 	public DistinctScan(Scan s, List<String> fields) {
 		this.s = s;
 		this.currentscan = s;
@@ -34,37 +33,46 @@ public class DistinctScan implements Scan {
 
 	
 	public boolean next() {
+		boolean notLast = true;
 		while (s.next()) {
-			
-			if (curr != null) {
-				curr.clear();
-			}
-			
-			for (String fieldname : fields) {
-				Constant value = s.getVal(fieldname);
-				curr.add(value);
-			}
-			
-			if (prev.isEmpty()) {
-				prev.addAll(curr);
-				return true;
-			}
-			
 			boolean isDifferentRecord = false;
-			for (int i = 0; i < curr.size(); i++) {
-				if (!prev.get(i).equals(curr.get(i))) {
-					isDifferentRecord = true;
+			while (!isDifferentRecord && notLast) {
+				if (curr != null) {
+					curr.clear();
 				}
 				
+				for (String fieldname : fields) {
+					Constant value = s.getVal(fieldname);
+					curr.add(value);
+				}
+				
+				if (prev.isEmpty()) {
+					prev.addAll(curr);
+					return true;
+				}
+				
+				
+				for (int i = 0; i < curr.size(); i++) {
+					if (!prev.get(i).equals(curr.get(i))) {
+						isDifferentRecord = true;
+						break;
+					}
+					
+				}
+				
+				this.prev.clear();
+				this.prev.addAll(curr);
+		
+				if (!isDifferentRecord) {
+					notLast = s.next();
+				}
 			}
 			
-			this.prev.clear();
-			this.prev.addAll(curr);
-	
-			if (!isDifferentRecord) {
-				s.next();
+			if (notLast) {
+				return true;
+			} else {
+				return false;
 			}
-			return true;
 		}
 		return false;
 	}
