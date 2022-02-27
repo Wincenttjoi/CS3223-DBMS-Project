@@ -44,6 +44,7 @@ public class MultibufferProductPlan implements Plan {
    public Scan open() {
       Scan leftscan = lhs.open();
       TempTable tt = copyRecordsFrom(rhs);
+      printPlan();
       return new MultibufferProductScan(tx, leftscan, tt.tableName(), tt.getLayout());
    }
 
@@ -111,5 +112,12 @@ public class MultibufferProductPlan implements Plan {
       src.close();
       dest.close();
       return t;
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   String stmt = "Multibuffer Product Plan used";
    }
 }

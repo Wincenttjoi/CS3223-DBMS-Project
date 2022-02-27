@@ -58,6 +58,7 @@ public class SortPlan implements Plan {
       src.close();
       while (runs.size() > 1)
          runs = doAMergeIteration(runs);
+      printPlan();
       return new SortScan(runs, comp);
    }
    
@@ -143,7 +144,7 @@ public class SortPlan implements Plan {
       
       boolean hasmore1 = src1.next();
       boolean hasmore2 = src2.next();
-      while (hasmore1 && hasmore2)
+    	 while (hasmore1 && hasmore2)
          if (comp.compare(src1, src2) < 0)
          hasmore1 = copy(src1, dest);
       else
@@ -155,6 +156,7 @@ public class SortPlan implements Plan {
       else
          while (hasmore2)
          hasmore2 = copy(src2, dest);
+
       src1.close();
       src2.close();
       dest.close();
@@ -166,5 +168,12 @@ public class SortPlan implements Plan {
       for (String fldname : sch.fields())
          dest.setVal(fldname, src.getVal(fldname));
       return src.next();
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Sort Plan used");
    }
 }
