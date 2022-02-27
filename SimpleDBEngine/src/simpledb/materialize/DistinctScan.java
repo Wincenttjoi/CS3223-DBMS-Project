@@ -5,7 +5,7 @@ import java.util.*;
 import simpledb.query.*;
 
 /**
- * The Scan class for the <i>sort</i> operator.
+ * The Scan class for the <i>Distinct</i> operator.
  * @author Edward Sciore
  */
 /**
@@ -32,8 +32,9 @@ public class DistinctScan implements Scan {
 
 	
 	public boolean next() {
+		boolean notLast = true;
 		while (s.next()) {
-			return nextDistinct();
+			return nextDistinct(notLast);
 		}
 		return false;
 	}
@@ -47,8 +48,7 @@ public class DistinctScan implements Scan {
 	 * @param notLast boolean whether the record is last
 	 * @return boolean true when next distinct record is found
 	 */
-	private boolean nextDistinct() {
-		boolean notLast = true;
+	private boolean nextDistinct(boolean notLast) {
 		boolean isDifferentRecord = false;
 		while (!isDifferentRecord && notLast) {
 			if (curr != null) {
