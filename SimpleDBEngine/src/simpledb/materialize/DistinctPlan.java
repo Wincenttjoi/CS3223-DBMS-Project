@@ -31,7 +31,7 @@ public class DistinctPlan implements Plan {
    public Scan open() {
       Scan s = p.open();
       printPlan();
-	  return new DistinctScan(s, fields);
+      return new DistinctScan(s, fields);
    }
    
    /**
