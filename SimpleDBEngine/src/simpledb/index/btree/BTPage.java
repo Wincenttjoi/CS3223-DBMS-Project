@@ -45,6 +45,24 @@ public class BTPage {
       return slot-1;
    }
    
+   public int findSlotBefore(Constant searchkey, String opr) {
+      int slot = 0;
+      
+      switch (opr) {
+	      case "=", ">=" -> {
+	          while (slot < getNumRecs() && getDataVal(slot).compareTo(searchkey) < 0)
+	              slot++;
+	          return slot-1;
+	      }
+	      case ">" -> { 
+	          while (slot < getNumRecs() && getDataVal(slot).compareTo(searchkey) <= 0)
+	              slot++;
+	          return slot-1;
+	      }
+	      default -> { return 0; }
+      }
+   }
+   
    /**
     * Close the page by unpinning its buffer.
     */

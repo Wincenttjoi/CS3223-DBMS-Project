@@ -103,22 +103,39 @@ public class Predicate {
    }
 
    /**
-    * Determine if there is a term of the form "F=c"
-    * where F is the specified field and c is some constant.
+    * Determine if there is a term of the form "F opr c"
+    * where F is the specified field, opr the operator and c is some constant.
     * If so, the method returns that constant.
     * If not, the method returns null.
     * @param fldname the name of the field
     * @return either the constant or null
     */
-   public Constant equatesWithConstant(String fldname) {
+   public Constant comparesWithConstant(String fldname) {
       for (Term t : terms) {
-         Constant c = t.equatesWithConstant(fldname);
+         Constant c = t.comparesWithConstant(fldname);
          if (c != null)
             return c;
       }
       return null;
    }
-
+   
+   /**
+    * Retrieve the operator where this term is of the form "F opr c"
+    * where F is the specified field, opr the operator and c is some constant.
+    * If so, the method returns that constant.
+    * If not, the method returns null.
+    * @param fldname the name of the field
+    * @return either the constant or null
+    */
+   public String getOperator(String fldname) {
+      for (Term t : terms) {
+         String opr = t.getOperator(fldname);
+         if (opr != null)
+            return opr;
+      }
+      return null;
+   }
+   
    /**
     * Determine if there is a term of the form "F1=F2"
     * where F1 is the specified field and F2 is another field.

@@ -97,11 +97,15 @@ class TablePlanner {
    
    private Plan makeIndexSelect() {
       for (String fldname : indexes.keySet()) {
-         Constant val = mypred.equatesWithConstant(fldname);
-         if (val != null) {
-            IndexInfo ii = indexes.get(fldname);
-            System.out.println("index on " + fldname + " used");
-            return new IndexSelectPlan(myplan, ii, val);
+         Constant val = mypred.comparesWithConstant(fldname);
+         String opr = mypred.getOperator(fldname);
+         IndexInfo ii = indexes.get(fldname);
+         
+         // use index select if operator isn't "!=" and if idxtype is hash, operator must be "="
+         if (val != null && (ii.supportsRangeSearch() || (!ii.supportsRangeSearch() && opr.equals("=")))
+         	&& !opr.equals("<>") && !opr.equals("!=") ) {
+            System.out.println("index select on " + fldname + opr + val);
+            return new IndexSelectPlan(myplan, ii, val, opr);
          }
       }
       return null;

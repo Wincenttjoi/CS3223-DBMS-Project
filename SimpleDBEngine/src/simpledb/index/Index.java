@@ -16,6 +16,14 @@ public interface Index {
     * @param searchkey the search key value.
     */
    public void    beforeFirst(Constant searchkey);
+	
+   /**
+    * Positions the index before the first record
+    * having the specified search key.
+    * @param searchkey the search key value.
+    * @param opr the relational operator
+    */
+   public void    beforeFirst(Constant searchkey, String opr);
    
    /**
     * Moves the index to the next record having the

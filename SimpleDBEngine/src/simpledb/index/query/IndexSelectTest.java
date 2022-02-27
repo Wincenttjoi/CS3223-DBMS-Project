@@ -26,7 +26,7 @@ public class IndexSelectTest {
 		Plan enrollplan = new TablePlan(tx, "enroll", mdm);
 		
 		// Create the selection constant
-		Constant c = new Constant(6);
+		Constant c = new Constant(3);
 		
 		// Two different ways to use the index in simpledb:
 		useIndexManually(sidIdx, enrollplan, c);		
@@ -41,7 +41,7 @@ public class IndexSelectTest {
 		Index idx = ii.open();
 
 		// Retrieve all index records having the specified dataval.
-		idx.beforeFirst(c);
+		idx.beforeFirst(c, ">");
 		while (idx.next()) {
 			// Use the datarid to go to the corresponding Enroll record.
 			RID datarid = idx.getDataRid();
@@ -54,11 +54,11 @@ public class IndexSelectTest {
 	
 	private static void useIndexScan(IndexInfo ii, Plan p, Constant c) {
 		// Open an index select scan on the enroll table.
-		Plan idxplan = new IndexSelectPlan(p, ii, c);
+		Plan idxplan = new IndexSelectPlan(p, ii, c, ">");
 		Scan s = idxplan.open();
 		
 		while (s.next()) {
-			System.out.println(s.getString("grade"));
+			System.out.println("test " + s.getString("grade"));
 		}
 		s.close();
 	}

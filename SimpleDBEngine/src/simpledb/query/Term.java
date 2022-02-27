@@ -2,6 +2,7 @@ package simpledb.query;
 
 import simpledb.plan.Plan;
 import simpledb.record.*;
+import simpledb.materialize.OprComparator;
 
 /**
  * A term is a comparison between two expressions.
@@ -36,19 +37,7 @@ public class Term {
       Constant lhsval = lhs.evaluate(s);
       Constant rhsval = rhs.evaluate(s);
       
-      boolean isLhsSmaller = lhsval.compareTo(rhsval) == -1;
-      boolean isEqual = rhsval.equals(lhsval); 
-      
-      switch (opr) {
-          case "=" -> { return isEqual; }
-          case "<" -> { return isLhsSmaller; }
-          case "<=" -> { return isLhsSmaller || isEqual; }
-          case ">" -> { return !isLhsSmaller && !isEqual; }
-
-          case ">=" -> { return !isLhsSmaller || isEqual; }
-          case "!=", "<>" -> { return !isEqual; }
-          default -> { return false; }
-      }
+      return OprComparator.compare(lhsval, rhsval, opr);
    }
    
    /**
@@ -83,14 +72,14 @@ public class Term {
    }
    
    /**
-    * Determine if this term is of the form "F=c"
-    * where F is the specified field and c is some constant.
+    * Determine if this term is of the form "F opr c"
+    * where F is the specified field, opr is a operator and c is some constant.
     * If so, the method returns that constant.
     * If not, the method returns null.
     * @param fldname the name of the field
     * @return either the constant or null
     */
-   public Constant equatesWithConstant(String fldname) {
+   public Constant comparesWithConstant(String fldname) {
       if (lhs.isFieldName() &&
           lhs.asFieldName().equals(fldname) &&
           !rhs.isFieldName())
@@ -101,6 +90,40 @@ public class Term {
          return lhs.asConstant();
       else
          return null;
+   }
+   
+   /**
+    * Retrieve the operator where this term is of the form "F opr c"
+    * where F is the specified field, opr is a operator and c is some constant.
+    * If so, the method returns that operator.
+    * If not, the method returns null.
+    * @param fldname the name of the field
+    * @return either the operator or null
+    */
+   public String getOperator(String fldname) {
+	  boolean isConstantOnLHS;
+      if (lhs.isFieldName() &&
+          lhs.asFieldName().equals(fldname) &&
+          !rhs.isFieldName())
+    	 isConstantOnLHS = false;
+      else if (rhs.isFieldName() &&
+               rhs.asFieldName().equals(fldname) &&
+               !lhs.isFieldName())
+    	  isConstantOnLHS = true;
+      else
+         return null;
+      
+      if (isConstantOnLHS) {
+          switch (opr) {
+		      case "<" -> { return ">="; }
+		      case "<=" -> { return ">"; }
+		      case ">" -> { return "<="; }
+		      case ">=" -> { return "<"; }
+		      default -> { return opr; }
+          }
+      } else {
+    	  return opr;
+      }
    }
    
    /**

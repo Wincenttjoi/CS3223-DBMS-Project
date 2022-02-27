@@ -64,8 +64,28 @@ public class Lab1Test {
 //                  pat      8      20
 //                  lee      9      10
     	  
-    	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 20 and sid > 4");
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid <= 20");
 // TEST5
+//          sname    sid majorid
+//          --------------------------
+
+//                  amy      2      20
+//                  max      3      10
+//                  sue      4      20
+//                  kim      6      20
+//                  pat      8      20
+//                  lee      9      10
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid < 20");
+// TEST6
+//          sname    sid majorid
+//          --------------------------
+
+//                  max      3      10
+//                  lee      9      10
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 20 and sid > 4");
+// TEST7
 //          sname    sid majorid
 //          --------------------------
 //                  bob      5      30
@@ -74,12 +94,84 @@ public class Lab1Test {
 //                  pat      8      20
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 20 and sid > 4 and sname != 'bob'");
-// TEST6
+// TEST8
 //          sname    sid majorid
 //          --------------------------
 //                  kim      6      20
 //                  art      7      30
 //                  pat      8      20
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where sid <> 4");
+// TEST9
+//          sname    sid majorid
+//          --------------------------
+//          joe      1      10
+//          amy      2      20
+//          max      3      10
+//          bob      5      30
+//          kim      6      20
+//          art      7      30
+//          pat      8      20
+//          lee      9      10
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where sid != 4");
+// TEST10
+//          sname    sid majorid
+//          --------------------------
+//          joe      1      10
+//          amy      2      20
+//          max      3      10
+//          bob      5      30
+//          kim      6      20
+//          art      7      30
+//          pat      8      20
+//          lee      9      10
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where sid = 4");
+// TEST11
+//          sname    sid majorid
+//          --------------------------
+//          sue      4      20
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where sid > 4");
+// TEST12
+//          sname    sid majorid
+//          --------------------------
+//          bob      5      30
+//          kim      6      20
+//          art      7      30
+//          pat      8      20
+//          lee      9      10
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where sid >= 4");
+// TEST13
+//          sname    sid majorid
+//          --------------------------
+//    	    sue      4      20
+//          bob      5      30
+//          kim      6      20
+//          art      7      30
+//          pat      8      20
+//          lee      9      10
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where sid < 4");
+// TEST13
+//          sname    sid majorid
+//          --------------------------
+//          joe      1      10
+//          amy      2      20
+//          max      3      10
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where sid <= 4");
+// TEST13
+//          sname    sid majorid
+//          --------------------------
+//          joe      1      10
+//          amy      2      20
+//          max      3      10
+//          sue      4      20
+    	  
+    	  
       }
       catch (SQLException e) {
          e.printStackTrace();
