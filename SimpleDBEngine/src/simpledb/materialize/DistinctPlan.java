@@ -30,6 +30,7 @@ public class DistinctPlan implements Plan {
     */
    public Scan open() {
       Scan s = p.open();
+      printPlan();
 	  return new DistinctScan(s, fields);
    }
    
@@ -75,5 +76,10 @@ public class DistinctPlan implements Plan {
       return p.schema();
    }
    
-
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Distinct Plan used");
+   }
 }

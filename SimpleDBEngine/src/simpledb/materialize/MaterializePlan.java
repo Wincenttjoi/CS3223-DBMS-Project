@@ -41,6 +41,7 @@ public class MaterializePlan implements Plan {
       }
       src.close();
       dest.beforeFirst();
+      printPlan();
       return dest;
    }
    
@@ -83,5 +84,12 @@ public class MaterializePlan implements Plan {
     */
    public Schema schema() {
       return srcplan.schema();
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Materialized Plan used");
    }
 }

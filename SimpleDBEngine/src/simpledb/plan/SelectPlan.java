@@ -30,6 +30,7 @@ public class SelectPlan implements Plan {
     */
    public Scan open() {
       Scan s = p.open();
+      printPlan();
 	  return new SelectScan(s, pred);
    }
    
@@ -82,5 +83,12 @@ public class SelectPlan implements Plan {
     */
    public Schema schema() {
       return p.schema();
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Select Plan used on predicate " + pred.toString());
    }
 }

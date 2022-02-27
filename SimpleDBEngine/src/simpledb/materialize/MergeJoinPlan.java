@@ -47,6 +47,7 @@ public class MergeJoinPlan implements Plan {
    public Scan open() {
       Scan s1 = p1.open();
       SortScan s2 = (SortScan) p2.open();
+      printPlan();
       return new MergeJoinScan(s1, s2, fldname1, fldname2);
    }
    
@@ -99,9 +100,15 @@ public class MergeJoinPlan implements Plan {
       return sch;
    }
    
-   @Override
    public String toString() {
 	      return "Merge join on " + fldname1 + " = " + fldname2;
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Merge join on " + fldname1 + " = " + fldname2);
    }
 }
 

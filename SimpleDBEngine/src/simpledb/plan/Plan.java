@@ -45,4 +45,9 @@ public interface Plan {
     * @return the query's schema
     */
    public Schema schema();
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan();
 }

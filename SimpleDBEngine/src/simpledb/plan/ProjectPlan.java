@@ -30,6 +30,7 @@ public class ProjectPlan implements Plan {
     */
    public Scan open() {
       Scan s = p.open();
+      printPlan();
       return new ProjectScan(s, schema.fields());
    }
 
@@ -68,5 +69,17 @@ public class ProjectPlan implements Plan {
     */
    public Schema schema() {
       return schema;
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   String stmt = "Project Plan used on fields of ";
+	   for (String fields : schema.fields()) {
+		   stmt += fields + ", ";
+	   }
+	   stmt = stmt.substring(0, stmt.length() - 2);
+	   System.out.println(stmt);
    }
 }

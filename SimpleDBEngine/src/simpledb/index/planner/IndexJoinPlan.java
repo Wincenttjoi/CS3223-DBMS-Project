@@ -43,6 +43,7 @@ public class IndexJoinPlan implements Plan {
       // throws an exception if p2 is not a tableplan
       TableScan ts = (TableScan) p2.open();
       Index idx = ii.open();
+      printPlan();
       return new IndexJoinScan(s, idx, joinfield, ts);
    }
    
@@ -87,5 +88,13 @@ public class IndexJoinPlan implements Plan {
     */
    public Schema schema() {
       return sch;
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Index Join Plan used between plan " + p1.toString() + " and " + 
+   p2.toString() + " with join condition on field " + this.joinfield);
    }
 }

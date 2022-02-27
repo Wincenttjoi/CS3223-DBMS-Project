@@ -58,6 +58,7 @@ public class SortPlan implements Plan {
       src.close();
       while (runs.size() > 1)
          runs = doAMergeIteration(runs);
+      printPlan();
       return new SortScan(runs, comp);
    }
    
@@ -167,5 +168,12 @@ public class SortPlan implements Plan {
       for (String fldname : sch.fields())
          dest.setVal(fldname, src.getVal(fldname));
       return src.next();
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Sort Plan used");
    }
 }
