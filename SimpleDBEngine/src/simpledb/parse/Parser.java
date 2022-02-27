@@ -65,16 +65,17 @@ public class Parser {
       Collection<String> tables = tableList();
       pred.conjoinWith(currPred);
       currPred = new Predicate();
-      
-      Map<String,Boolean> sortMap = new LinkedHashMap<>();
       if (lex.matchKeyword("where")) {
          lex.eatKeyword("where");
          pred.conjoinWith(predicate());
       }
+      
+      Map<String,Boolean> sortMap = new LinkedHashMap<>();
       if (lex.matchKeyword("order")) {
           lex.eatKeyword("order");
           sortMap = sortList();
-       }
+      }
+      
       return new QueryData(fields, tables, pred, sortMap);
    }
    

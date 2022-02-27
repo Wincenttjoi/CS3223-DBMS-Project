@@ -53,7 +53,12 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       // Step 4.  Project on the field names and return
       Plan projectplan = new ProjectPlan(currentplan, data.fields());
       
-      // Step 5. Add sort plan as the top-most node in the query tree (Lab3)
+      // Step 5. Aggregate results on group fields and return (Lab5)
+      if (!data.aggfns().isEmpty()) {
+    	  projectPlan = new GroupByPlan(tx, projectplan, data.groupfields(), data.aggfns());
+      }
+      
+      // Step 6. Sort results on sort fields and return (Lab3)
       if (!data.sortMap().isEmpty()) {
     	  projectplan = new SortPlan(tx, projectplan, data.sortMap());
       }

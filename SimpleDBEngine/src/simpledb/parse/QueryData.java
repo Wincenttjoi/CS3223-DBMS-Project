@@ -2,6 +2,7 @@ package simpledb.parse;
 
 import java.util.*;
 
+import simpledb.materialize.AggregationFn;
 import simpledb.query.*;
 
 /**
@@ -13,6 +14,8 @@ public class QueryData {
    private Collection<String> tables;
    private Predicate pred;
    private Map<String,Boolean> sortMap;
+   private List<String> groupFields;
+   private List<AggregationFn> aggFns;
    
    /**
     * Saves the field and table list and predicate.
