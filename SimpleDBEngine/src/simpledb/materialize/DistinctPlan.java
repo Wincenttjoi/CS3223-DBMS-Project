@@ -6,7 +6,7 @@ import simpledb.plan.Plan;
 import simpledb.query.*;
 
 /**
- * The Plan class for the <i>sort</i> operator.
+ * The Plan class for the <i>distinct</i> operator.
  * @author Edward Sciore
  */
 public class DistinctPlan implements Plan {
@@ -31,7 +31,7 @@ public class DistinctPlan implements Plan {
    public Scan open() {
       Scan s = p.open();
       printPlan();
-	  return new DistinctScan(s, fields);
+      return new DistinctScan(s, fields);
    }
    
    /**

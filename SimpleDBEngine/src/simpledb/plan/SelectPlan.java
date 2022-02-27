@@ -31,7 +31,7 @@ public class SelectPlan implements Plan {
    public Scan open() {
       Scan s = p.open();
       printPlan();
-	  return new SelectScan(s, pred);
+      return new SelectScan(s, pred);
    }
    
    /**
