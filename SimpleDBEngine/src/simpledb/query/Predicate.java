@@ -120,14 +120,31 @@ public class Predicate {
    }
    
    /**
-    * Retrieve the operator where this term is of the form "F opr x"
+    * Retrieve the operator where this term is of the form "F opr c"
     * where F is the specified field, opr is a operator and c is some constant.
     * If so, the method returns that constant.
     * If not, the method returns null.
     * @param fldname the name of the field
     * @return either the constant or null
     */
-   public String getOperator(String fldname) {
+   public String getOperatorFromConstantComparison(String fldname) {
+      for (Term t : terms) {
+         Constant c = t.comparesWithConstant(fldname);
+         if (c != null)
+            return t.getOperator(fldname);
+      }
+      return null;
+   }
+   
+   /**
+    * Retrieve the operator where this term is of the form "F opr F2"
+    * where F1 is the specified field, opr is a operator and F2 is another field.
+    * If so, the method returns that constant.
+    * If not, the method returns null.
+    * @param fldname the name of the field
+    * @return either the constant or null
+    */
+   public String getOperatorFromFieldComparison(String fldname) {
       for (Term t : terms) {
          String s = t.comparesWithField(fldname);
          if (s != null)

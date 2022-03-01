@@ -113,7 +113,6 @@ public class Term {
          return null;
    }
    
-   
    /**
     * Retrieve the operator where this term is of the form "F opr x"
     * where F is the specified field, opr is a operator and x is some constant or field.
@@ -135,10 +134,10 @@ public class Term {
       
       if (!isFldNameOnLHS) {
           switch (opr) {
-		      case "<" -> { return ">="; }
-		      case "<=" -> { return ">"; }
-		      case ">" -> { return "<="; }
-		      case ">=" -> { return "<"; }
+		      case "<" -> { return ">"; }
+		      case "<=" -> { return ">="; }
+		      case ">" -> { return "<"; }
+		      case ">=" -> { return "<="; }
 		      default -> { return opr; }
           }
       } else {

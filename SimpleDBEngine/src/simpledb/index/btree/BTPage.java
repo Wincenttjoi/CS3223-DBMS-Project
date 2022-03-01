@@ -47,7 +47,7 @@ public class BTPage {
    
    public int findSlotBefore(Constant searchkey, String opr) {
       int slot = 0;
-      
+
       switch (opr) {
 	      case "=", ">=" -> {
 	          while (slot < getNumRecs() && getDataVal(slot).compareTo(searchkey) < 0)
@@ -59,7 +59,7 @@ public class BTPage {
 	              slot++;
 	          return slot-1;
 	      }
-	      default -> { return 0; }
+	      default -> { return -1; }
       }
    }
    

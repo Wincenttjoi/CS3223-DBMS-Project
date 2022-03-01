@@ -107,7 +107,7 @@ class TablePlanner {
    private Plan makeIndexSelect() {
       for (String fldname : indexes.keySet()) {
          Constant val = mypred.comparesWithConstant(fldname);
-         String opr = mypred.getOperator(fldname);
+         String opr = mypred.getOperatorFromConstantComparison(fldname);
          IndexInfo ii = indexes.get(fldname);
          
          // use index select if operator isn't "!=" and if idxtype is hash, operator must be "="
@@ -123,7 +123,7 @@ class TablePlanner {
    private Plan makeIndexJoin(Plan current, Schema currsch) {
       for (String fldname : indexes.keySet()) {
          String outerfield = mypred.comparesWithField(fldname);
-         String opr = mypred.getOperator(fldname);
+         String opr = mypred.getOperatorFromFieldComparison(fldname);
 
          if (outerfield != null && opr.equals("=") && currsch.hasField(outerfield)) {
             IndexInfo ii = indexes.get(fldname);
@@ -142,7 +142,7 @@ class TablePlanner {
 	   String joinValLHS = joinTerm.getLHS().asFieldName();
 	   String joinValRHS = joinTerm.getRHS().asFieldName();
 	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-	   String opr = mypred.getOperator(joinValLHS);
+	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
 	   
 	   Plan lhsPlan, rhsPlan;
 	   if (isCurrentPlanOnRHS) {
