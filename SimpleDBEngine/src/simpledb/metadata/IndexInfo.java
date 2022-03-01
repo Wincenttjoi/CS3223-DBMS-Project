@@ -98,6 +98,17 @@ public class IndexInfo {
       return fldname.equals(fname) ? 1 : si.distinctValues(fldname);
    }
    
+   /** 
+    * Return true if the index supports rangesearch
+    */
+   public boolean supportsRangeSearch() {
+	   switch (idxtype) {
+		  case "hash" -> { return false; }
+		  case "btree" -> { return true; }
+		  default -> throw new RuntimeException();	   
+	   }
+   }
+   
    /**
     * Return the layout of the index records.
     * The schema consists of the dataRID (which is

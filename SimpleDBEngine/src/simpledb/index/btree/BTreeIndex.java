@@ -172,6 +172,7 @@ public class BTreeIndex implements Index {
     * @return the estimated traversal cost
     */
    public static int searchCost(int numblocks, int rpb) {
+	  if (numblocks == 0) return 1;
       return 1 + (int)(Math.log(numblocks) / Math.log(rpb));
    }
 }

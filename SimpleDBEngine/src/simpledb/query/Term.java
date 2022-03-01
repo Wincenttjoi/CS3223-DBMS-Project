@@ -93,27 +93,25 @@ public class Term {
    }
    
    /**
-    * Retrieve the operator where this term is of the form "F opr c"
-    * where F is the specified field, opr is a operator and c is some constant.
+    * Retrieve the operator where this term is of the form "F opr x"
+    * where F is the specified field, opr is a operator and x is some constant or field.
     * If so, the method returns that operator.
     * If not, the method returns null.
     * @param fldname the name of the field
     * @return either the operator or null
     */
    public String getOperator(String fldname) {
-	  boolean isConstantOnLHS;
+	  boolean isFldNameOnLHS;
       if (lhs.isFieldName() &&
-          lhs.asFieldName().equals(fldname) &&
-          !rhs.isFieldName())
-    	 isConstantOnLHS = false;
+          lhs.asFieldName().equals(fldname))
+    	 isFldNameOnLHS = true;
       else if (rhs.isFieldName() &&
-               rhs.asFieldName().equals(fldname) &&
-               !lhs.isFieldName())
-    	  isConstantOnLHS = true;
+               rhs.asFieldName().equals(fldname))
+    	  isFldNameOnLHS = false;
       else
          return null;
       
-      if (isConstantOnLHS) {
+      if (!isFldNameOnLHS) {
           switch (opr) {
 		      case "<" -> { return ">="; }
 		      case "<=" -> { return ">"; }

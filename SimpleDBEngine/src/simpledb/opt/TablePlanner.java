@@ -1,6 +1,5 @@
 package simpledb.opt;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,7 +23,8 @@ class TablePlanner {
    private Schema myschema;
    private Map<String,IndexInfo> indexes;
    private Transaction tx;
-   
+
+
    /**
     * Creates a new table planner.
     * The specified predicate applies to the entire query.
@@ -64,24 +64,33 @@ class TablePlanner {
     * @param current the specified plan
     * @return a join plan of the plan and this table
     */
-   public Plan makeJoinPlan(Plan current) {
+   public Plan makeJoinPlan(Plan current, JoinAlgoSelector joinAlgoSelected) {
       Schema currsch = current.schema();
       Predicate joinpred = mypred.joinSubPred(myschema, currsch);
       if (joinpred == null)
          return null;
-     
-     Plan indexJoinPlan = makeIndexJoin(current, currsch);
- 	 Plan mergeJoinPlan = makeMergeJoin(current, currsch);
-     Plan nestedJoinPlan = makeProductJoin(current, currsch);
+            
+      if (joinAlgoSelected == null) {
+	      Plan indexJoinPlan = makeIndexJoin(current, currsch);
+	      Plan mergeJoinPlan = makeMergeJoin(current, currsch);
+	      Plan nestedJoinPlan = makeProductJoin(current, currsch);
 
-     Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan)
-    		 .filter((p) -> p != null)
-    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()))
-    	     .peek(x -> System.out.println(x.toString() + ". Blocks accessed: " + x.blocksAccessed()));
-     List<Plan> res = plans.collect(Collectors.toList());
-     
-     Plan bestPlan = res.get(0);
-     return bestPlan;
+	      Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan)
+	    		 .filter((p) -> p != null)
+	    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()));
+	      return plans.collect(Collectors.toList()).get(0);
+      }
+      
+      switch (joinAlgoSelected) {
+	      case INDEXJOIN_PLAN:
+	    	  return makeIndexJoin(current, currsch);
+	      case MERGEJOIN_PLAN:
+	    	  return makeMergeJoin(current, currsch);
+	      case NESTEDJOIN_PLAN:
+	    	  return makeProductJoin(current, currsch);
+	      default:
+	    	  throw new RuntimeException();
+      }
    }
    
    /**
@@ -114,10 +123,13 @@ class TablePlanner {
    private Plan makeIndexJoin(Plan current, Schema currsch) {
       for (String fldname : indexes.keySet()) {
          String outerfield = mypred.equatesWithField(fldname);
-         if (outerfield != null && currsch.hasField(outerfield)) {
+         String opr = mypred.getOperator(fldname);
+
+         if (outerfield != null && opr.equals("=") && currsch.hasField(outerfield)) {
             IndexInfo ii = indexes.get(fldname);
             Plan p = new IndexJoinPlan(current, myplan, ii, outerfield);
             p = addSelectPred(p);
+            System.out.println("Indexjoin blocks accessed = " + p.blocksAccessed());
             return addJoinPred(p, currsch);
          }
       }
@@ -129,15 +141,22 @@ class TablePlanner {
 	   Term joinTerm = joinpred.getTerms().get(0);
 	   String joinValLHS = joinTerm.getLHS().asFieldName();
 	   String joinValRHS = joinTerm.getRHS().asFieldName();
-	   if (current.schema().fields().contains(joinValRHS)) {
-		   return new MergeJoinPlan(tx, current, myplan, joinValRHS, joinValLHS);
+	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
+	   Plan p;
+	   if (isCurrentPlanOnRHS) {
+		   p = new MergeJoinPlan(tx, current, myplan, joinValRHS, joinValLHS);
 	   } else {
-		   return new MergeJoinPlan(tx, current, myplan, joinValLHS, joinValRHS);
+		   p = new MergeJoinPlan(tx, current, myplan, joinValLHS, joinValRHS);
 	   }
+	   p = addSelectPred(p);
+       System.out.println("Mergejoin blocks accessed = " + p.blocksAccessed());
+	   return addJoinPred(p, currsch);
    }
    
    private Plan makeProductJoin(Plan current, Schema currsch) {
       Plan p = makeProductPlan(current);
+      p = addSelectPred(p);
+      System.out.println("Nestedplan blocks accessed = " + p.blocksAccessed());
       return addJoinPred(p, currsch);
    }
    

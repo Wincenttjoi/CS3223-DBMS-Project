@@ -101,14 +101,14 @@ public class MergeJoinPlan implements Plan {
    }
    
    public String toString() {
-	      return "Merge join on " + fldname1 + " = " + fldname2;
+	  return "Merge join plan used on " + fldname1 + " = " + fldname2;
    }
    
    /**
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Merge join on " + fldname1 + " = " + fldname2);
+	   System.out.println("Merge join plan used on " + fldname1 + " = " + fldname2);
    }
 }
 

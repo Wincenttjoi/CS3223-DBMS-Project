@@ -4,6 +4,7 @@ import java.util.*;
 
 import simpledb.query.*;
 import simpledb.record.*;
+import simpledb.opt.JoinAlgoSelector;
 
 /**
  * The SimpleDB parser.
@@ -76,12 +77,23 @@ public class Parser {
          lex.eatKeyword("where");
          pred.conjoinWith(predicate());
       }
+      
+      JoinAlgoSelector joinAlgoSelected = null;
+      for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
+    	  if (lex.matchKeyword(selector.toString())) {
+              lex.eatKeyword(selector.toString());
+              joinAlgoSelected = selector;
+    	  }
+      }
+      
       if (lex.matchKeyword("order")) {
           lex.eatKeyword("order");
           lex.eatKeyword("by");
           sortMap = sortList();
        }
-      return new QueryData(fields, isDistinct, tables, pred, sortMap);
+      
+      
+      return new QueryData(fields, isDistinct, tables, pred, sortMap, joinAlgoSelected);
    }
    
    private List<String> selectList() {

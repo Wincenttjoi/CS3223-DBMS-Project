@@ -1,7 +1,5 @@
 package simpledb.materialize;
 
-import java.util.*;
-
 import simpledb.query.*;
 
 /**

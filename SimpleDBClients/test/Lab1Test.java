@@ -155,7 +155,7 @@ public class Lab1Test {
 //          lee      9      10
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where sid < 4");
-// TEST13
+// TEST14
 //          sname    sid majorid
 //          --------------------------
 //          joe      1      10
@@ -163,7 +163,7 @@ public class Lab1Test {
 //          max      3      10
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where sid <= 4");
-// TEST13
+// TEST15
 //          sname    sid majorid
 //          --------------------------
 //          joe      1      10
@@ -171,7 +171,16 @@ public class Lab1Test {
 //          max      3      10
 //          sue      4      20
     	  
+    	  doTest(stmt, "select sname from student, dept where sname = 'jonah'");
+// TEST16
+//        sname  
+//        ------
     	  
+    	  doTest(stmt, "select sname from student where sname = 'jonah'");
+// TEST17
+//        sname  
+//        ------
+
       }
       catch (SQLException e) {
          e.printStackTrace();
