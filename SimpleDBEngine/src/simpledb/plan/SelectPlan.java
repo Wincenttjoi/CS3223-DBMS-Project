@@ -67,7 +67,7 @@ public class SelectPlan implements Plan {
       if (pred.comparesWithConstant(fldname) != null)
          return 1;
       else {
-         String fldname2 = pred.equatesWithField(fldname);
+         String fldname2 = pred.comparesWithField(fldname);
          if (fldname2 != null) 
             return Math.min(p.distinctValues(fldname),
                             p.distinctValues(fldname2));

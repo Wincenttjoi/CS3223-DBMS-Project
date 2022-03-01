@@ -11,6 +11,10 @@ public class MergeJoinScan implements Scan {
    private SortScan s2;
    private String fldname1, fldname2;
    private Constant joinval = null;
+   private Constant joinval2 = null;
+   private boolean firstMatchforLHS = true, firstScan = true, positionSaved = false;
+
+   private String opr;
    
    /**
     * Create a mergejoin scan for the two underlying sorted scans.
@@ -19,11 +23,12 @@ public class MergeJoinScan implements Scan {
     * @param fldname1 the LHS join field
     * @param fldname2 the RHS join field
     */
-   public MergeJoinScan(Scan s1, SortScan s2, String fldname1, String fldname2) {
+   public MergeJoinScan(Scan s1, SortScan s2, String fldname1, String fldname2, String opr) {
       this.s1 = s1;
       this.s2 = s2;
       this.fldname1 = fldname1;
       this.fldname2 = fldname2;
+      this.opr = opr;
       beforeFirst();
    }
    
@@ -61,30 +66,67 @@ public class MergeJoinScan implements Scan {
     * @see simpledb.query.Scan#next()
     */
    public boolean next() {
-      boolean hasmore2 = s2.next();
-      if (hasmore2 && s2.getVal(fldname2).equals(joinval))
-         return true;
-      
-      boolean hasmore1 = s1.next();
-      if (hasmore1 && s1.getVal(fldname1).equals(joinval)) {
-         s2.restorePosition();
-         return true;
-      }
-      
-      while (hasmore1 && hasmore2) {
-         Constant v1 = s1.getVal(fldname1);
-         Constant v2 = s2.getVal(fldname2);
-         if (v1.compareTo(v2) < 0)
-            hasmore1 = s1.next();
-         else if (v1.compareTo(v2) > 0)
-            hasmore2 = s2.next();
-         else {
-            s2.savePosition();
-            joinval  = s2.getVal(fldname2);
-            return true;
-         }
-      }
-      return false;
+	  if (opr.equals("=")) {
+	      boolean hasmore2 = s2.next();
+	      if (hasmore2 && s2.getVal(fldname2).equals(joinval))
+	         return true;
+	      
+	      boolean hasmore1 = s1.next();
+	      if (hasmore1 && s1.getVal(fldname1).equals(joinval)) {
+	         s2.restorePosition();
+	         return true;
+	      }
+	      
+	      while (hasmore1 && hasmore2) {
+	         Constant v1 = s1.getVal(fldname1);
+	         Constant v2 = s2.getVal(fldname2);
+	         if (v1.compareTo(v2) < 0)
+	            hasmore1 = s1.next();
+	         else if (v1.compareTo(v2) > 0)
+	            hasmore2 = s2.next();
+	         else {
+	            s2.savePosition();
+	            joinval  = s2.getVal(fldname2);
+	            return true;
+	         }
+	      }
+	      return false;
+	  } else if (opr.equals("<") || opr.equals("<=")) {
+  	  	  boolean hasmore1 = true;
+     	  boolean hasmore2 = s2.next();
+
+		  if (firstScan == true) {
+			   hasmore1 = s1.next();
+			   firstScan = false;
+		  }
+     	  
+	      while (hasmore1) {
+	     	 while (hasmore2) {
+	     		  if (OprComparator.compare(s1.getVal(fldname1), s2.getVal(fldname2), opr)) {
+	     			  if (firstMatchforLHS) {
+		         		  s2.savePosition();
+		         		  positionSaved = true;
+		         		  firstMatchforLHS = false;
+	     			  }
+	         		  return true;
+	     		  }
+	     		  hasmore2 = s2.next();
+	     	 }
+	     	 hasmore1 = s1.next();
+	     	 if (positionSaved) {
+	     		 s2.restorePosition();
+	     	 }
+		     firstMatchforLHS = true;
+		     if (!positionSaved) {
+		    	 s2.beforeFirst();
+		    	 s2.next();
+		     }
+		     hasmore2 = true;
+	      }
+	      return false;
+	  } else {
+		  return false;
+	  }
    }
    
    /** 

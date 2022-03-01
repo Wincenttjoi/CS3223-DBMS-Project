@@ -93,6 +93,28 @@ public class Term {
    }
    
    /**
+    * Determine if this term is of the form "F1 opr F2"
+    * where F1 is the specified field, opr is a operator and F2 is another field.
+    * If so, the method returns the name of that field.
+    * If not, the method returns null.
+    * @param fldname the name of the field
+    * @return either the name of the other field, or null
+    */
+   public String comparesWithField(String fldname) {
+      if (lhs.isFieldName() &&
+          lhs.asFieldName().equals(fldname) &&
+          rhs.isFieldName())
+         return rhs.asFieldName();
+      else if (rhs.isFieldName() &&
+               rhs.asFieldName().equals(fldname) &&
+               lhs.isFieldName())
+         return lhs.asFieldName();
+      else
+         return null;
+   }
+   
+   
+   /**
     * Retrieve the operator where this term is of the form "F opr x"
     * where F is the specified field, opr is a operator and x is some constant or field.
     * If so, the method returns that operator.
@@ -122,27 +144,6 @@ public class Term {
       } else {
     	  return opr;
       }
-   }
-   
-   /**
-    * Determine if this term is of the form "F1=F2"
-    * where F1 is the specified field and F2 is another field.
-    * If so, the method returns the name of that field.
-    * If not, the method returns null.
-    * @param fldname the name of the field
-    * @return either the name of the other field, or null
-    */
-   public String equatesWithField(String fldname) {
-      if (lhs.isFieldName() &&
-          lhs.asFieldName().equals(fldname) &&
-          rhs.isFieldName())
-         return rhs.asFieldName();
-      else if (rhs.isFieldName() &&
-               rhs.asFieldName().equals(fldname) &&
-               lhs.isFieldName())
-         return lhs.asFieldName();
-      else
-         return null;
    }
    
    /**

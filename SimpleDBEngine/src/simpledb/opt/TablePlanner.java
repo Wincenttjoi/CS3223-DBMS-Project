@@ -122,7 +122,7 @@ class TablePlanner {
       
    private Plan makeIndexJoin(Plan current, Schema currsch) {
       for (String fldname : indexes.keySet()) {
-         String outerfield = mypred.equatesWithField(fldname);
+         String outerfield = mypred.comparesWithField(fldname);
          String opr = mypred.getOperator(fldname);
 
          if (outerfield != null && opr.equals("=") && currsch.hasField(outerfield)) {
@@ -142,11 +142,29 @@ class TablePlanner {
 	   String joinValLHS = joinTerm.getLHS().asFieldName();
 	   String joinValRHS = joinTerm.getRHS().asFieldName();
 	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-	   Plan p;
+	   String opr = mypred.getOperator(joinValLHS);
+	   
+	   Plan lhsPlan, rhsPlan;
 	   if (isCurrentPlanOnRHS) {
-		   p = new MergeJoinPlan(tx, current, myplan, joinValRHS, joinValLHS);
+		   lhsPlan = myplan;
+		   rhsPlan = current;
 	   } else {
-		   p = new MergeJoinPlan(tx, current, myplan, joinValLHS, joinValRHS);
+		   lhsPlan = current;
+		   rhsPlan = myplan;
+	   }
+	   
+	   Plan p;
+	   if (opr.equals(">")) {
+		   opr = "<";
+		   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
+	   } else if (opr.equals(">=")) {
+		   opr = "<=";
+		   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
+	   } else if (opr.equals("=") || opr.equals("<") || opr.equals("<=")) {
+		   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+	   } else {
+		   // No mergejoin plan for <>; sounds inefficient
+		   return null;
 	   }
 	   p = addSelectPred(p);
        System.out.println("Mergejoin blocks accessed = " + p.blocksAccessed());
@@ -156,7 +174,7 @@ class TablePlanner {
    private Plan makeProductJoin(Plan current, Schema currsch) {
       Plan p = makeProductPlan(current);
       p = addSelectPred(p);
-      System.out.println("Nestedplan blocks accessed = " + p.blocksAccessed());
+      System.out.println("Nestedjoin blocks accessed = " + p.blocksAccessed());
       return addJoinPred(p, currsch);
    }
    

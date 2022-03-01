@@ -15,6 +15,7 @@ public class MergeJoinPlan implements Plan {
    private Plan p1, p2;
    private String fldname1, fldname2;
    private Schema sch = new Schema();
+   private String opr;
    
    /**
     * Creates a mergejoin plan for the two specified queries.
@@ -26,7 +27,7 @@ public class MergeJoinPlan implements Plan {
     * @param fldname2 the RHS join field
     * @param tx the calling transaction
     */
-   public MergeJoinPlan(Transaction tx, Plan p1, Plan p2, String fldname1, String fldname2) {
+   public MergeJoinPlan(Transaction tx, Plan p1, Plan p2, String fldname1, String fldname2, String opr) {
       this.fldname1 = fldname1;
       List<String> sortlist1 = Arrays.asList(fldname1);
       this.p1 = new SortPlan(tx, p1, sortlist1);
@@ -35,6 +36,7 @@ public class MergeJoinPlan implements Plan {
       List<String> sortlist2 = Arrays.asList(fldname2);
       this.p2 = new SortPlan(tx, p2, sortlist2);
       
+      this.opr = opr;
       sch.addAll(p1.schema());
       sch.addAll(p2.schema());
    }
@@ -45,10 +47,10 @@ public class MergeJoinPlan implements Plan {
      * @see simpledb.plan.Plan#open()
      */
    public Scan open() {
-      Scan s1 = p1.open();
+	  Scan s1 = p1.open();
       SortScan s2 = (SortScan) p2.open();
       printPlan();
-      return new MergeJoinScan(s1, s2, fldname1, fldname2);
+      return new MergeJoinScan(s1, s2, fldname1, fldname2, opr);
    }
    
    /**
@@ -101,14 +103,14 @@ public class MergeJoinPlan implements Plan {
    }
    
    public String toString() {
-	  return "Merge join plan used on " + fldname1 + " = " + fldname2;
+	  return "Merge join plan used on " + fldname1 + opr + fldname2;
    }
    
    /**
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Merge join plan used on " + fldname1 + " = " + fldname2);
+	   System.out.println("Merge join plan used on " + fldname1 + opr + fldname2);
    }
 }
 

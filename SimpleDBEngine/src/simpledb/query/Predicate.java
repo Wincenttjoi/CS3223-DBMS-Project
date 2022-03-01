@@ -104,7 +104,7 @@ public class Predicate {
 
    /**
     * Determine if there is a term of the form "F opr c"
-    * where F is the specified field, opr the operator and c is some constant.
+    * where F is the specified field, opr is a operator and c is some constant.
     * If so, the method returns that constant.
     * If not, the method returns null.
     * @param fldname the name of the field
@@ -120,8 +120,8 @@ public class Predicate {
    }
    
    /**
-    * Retrieve the operator where this term is of the form "F opr c"
-    * where F is the specified field, opr the operator and c is some constant.
+    * Retrieve the operator where this term is of the form "F opr x"
+    * where F is the specified field, opr is a operator and c is some constant.
     * If so, the method returns that constant.
     * If not, the method returns null.
     * @param fldname the name of the field
@@ -129,24 +129,24 @@ public class Predicate {
     */
    public String getOperator(String fldname) {
       for (Term t : terms) {
-         String opr = t.getOperator(fldname);
-         if (opr != null)
-            return opr;
+         String s = t.comparesWithField(fldname);
+         if (s != null)
+            return t.getOperator(fldname);
       }
       return null;
    }
    
    /**
-    * Determine if there is a term of the form "F1=F2"
-    * where F1 is the specified field and F2 is another field.
+    * Determine if there is a term of the form "F1 opr F2"
+    * where F1 is the specified field, opr is a operator and F2 is another field.
     * If so, the method returns the name of that field.
     * If not, the method returns null.
     * @param fldname the name of the field
     * @return the name of the other field, or null
     */
-   public String equatesWithField(String fldname) {
+   public String comparesWithField(String fldname) {
       for (Term t : terms) {
-         String s = t.equatesWithField(fldname);
+         String s = t.comparesWithField(fldname);
          if (s != null)
             return s;
       }
