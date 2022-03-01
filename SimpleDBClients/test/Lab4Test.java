@@ -22,9 +22,11 @@ public class Lab4Test {
       try (Connection conn = d.connect(s, null);
           Statement stmt = conn.createStatement()) {
 
+//		  For reference    	  
 //    	  doQuery(stmt, "select SId, SName, MajorId, GradYear from student");
 //    	  doQuery(stmt, "select EId, StudentId, SectionId, Grade from enroll");
 //    	  doQuery(stmt, "select DId, DName from dept");
+//    	  doQuery(stmt, "select CId, Title, DeptId from course");
 //
 // ------------------- No indexes ------------------- 
     	  
@@ -39,7 +41,8 @@ public class Lab4Test {
 //    	        algebra     20     20
 //    	         acting     30     30
 //    	      elocution     30     30
-    	    	  
+    	  
+    	  
     	  doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where deptid < did");
 // TEST2 - Less than
 // Note: indexjoin fails because there's no index + range search not supported
@@ -80,7 +83,7 @@ public class Lab4Test {
 // ------------------- BTree index on majorid ------------------- 
 
     	  doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid = did indexjoin");
-// TEST7 - Equal 
+// TEST5 - Equal 
 //                  sname sid  majorid   did
 //          ---------------------------------
 //                  lee      9      10     10
@@ -97,7 +100,7 @@ public class Lab4Test {
 
     	  doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
     	  		+ "student, enroll, dept where studentid = sid and majorid = did indexjoin");
-// TEST10 - Equal (hash) and equal (btree)
+// TEST6 - Equal (hash) and equal (btree)
 //                  sname sid  majorid   did
 //          ---------------------------------
 //                  lee      9      10     10
@@ -112,23 +115,21 @@ public class Lab4Test {
     	  
     	  doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
       	  		+ "student, enroll, dept where studentid = sid and majorid < did indexjoin");
-// TEST11 - Equal (hash) and less than (btree)
-//                  sname sid  majorid    did
-//          ---------------------------------
-//                  joe      1      10     20
-//                  max      3      10     20
-//                  lee      9      10     20
-//                  joe      1      10     30
-//                  amy      2      20     30
-//                  max      3      10     30
-//                  sue      4      20     30
-//                  kim      6      20     30
-//                  pat      8      20     30
-//                  lee      9      10     30
+// TEST7 - Equal (hash) and less than (btree)
+          sname    sid studentid grade majorid    did
+          -------------------------------------------------
+                  joe      1         1     A      10     20
+                  joe      1         1     C      10     20
+                  joe      1         1     A      10     30
+                  joe      1         1     C      10     30
+                  amy      2         2    B+      20     30
+                  sue      4         4     B      20     30
+                  sue      4         4     A      20     30
+                  kim      6         6     A      20     30
     	  
     	  doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
         	  		+ "student, enroll, dept where studentid = sid and majorid <> did indexjoin");
-// TEST12 - Equal (hash)  and not equal (btree)
+// TEST8 - Equal (hash)  and not equal (btree)
 //          sname    sid studentid grade majorid    did
 //          -------------------------------------------------
 //                  amy      2         2    B+      20     10

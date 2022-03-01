@@ -20,6 +20,9 @@ public class Lab1Test {
       
       try (Connection conn = d.connect(s, null);
           Statement stmt = conn.createStatement()) {
+    	  
+//		  For reference
+//    	  doQuery(stmt, "select SId, SName, MajorId, GradYear from student");
 
     	  doTest(stmt, "select sname, sid, majorid from student where majorid = 10");
 // TEST1
@@ -50,8 +53,22 @@ public class Lab1Test {
 //                  art      7      30
 //                  pat      8      20
     	  
-    	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 10");
+    	  doTest(stmt, "select sname, sid, majorid from student where 10 <= majorid");
 // TEST4
+//        sname    sid majorid
+//        --------------------------
+//                joe      1      10
+//                amy      2      20
+//                max      3      10
+//                sue      4      20
+//                bob      5      30
+//                kim      6      20
+//                art      7      30
+//                pat      8      20
+//                lee      9      10
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 10");
+// TEST5
 //          sname    sid majorid
 //          --------------------------
 //                  joe      1      10
@@ -65,27 +82,27 @@ public class Lab1Test {
 //                  lee      9      10
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where majorid <= 20");
-// TEST5
-//          sname    sid majorid
-//          --------------------------
-
-//                  amy      2      20
-//                  max      3      10
-//                  sue      4      20
-//                  kim      6      20
-//                  pat      8      20
-//                  lee      9      10
-    	  
-    	  doTest(stmt, "select sname, sid, majorid from student where majorid < 20");
 // TEST6
 //          sname    sid majorid
 //          --------------------------
-
-//                  max      3      10
-//                  lee      9      10
+//          lee      9      10
+//          max      3      10
+//          joe      1      10
+//          pat      8      20
+//          kim      6      20
+//          sue      4      20
+//          amy      2      20
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where majorid < 20");
+// TEST7
+//          sname    sid majorid
+//          --------------------------
+//          lee      9      10
+//          max      3      10
+//          joe      1      10
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 20 and sid > 4");
-// TEST7
+// TEST8
 //          sname    sid majorid
 //          --------------------------
 //                  bob      5      30
@@ -94,7 +111,7 @@ public class Lab1Test {
 //                  pat      8      20
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where majorid >= 20 and sid > 4 and sname != 'bob'");
-// TEST8
+// TEST9
 //          sname    sid majorid
 //          --------------------------
 //                  kim      6      20
@@ -102,19 +119,6 @@ public class Lab1Test {
 //                  pat      8      20
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where sid <> 4");
-// TEST9
-//          sname    sid majorid
-//          --------------------------
-//          joe      1      10
-//          amy      2      20
-//          max      3      10
-//          bob      5      30
-//          kim      6      20
-//          art      7      30
-//          pat      8      20
-//          lee      9      10
-    	  
-    	  doTest(stmt, "select sname, sid, majorid from student where sid != 4");
 // TEST10
 //          sname    sid majorid
 //          --------------------------
@@ -127,14 +131,27 @@ public class Lab1Test {
 //          pat      8      20
 //          lee      9      10
     	  
-    	  doTest(stmt, "select sname, sid, majorid from student where sid = 4");
+    	  doTest(stmt, "select sname, sid, majorid from student where sid != 4");
 // TEST11
+//          sname    sid majorid
+//          --------------------------
+//          joe      1      10
+//          amy      2      20
+//          max      3      10
+//          bob      5      30
+//          kim      6      20
+//          art      7      30
+//          pat      8      20
+//          lee      9      10
+    	  
+    	  doTest(stmt, "select sname, sid, majorid from student where sid = 4");
+// TEST12
 //          sname    sid majorid
 //          --------------------------
 //          sue      4      20
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where sid > 4");
-// TEST12
+// TEST13
 //          sname    sid majorid
 //          --------------------------
 //          bob      5      30
@@ -144,7 +161,7 @@ public class Lab1Test {
 //          lee      9      10
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where sid >= 4");
-// TEST13
+// TEST14
 //          sname    sid majorid
 //          --------------------------
 //    	    sue      4      20
@@ -155,7 +172,7 @@ public class Lab1Test {
 //          lee      9      10
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where sid < 4");
-// TEST14
+// TEST15
 //          sname    sid majorid
 //          --------------------------
 //          joe      1      10
@@ -163,7 +180,7 @@ public class Lab1Test {
 //          max      3      10
     	  
     	  doTest(stmt, "select sname, sid, majorid from student where sid <= 4");
-// TEST15
+// TEST16
 //          sname    sid majorid
 //          --------------------------
 //          joe      1      10
@@ -172,14 +189,15 @@ public class Lab1Test {
 //          sue      4      20
     	  
     	  doTest(stmt, "select sname from student, dept where sname = 'jonah'");
-// TEST16
-//        sname  
-//        ------
-    	  
-    	  doTest(stmt, "select sname from student where sname = 'jonah'");
 // TEST17
 //        sname  
 //        ------
+    	  
+//    	  doTest(stmt, "select sname from student where sname = 'jonah'");
+// TEST18
+//        sname  
+//        ------
+
 
       }
       catch (SQLException e) {
