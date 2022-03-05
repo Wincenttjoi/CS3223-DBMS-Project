@@ -45,6 +45,7 @@ public class GroupByPlan implements Plan {
     */
    public Scan open() {
       Scan s = p.open();
+      printPlan();
       return new GroupByScan(s, groupfields, aggfns);
    }
    
@@ -97,5 +98,13 @@ public class GroupByPlan implements Plan {
     */
    public Schema schema() {
       return sch;
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   // TODO: to include the aggregation functions and groupfields
+	   System.out.println("Group By Plan used");
    }
 }

@@ -32,6 +32,7 @@ public class TablePlan implements Plan {
     * @see simpledb.plan.Plan#open()
     */
    public Scan open() {
+	  printPlan();
       return new TableScan(tx, tblname, layout);
    }
    
@@ -69,5 +70,12 @@ public class TablePlan implements Plan {
     */
    public Schema schema() {
       return layout.schema();
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Table Plan used on table " + tblname);
    }
 }

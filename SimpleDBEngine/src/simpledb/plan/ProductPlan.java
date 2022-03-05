@@ -32,6 +32,7 @@ public class ProductPlan implements Plan {
    public Scan open() {
       Scan s1 = p1.open();
       Scan s2 = p2.open();
+      printPlan();
       return new ProductScan(s1, s2);
    }
    
@@ -75,5 +76,21 @@ public class ProductPlan implements Plan {
     */
    public Schema schema() {
       return schema;
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   String stmt = "Product Plan used across fields ";
+	   for (String field1 : p1.schema().fields()) {
+		   stmt += field1 + ", ";
+	   }
+	   stmt += " and fields ";
+	   for (String field2 : p2.schema().fields()) {
+		   stmt += field2 + ", ";
+	   }
+	   stmt = stmt.substring(0, stmt.length() - 2);
+	   System.out.println(stmt);
    }
 }

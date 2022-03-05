@@ -20,6 +20,7 @@ public class OptimizedProductPlan implements Plan {
    }
 
    public Scan open() {
+	  printPlan();
       return bestplan.open();
    }
    
@@ -37,5 +38,12 @@ public class OptimizedProductPlan implements Plan {
 
    public Schema schema() {
       return bestplan.schema();
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Optimized Product Plan used");
    }
 }

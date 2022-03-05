@@ -38,6 +38,7 @@ public class IndexSelectPlan implements Plan {
       // throws an exception if p is not a tableplan.
       TableScan ts = (TableScan) p.open();
       Index idx = ii.open();
+      printPlan();
       return new IndexSelectScan(ts, idx, val);
    }
    
@@ -75,5 +76,13 @@ public class IndexSelectPlan implements Plan {
     */
    public Schema schema() {
       return p.schema(); 
+   }
+   
+   /**
+    * Prints the plan that is being used.
+    */
+   public void printPlan() {
+	   System.out.println("Index Select Plan used for plan " + p.toString() +
+			   " with value of " + val.toString());
    }
 }

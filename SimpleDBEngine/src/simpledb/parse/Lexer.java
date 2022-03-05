@@ -64,7 +64,8 @@ public class Lexer {
     * @return true if that keyword is the current token
     */
    public boolean matchKeyword(String w) {
-      return tok.ttype == StreamTokenizer.TT_WORD && tok.sval.equals(w);
+      return tok.ttype == StreamTokenizer.TT_WORD && keywords.contains(w) &&
+    		  tok.sval.equals(w);
    }
    
    /**
@@ -245,9 +246,10 @@ public class Lexer {
       keywords = Arrays.asList("select", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
                                "create", "table", "int", "varchar", "view", "as", "index", "using", "on",
-                               "order", "by", 
+                               "order", "by", "distinct",
                                "group", "by",
                                "sum", "count", "avg", "min", "max");
+
    }
    
    private void initOperators() {

@@ -30,7 +30,7 @@ public class HeuristicQueryPlanner implements QueryPlanner {
    public Plan createPlan(QueryData data, Transaction tx) {
       
 	  // for debugging
-	  // System.out.println(data.toString());
+//	   System.out.println(data.toString());
 	   
       // Step 1:  Create a TablePlanner object for each mentioned table
       for (String tblname : data.tables()) {
@@ -53,10 +53,15 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       // Step 4.  Project on the field names and return
       Plan projectplan = new ProjectPlan(currentplan, data.fields());
       
-      // Step 5. Aggregate results on group fields and return (Lab5)
-      if (!data.aggfns().isEmpty()) {
-    	  projectPlan = new GroupByPlan(tx, projectplan, data.groupfields(), data.aggfns());
+      if (data.isDistinct()) {
+    	  projectplan = new SortPlan(tx, projectplan, data.fields());
+    	  projectplan = new DistinctPlan(projectplan);
       }
+      
+      // Step 5. Aggregate results on group fields and return (Lab5)
+//      if (!data.aggfns().isEmpty()) {
+//    	  projectPlan = new GroupByPlan(tx, projectplan, data.groupfields(), data.aggfns());
+//      }
       
       // Step 6. Sort results on sort fields and return (Lab3)
       if (!data.sortMap().isEmpty()) {

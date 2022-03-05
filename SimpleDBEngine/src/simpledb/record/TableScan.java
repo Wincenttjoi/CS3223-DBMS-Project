@@ -1,6 +1,7 @@
 package simpledb.record;
 
 import static java.sql.Types.INTEGER;
+
 import simpledb.file.BlockId;
 import simpledb.query.*;
 import simpledb.tx.Transaction;

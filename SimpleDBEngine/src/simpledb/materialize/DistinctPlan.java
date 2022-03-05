@@ -1,27 +1,27 @@
-package simpledb.plan;
+package simpledb.materialize;
 
-import simpledb.query.Predicate;
-import simpledb.query.Scan;
-import simpledb.query.SelectScan;
-import simpledb.record.Schema;
+import java.util.*;
+import simpledb.record.*;
+import simpledb.plan.Plan;
+import simpledb.query.*;
 
-/** The Plan class corresponding to the <i>select</i>
-  * relational algebra operator.
-  * @author Edward Sciore
-  */
-public class SelectPlan implements Plan {
+/**
+ * The Plan class for the <i>distinct</i> operator.
+ * @author Edward Sciore
+ */
+public class DistinctPlan implements Plan {
    private Plan p;
-   private Predicate pred;
-   
+   private List<String> fields; 
+
    /**
     * Creates a new select node in the query tree,
     * having the specified subquery and predicate.
     * @param p the subquery
     * @param pred the predicate
     */
-   public SelectPlan(Plan p, Predicate pred) {
+   public DistinctPlan(Plan p) {
       this.p = p;
-      this.pred = pred;
+      this.fields = p.schema().fields();
    }
    
    /**
@@ -31,7 +31,7 @@ public class SelectPlan implements Plan {
    public Scan open() {
       Scan s = p.open();
       printPlan();
-      return new SelectScan(s, pred);
+      return new DistinctScan(s, fields);
    }
    
    /**
@@ -50,7 +50,7 @@ public class SelectPlan implements Plan {
     * @see simpledb.plan.Plan#recordsOutput()
     */
    public int recordsOutput() {
-      return p.recordsOutput() / pred.reductionFactor(p);
+      return p.recordsOutput();
    }
    
    /**
@@ -64,16 +64,7 @@ public class SelectPlan implements Plan {
     * @see simpledb.plan.Plan#distinctValues(java.lang.String)
     */
    public int distinctValues(String fldname) {
-      if (pred.equatesWithConstant(fldname) != null)
-         return 1;
-      else {
-         String fldname2 = pred.equatesWithField(fldname);
-         if (fldname2 != null) 
-            return Math.min(p.distinctValues(fldname),
-                            p.distinctValues(fldname2));
-         else
-            return p.distinctValues(fldname);
-      }
+      return p.distinctValues(fldname);
    }
    
    /**
@@ -89,6 +80,6 @@ public class SelectPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Select Plan used on predicate " + pred.toString());
+	   System.out.println("Distinct Plan used");
    }
 }
