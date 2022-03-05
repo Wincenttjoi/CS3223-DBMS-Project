@@ -1,9 +1,11 @@
 package simpledb.parse;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 import simpledb.query.*;
 import simpledb.record.*;
+import simpledb.materialize.*;
 
 /**
  * The SimpleDB parser.
@@ -22,6 +24,19 @@ public class Parser {
    
    public String field() {
       return lex.eatId();
+   }
+   
+   public List<String> aggField() {
+	   List<String> l = new ArrayList<>();
+	   if (lex.matchAggType()) {
+		   String aggType = lex.eatAggType();
+		   String aggField = lex.eatAggField();
+		   l.add(aggField);
+		   l.add(aggType);
+	   } else {
+		   l.add(lex.eatId());
+	   }
+	   return l;
    }
    
    public Constant constant() {
@@ -57,16 +72,28 @@ public class Parser {
 // Methods for parsing queries
    
    public QueryData query() {
-      lex.eatKeyword("select");
+	  lex.eatKeyword("select");
       boolean isDistinct = false;
       if (lex.matchKeyword("distinct")) {
     	  isDistinct = true;
     	  lex.eatKeyword("distinct");
       }
-      List<String> fields = selectList();
+      
+      List<List<String>> selects = selectList();
+      List<String> fields = new ArrayList<>();
+      List<AggregationFn> aggFns = new ArrayList<>();
+      for (List<String> s : selects) {
+    	  String field = s.get(0);
+    	  if (s.size() >= 2) {
+    		  String func = s.get(1);
+    		  AggregationFn aggFn = parseAggFn(field, func);
+    		  aggFns.add(aggFn);
+    	  }
+    	  fields.add(field);
+      }
+      
       lex.eatKeyword("from");
       Predicate pred = new Predicate();
-      
       Collection<String> tables = tableList();
       pred.conjoinWith(currPred);
       currPred = new Predicate();
@@ -81,12 +108,15 @@ public class Parser {
           lex.eatKeyword("by");
           sortMap = sortList();
       }
-      return new QueryData(fields, isDistinct, tables, pred, sortMap);
+      
+      List<String> groupFields = new ArrayList<>();
+      return new QueryData(fields, isDistinct, tables, pred, sortMap, groupFields, aggFns);
    }
    
-   private List<String> selectList() {
-      List<String> L = new ArrayList<String>();
-      L.add(field());
+   private List<List<String>> selectList() {
+      List<List<String>> L = new ArrayList<>();
+      List<String> l = aggField();
+      L.add(l);
       if (lex.matchDelim(',')) {
          lex.eatDelim(',');
          L.addAll(selectList());
@@ -119,13 +149,13 @@ public class Parser {
 	  Boolean sType = true; // sort type is ascending by default
       if (lex.matchSortType()) {
     	  sType = lex.eatSortType();
-      } else if (lex.matchEnd()) {
-    	  return M;
       }
       M.put(sField, sType);
       if (lex.matchDelim(',')) {
          lex.eatDelim(',');
          M.putAll(sortList());
+      } else {
+    	 lex.eatEnd();
       }
       return M;
    }
@@ -286,6 +316,33 @@ public class Parser {
       lex.eatKeyword("using");
       String idxtype = lex.eatIdxType();
       return new CreateIndexData(idxname, idxtype, tblname, fldname);
+   }
+   
+//  Method for parsing the aggregate functions
+   
+   public AggregationFn parseAggFn(String field, String func) {
+	   AggregationFn aggFn;
+	   switch (func) 
+	   {
+	   case "sum":
+		   aggFn = new SumFn(field);
+		   break;
+	   case "count":
+		   aggFn = new CountFn(field);
+		   break;
+	   case "avg":
+		   aggFn = new AvgFn(field);
+		   break;
+	   case "min":
+		   aggFn = new MinFn(field);
+		   break;
+	   case "max":
+		   aggFn = new MaxFn(field);
+		   break;
+	   default:
+		   aggFn = null;
+	   }
+	   return aggFn;
    }
 }
 
