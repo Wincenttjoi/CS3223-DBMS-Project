@@ -25,6 +25,7 @@ public class MergeJoinPlan implements Plan {
     * @param p2 the RHS query plan
     * @param fldname1 the LHS join field
     * @param fldname2 the RHS join field
+    * @param opr the relational operator between join fields
     * @param tx the calling transaction
     */
    public MergeJoinPlan(Transaction tx, Plan p1, Plan p2, String fldname1, String fldname2, String opr) {
@@ -81,9 +82,8 @@ public class MergeJoinPlan implements Plan {
    }
    
    /**
-    * Estimate the distinct number of field values in the join.
-    * Since the join does not increase or decrease field values,
-    * the estimate is the same as in the appropriate underlying query.
+    * Estimates the number of distinct values for the 
+    * specified field.  
     * @see simpledb.plan.Plan#distinctValues(java.lang.String)
     */
    public int distinctValues(String fldname) {

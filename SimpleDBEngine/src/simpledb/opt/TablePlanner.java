@@ -10,6 +10,7 @@ import simpledb.query.*;
 import simpledb.metadata.*;
 import simpledb.index.planner.*;
 import simpledb.materialize.MergeJoinPlan;
+import simpledb.materialize.NestedJoinPlan;
 import simpledb.multibuffer.MultibufferProductPlan;
 import simpledb.plan.*;
 
@@ -67,6 +68,7 @@ class TablePlanner {
    public Plan makeJoinPlan(Plan current, JoinAlgoSelector joinAlgoSelected) {
       Schema currsch = current.schema();
       Predicate joinpred = mypred.joinSubPred(myschema, currsch);
+      Plan p;
       if (joinpred == null)
          return null;
             
@@ -76,21 +78,28 @@ class TablePlanner {
 	      Plan nestedJoinPlan = makeProductJoin(current, currsch);
 
 	      Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan)
-	    		 .filter((p) -> p != null)
+	    		 .filter((p1) -> p1 != null)
 	    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()));
 	      return plans.collect(Collectors.toList()).get(0);
       }
       
       switch (joinAlgoSelected) {
 	      case INDEXJOIN_PLAN:
-	    	  return makeIndexJoin(current, currsch);
+	    	  p = makeIndexJoin(current, currsch);
+	    	  if (p == null) {
+	    		  p = makeProductJoin(current, currsch);
+	    	  }
+	    	  break;
 	      case MERGEJOIN_PLAN:
-	    	  return makeMergeJoin(current, currsch);
+	    	  p = makeMergeJoin(current, currsch);
+	    	  break;
 	      case NESTEDJOIN_PLAN:
-	    	  return makeProductJoin(current, currsch);
+	    	  p = makeNestedJoin(current, currsch);
+	    	  break;
 	      default:
 	    	  throw new RuntimeException();
       }
+      return p;
    }
    
    /**
@@ -120,6 +129,13 @@ class TablePlanner {
       return null;
    }
       
+   
+   /**
+    * Constructs a indexjoin plan of the specified plan and
+    * this table.
+    * @param current the specified plan
+    * @return a indexjoin plan of the specified plan and this table
+    */
    private Plan makeIndexJoin(Plan current, Schema currsch) {
       for (String fldname : indexes.keySet()) {
          String outerfield = mypred.comparesWithField(fldname);
@@ -135,6 +151,13 @@ class TablePlanner {
       }
       return null;
    }
+   
+   /**
+    * Constructs a mergejoin plan of the specified plan and
+    * this table.
+    * @param current the specified plan
+    * @return a mergejoin plan of the specified plan and this table
+    */
    
    private Plan makeMergeJoin(Plan current, Schema currsch) {
 	   Predicate joinpred = mypred.joinSubPred(currsch, myschema);
@@ -163,7 +186,6 @@ class TablePlanner {
 	   } else if (opr.equals("=") || opr.equals("<") || opr.equals("<=")) {
 		   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
 	   } else {
-		   // No mergejoin plan for <>; sounds inefficient
 		   return null;
 	   }
 	   p = addSelectPred(p);
@@ -172,10 +194,28 @@ class TablePlanner {
    }
    
    private Plan makeProductJoin(Plan current, Schema currsch) {
-      Plan p = makeProductPlan(current);
-      p = addSelectPred(p);
-      System.out.println("Nestedjoin blocks accessed = " + p.blocksAccessed());
-      return addJoinPred(p, currsch);
+       Plan p = makeProductPlan(current);
+       return addJoinPred(p, currsch);
+   }
+   
+   private Plan makeNestedJoin(Plan current, Schema currsch) {
+	   Predicate joinpred = mypred.joinSubPred(currsch, myschema);
+	   Term joinTerm = joinpred.getTerms().get(0);
+	   String joinValLHS = joinTerm.getLHS().asFieldName();
+	   String joinValRHS = joinTerm.getRHS().asFieldName();
+	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
+	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
+	   
+	   Plan lhsPlan, rhsPlan;
+	   if (isCurrentPlanOnRHS) {
+		   lhsPlan = myplan;
+		   rhsPlan = current;
+	   } else {
+		   lhsPlan = current;
+		   rhsPlan = myplan;
+	   }
+	   
+      return new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
    }
    
    private Plan addSelectPred(Plan p) {

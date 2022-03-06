@@ -22,6 +22,7 @@ public class MergeJoinScan implements Scan {
     * @param s2 the RHS sorted scan
     * @param fldname1 the LHS join field
     * @param fldname2 the RHS join field
+    * @param opr the relational operator between join fields
     */
    public MergeJoinScan(Scan s1, SortScan s2, String fldname1, String fldname2, String opr) {
       this.s1 = s1;
@@ -67,67 +68,75 @@ public class MergeJoinScan implements Scan {
     */
    public boolean next() {
 	  if (opr.equals("=")) {
-	      boolean hasmore2 = s2.next();
-	      if (hasmore2 && s2.getVal(fldname2).equals(joinval))
-	         return true;
-	      
-	      boolean hasmore1 = s1.next();
-	      if (hasmore1 && s1.getVal(fldname1).equals(joinval)) {
-	         s2.restorePosition();
-	         return true;
-	      }
-	      
-	      while (hasmore1 && hasmore2) {
-	         Constant v1 = s1.getVal(fldname1);
-	         Constant v2 = s2.getVal(fldname2);
-	         if (v1.compareTo(v2) < 0)
-	            hasmore1 = s1.next();
-	         else if (v1.compareTo(v2) > 0)
-	            hasmore2 = s2.next();
-	         else {
-	            s2.savePosition();
-	            joinval  = s2.getVal(fldname2);
-	            return true;
-	         }
-	      }
-	      return false;
+		  return nextEquals();
 	  } else if (opr.equals("<") || opr.equals("<=")) {
-  	  	  boolean hasmore1 = true;
-     	  boolean hasmore2 = s2.next();
-
-		  if (firstScan == true) {
-			   hasmore1 = s1.next();
-			   firstScan = false;
-		  }
-     	  
-	      while (hasmore1) {
-	     	 while (hasmore2) {
-	     		  if (OprComparator.compare(s1.getVal(fldname1), s2.getVal(fldname2), opr)) {
-	     			  if (firstMatchforLHS) {
-		         		  s2.savePosition();
-		         		  positionSaved = true;
-		         		  firstMatchforLHS = false;
-	     			  }
-	         		  return true;
-	     		  }
-	     		  hasmore2 = s2.next();
-	     	 }
-	     	 hasmore1 = s1.next();
-	     	 if (positionSaved) {
-	     		 s2.restorePosition();
-	     	 }
-		     firstMatchforLHS = true;
-		     if (!positionSaved) {
-		    	 s2.beforeFirst();
-		    	 s2.next();
-		     }
-		     hasmore2 = true;
-	      }
-	      return false;
+		  return nextLesser();
 	  } else {
 		  return false;
 	  }
    }
+	  
+   private boolean nextEquals() {
+      boolean hasmore2 = s2.next();
+      if (hasmore2 && s2.getVal(fldname2).equals(joinval))
+         return true;
+      
+      boolean hasmore1 = s1.next();
+      if (hasmore1 && s1.getVal(fldname1).equals(joinval)) {
+         s2.restorePosition();
+         return true;
+      }
+      
+      while (hasmore1 && hasmore2) {
+         Constant v1 = s1.getVal(fldname1);
+         Constant v2 = s2.getVal(fldname2);
+         if (v1.compareTo(v2) < 0)
+            hasmore1 = s1.next();
+         else if (v1.compareTo(v2) > 0)
+            hasmore2 = s2.next();
+         else {
+            s2.savePosition();
+            joinval  = s2.getVal(fldname2);
+            return true;
+         }
+      }
+      return false;
+    }
+    
+    private boolean nextLesser() {
+  	  boolean hasmore1 = true;
+  	  boolean hasmore2 = s2.next();
+
+	  if (firstScan == true) {
+		   hasmore1 = s1.next();
+		   firstScan = false;
+	  }
+  
+      while (hasmore1) {
+     	 while (hasmore2) {
+     		  if (OprComparator.compare(s1.getVal(fldname1), s2.getVal(fldname2), opr)) {
+     			  if (firstMatchforLHS) {
+	         		  s2.savePosition();
+	         		  positionSaved = true;
+	         		  firstMatchforLHS = false;
+     			  }
+         		  return true;
+     		  }
+     		  hasmore2 = s2.next();
+     	 }
+     	 hasmore1 = s1.next();
+     	 if (positionSaved) {
+     		 s2.restorePosition();
+     	 }
+	     firstMatchforLHS = true;
+	     if (!positionSaved) {
+	    	 s2.beforeFirst();
+	    	 s2.next();
+	     }
+	     hasmore2 = true;
+      }
+      return false;
+    }
    
    /** 
     * Return the integer value of the specified field.
