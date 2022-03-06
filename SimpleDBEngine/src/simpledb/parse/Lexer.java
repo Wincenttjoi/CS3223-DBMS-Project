@@ -277,14 +277,9 @@ public class Lexer {
     * @return the string value of the current token
     */
    public String eatAggField() {
-	  if (!matchDelim('('))
-		 throw new BadSyntaxException();
 	  eatDelim('(');
-	  String s = tok.sval;
-	  if (!matchDelim(')'))
-		 throw new BadSyntaxException();
+	  String s = eatId();
 	  eatDelim(')');
-	  nextToken();
 	  return s;
    }
    
@@ -298,10 +293,10 @@ public class Lexer {
    }
    
    private void initKeywords() {
-	   keywords = Arrays.asList("select", "from", "where", "and",
+	   keywords = Arrays.asList("select", "distinct", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
                                "create", "table", "int", "varchar", "view", "as", "index", "using", "on",
-                               "order", "group", "by", "distinct");
+                               "order", "group", "by");
    }
    
    private void initOperators() {
