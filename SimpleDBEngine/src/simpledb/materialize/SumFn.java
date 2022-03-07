@@ -8,7 +8,7 @@ import simpledb.query.*;
  */
 public class SumFn implements AggregationFn {
    private String fldname;
-   private Constant val;
+   private int sum;
    
    /**
     * Create a sum aggregation function for the specified field.
@@ -24,7 +24,7 @@ public class SumFn implements AggregationFn {
     * @see simpledb.materialize.AggregationFn#processFirst(simpledb.query.Scan)
     */
    public void processFirst(Scan s) {
-	  val = s.getVal(fldname);
+	  sum = s.getInt(fldname);
    }
    
    /**
@@ -33,7 +33,7 @@ public class SumFn implements AggregationFn {
     * @see simpledb.materialize.AggregationFn#processNext(simpledb.query.Scan)
     */
    public void processNext(Scan s) {
-	  val = new Constant(val.asInt() + s.getVal(fldname).asInt());
+	  sum += s.getInt(fldname);
    }
    
    /**
@@ -49,6 +49,6 @@ public class SumFn implements AggregationFn {
     * @see simpledb.materialize.AggregationFn#value()
     */
    public Constant value() {
-      return val;
+	   return new Constant(sum);
    }
 }

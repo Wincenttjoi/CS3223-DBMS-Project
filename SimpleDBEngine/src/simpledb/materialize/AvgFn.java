@@ -8,7 +8,7 @@ import simpledb.query.*;
  */
 public class AvgFn implements AggregationFn {
    private String fldname;
-   private Constant val;
+   private int sum;
    private int num;
    
    /**
@@ -25,7 +25,7 @@ public class AvgFn implements AggregationFn {
     * @see simpledb.materialize.AggregationFn#processFirst(simpledb.query.Scan)
     */
    public void processFirst(Scan s) {
-	  val = s.getVal(fldname);
+	  sum = s.getInt(fldname);
 	  num = 1;
    }
    
@@ -36,7 +36,7 @@ public class AvgFn implements AggregationFn {
     */
    public void processNext(Scan s) {
 	  num++;
-	  val = new Constant(val.asInt() / num);
+	  sum += s.getInt(fldname);
    }
    
    /**
@@ -52,6 +52,6 @@ public class AvgFn implements AggregationFn {
     * @see simpledb.materialize.AggregationFn#value()
     */
    public Constant value() {
-      return val;
+	   return new Constant(sum/num);
    }
 }

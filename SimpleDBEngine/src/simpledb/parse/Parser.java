@@ -89,9 +89,8 @@ public class Parser {
 				String func = s.get(1);
 				AggregationFn aggFn = parseAggFn(field, func);
 				aggFns.add(aggFn);
-			} else {
-				fields.add(field);
 			}
+			fields.add(field);
 		}
 
 		lex.eatKeyword("from");
