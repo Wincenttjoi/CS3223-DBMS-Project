@@ -42,9 +42,9 @@ public class Lab4Test {
 //    	         acting     30     30
 //    	      elocution     30     30
     	  
-    	  doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where deptid < did");
+    	  doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where did < deptid");
 // TEST2 - Less than
-// Note: indexjoin fails because there's no index + range search not supported
+// Note: indexjoin fails because there's no index
 //    	             title  deptid    did
 //-----------------------------------------
 //    	         db systems     10     20
@@ -56,7 +56,7 @@ public class Lab4Test {
     	    	  
     	  doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where deptid <> did");
 // TEST3 - Not equal
-// Note: indexjoin fails because there's no index + range search not supported
+// Note: indexjoin fails because there's no index
 //    	 mergejoin fails because we don't support <>
 //    	              title deptid    did
 //-----------------------------------------
@@ -96,11 +96,90 @@ public class Lab4Test {
 //                  art      7      30     30
 //                  bob      5      30     30
     	  
+    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid < did indexjoin");
+// TEST6 - Less than (lhs index) 
+//                  sname sid  majorid   did
+//          ---------------------------------
+//                  lee      9      10     10
+//                  max      3      10     10
+//                  joe      1      10     10
+//                  pat      8      20     20
+//                  kim      6      20     20
+//                  sue      4      20     20
+//                  amy      2      20     20
+//                  art      7      30     30
+//                  bob      5      30     30
+    	  
+    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where did > majorid indexjoin");
+// TEST7 - Greater than (rhs index) 
+//          sname    sid majorid    did
+//          ---------------------------------
+//                  lee      9      10     20
+//                  max      3      10     20
+//                  joe      1      10     20
+//                  lee      9      10     30
+//                  max      3      10     30
+//                  joe      1      10     30
+//                  pat      8      20     30
+//                  kim      6      20     30
+//                  sue      4      20     30
+//                  amy      2      20     30
+    	  
+    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid > did indexjoin");
+// TEST8 - Greater than (lhs index) 
+//                  sname sid  majorid   did
+//          ---------------------------------
+//                  lee      9      10     10
+//                  max      3      10     10
+//                  joe      1      10     10
+//                  pat      8      20     20
+//                  kim      6      20     20
+//                  sue      4      20     20
+//                  amy      2      20     20
+//                  art      7      30     30
+//                  bob      5      30     30
+    	  
+    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where did < majorid indexjoin");
+// TEST9 - Less than (rhs index) 
+//                  sname sid  majorid   did
+//          ---------------------------------
+//                  lee      9      10     10
+//                  max      3      10     10
+//                  joe      1      10     10
+//                  pat      8      20     20
+//                  kim      6      20     20
+//                  sue      4      20     20
+//                  amy      2      20     20
+//                  art      7      30     30
+//                  bob      5      30     30
+    	  
+    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where did <= majorid indexjoin");
+// TEST10 - Less than (rhs index) 
+//          sname    sid majorid    did
+//          ---------------------------------
+//                  lee      9      10     10
+//                  max      3      10     10
+//                  joe      1      10     10
+//                  pat      8      20     10
+//                  kim      6      20     10
+//                  sue      4      20     10
+//                  amy      2      20     10
+//                  art      7      30     10
+//                  bob      5      30     10
+//                  pat      8      20     20
+//                  kim      6      20     20
+//                  sue      4      20     20
+//                  amy      2      20     20
+//                  art      7      30     20
+//                  bob      5      30     20
+//                  art      7      30     30
+//                  bob      5      30     30
+    	  
 // ------------------- BTree index on majorid and Hash index on sid ------------------- 
 
     	  doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
     	  		+ "student, enroll, dept where studentid = sid and majorid = did indexjoin");
-// TEST6 - Equal (hash) and equal (btree)
+// TEST11 - Equal (hash) and equal (btree)
 //          sname    sid studentid grade majorid    did
 //          -------------------------------------------------
 //                  joe      1         1     A      10     10
@@ -111,8 +190,8 @@ public class Lab4Test {
 //                  kim      6         6     A      20     20
     	  
     	  doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
-      	  		+ "student, enroll, dept where studentid = sid and majorid < did indexjoin");
-// TEST7 - Equal (hash) and less than (btree)
+      	  		+ "student, enroll, dept where studentid = sid and did > majorid indexjoin");
+// TEST12 - Equal (hash) and greater than (btree)
 //          sname    sid studentid grade majorid    did
 //          -------------------------------------------------
 //                  joe      1         1     A      10     20
@@ -125,22 +204,20 @@ public class Lab4Test {
 //                  kim      6         6     A      20     30
     	  
     	  doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
-        	  		+ "student, enroll, dept where studentid = sid and majorid <> did indexjoin");
-// TEST8 - Equal (hash)  and not equal (btree)
+        	  		+ "student, enroll, dept where studentid = sid and majorid >= did indexjoin");
+// TEST13 - Equal (hash)  and greater or equal to (btree)
 //          sname    sid studentid grade majorid    did
 //          -------------------------------------------------
-//                  amy      2         2    B+      20     10
+//                  joe      1         1     A      10     10
+//                  joe      1         1     C      10     10
+//                  kim      6         6     A      20     10
 //                  sue      4         4     B      20     10
 //                  sue      4         4     A      20     10
-//                  kim      6         6     A      20     10
-//                  joe      1         1     A      10     20
-//                  joe      1         1     C      10     20
-//                  joe      1         1     A      10     30
-//                  joe      1         1     C      10     30
-//                  amy      2         2    B+      20     30
-//                  sue      4         4     B      20     30
-//                  sue      4         4     A      20     30
-//                  kim      6         6     A      20     30
+//                  amy      2         2    B+      20     10
+//                  kim      6         6     A      20     20
+//                  sue      4         4     B      20     20
+//                  sue      4         4     A      20     20
+//                  amy      2         2    B+      20     20
     	  
       }
       catch (SQLException e) {

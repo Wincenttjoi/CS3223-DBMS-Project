@@ -58,6 +58,14 @@ public class IndexInfo {
    }
    
    /**
+    * Returns the field name of this index
+    * @return field name 
+    */
+   public String getFieldName() {
+	  return this.fldname;
+   }
+   
+   /**
     * Estimate the number of block accesses required to
     * find all index records having a particular search key.
     * The method uses the table's metadata to estimate the
@@ -101,10 +109,10 @@ public class IndexInfo {
    /** 
     * Return true if the index supports rangesearch
     */
-   public boolean supportsRangeSearch() {
+   public boolean supportsRangeSearch(String opr) {
 	   switch (idxtype) {
-		  case "hash" -> { return false; }
-		  case "btree" -> { return true; }
+		  case "hash" -> { return opr.equals("="); }
+		  case "btree" -> { return !opr.equals("<>") && !opr.equals("!="); }
 		  default -> throw new RuntimeException();	   
 	   }
    }

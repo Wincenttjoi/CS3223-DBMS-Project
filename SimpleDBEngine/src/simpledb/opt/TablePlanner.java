@@ -120,8 +120,7 @@ class TablePlanner {
          IndexInfo ii = indexes.get(fldname);
          
          // use index select if operator isn't "!=" and if idxtype is hash, operator must be "="
-         if (val != null && (ii.supportsRangeSearch() || (!ii.supportsRangeSearch() && opr.equals("=")))
-         	&& !opr.equals("<>") && !opr.equals("!=") ) {
+         if (val != null && ii.supportsRangeSearch(opr)) {
             System.out.println("index select on " + fldname + opr + val);
             return new IndexSelectPlan(myplan, ii, val, opr);
          }
@@ -140,15 +139,16 @@ class TablePlanner {
       for (String fldname : indexes.keySet()) {
          String outerfield = mypred.comparesWithField(fldname);
          String opr = mypred.getOperatorFromFieldComparison(fldname);
+         IndexInfo ii = indexes.get(fldname);
 
-         if (outerfield != null && opr.equals("=") && currsch.hasField(outerfield)) {
-            IndexInfo ii = indexes.get(fldname);
-            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield);
-            p = addSelectPred(p);
+         if (outerfield != null && currsch.hasField(outerfield) && ii.supportsRangeSearch(opr)) {
+            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield, opr);
             System.out.println("Indexjoin blocks accessed = " + p.blocksAccessed());
+     	    p = addSelectPred(p);
             return addJoinPred(p, currsch);
          }
       }
+      System.out.println("Indexjoin failed: No index in " + indexes.keySet() + " matches, using productjoin instead");
       return null;
    }
    
@@ -188,8 +188,8 @@ class TablePlanner {
 	   } else {
 		   return null;
 	   }
-	   p = addSelectPred(p);
        System.out.println("Mergejoin blocks accessed = " + p.blocksAccessed());
+	   p = addSelectPred(p);
 	   return addJoinPred(p, currsch);
    }
    
@@ -215,7 +215,9 @@ class TablePlanner {
 		   rhsPlan = myplan;
 	   }
 	   
-      return new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+       Plan p = new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+	   p = addSelectPred(p);
+	   return addJoinPred(p, currsch);
    }
    
    private Plan addSelectPred(Plan p) {

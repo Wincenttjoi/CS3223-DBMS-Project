@@ -14,7 +14,7 @@ import simpledb.index.query.IndexJoinScan;
 public class IndexJoinPlan implements Plan {
    private Plan p1, p2;
    private IndexInfo ii;
-   private String joinfield;
+   private String joinfield, opr;
    private Schema sch = new Schema();
    
    /**
@@ -25,11 +25,12 @@ public class IndexJoinPlan implements Plan {
     * @param ii information about the right-hand index
     * @param joinfield the left-hand field used for joining
     */
-   public IndexJoinPlan(Plan p1, Plan p2, IndexInfo ii, String joinfield) {
+   public IndexJoinPlan(Plan p1, Plan p2, IndexInfo ii, String joinfield, String opr) {
       this.p1 = p1;
       this.p2 = p2;
       this.ii = ii;
       this.joinfield = joinfield;
+      this.opr = opr;
       sch.addAll(p1.schema());
       sch.addAll(p2.schema());
    }
@@ -44,7 +45,7 @@ public class IndexJoinPlan implements Plan {
       TableScan ts = (TableScan) p2.open();
       Index idx = ii.open();
       printPlan();
-      return new IndexJoinScan(s, idx, joinfield, ts);
+      return new IndexJoinScan(s, idx, joinfield, ts, opr);
    }
    
    /**
@@ -94,7 +95,7 @@ public class IndexJoinPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Index Join Plan used between plan " + p1.toString() + " and " + 
-   p2.toString() + " with join condition on field " + this.joinfield);
+	   System.out.println("Index join Plan used between " + p1.toString() + " and " + 
+   p2.toString() + " on " + this.joinfield + this.opr + this.ii.getFieldName());
    }
 }

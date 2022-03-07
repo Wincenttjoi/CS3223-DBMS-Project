@@ -15,7 +15,7 @@ import simpledb.query.*;
 public class IndexJoinScan implements Scan {
    private Scan lhs;
    private Index idx;
-   private String joinfield;
+   private String joinfield, opr;
    private TableScan rhs;  
    
    /**
@@ -26,11 +26,12 @@ public class IndexJoinScan implements Scan {
     * @param joinfield the LHS field used for joining
     * @param rhs the RHS scan
     */
-   public IndexJoinScan(Scan lhs, Index idx, String joinfield, TableScan rhs) {
+   public IndexJoinScan(Scan lhs, Index idx, String joinfield, TableScan rhs, String opr) {
       this.lhs = lhs;
       this.idx  = idx;
       this.joinfield = joinfield;
       this.rhs = rhs;
+      this.opr = opr;
       beforeFirst();
    }
    
@@ -119,6 +120,6 @@ public class IndexJoinScan implements Scan {
 
    private void resetIndex() {
       Constant searchkey = lhs.getVal(joinfield);
-      idx.beforeFirst(searchkey);
+      idx.beforeFirst(searchkey, opr);
    }
 }
