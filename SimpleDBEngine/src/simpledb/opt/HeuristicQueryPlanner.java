@@ -59,12 +59,11 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 			} else {
 				projectplan = new GroupByPlan(tx, projectplan, new ArrayList<String>(), data.aggFns());
 			}
-		} 
-//		else {
-//			if (!data.groupFields().isEmpty()) {
-//				projectplan = new GroupByPlan(tx, projectplan, data.groupFields(), new ArrayList<AggregationFn>());
-//			}
-//		}
+		} else {
+			if (!data.groupFields().isEmpty()) {
+				projectplan = new GroupByPlan(tx, projectplan, data.groupFields(), new ArrayList<AggregationFn>());
+			}
+		}
 
 		if (data.isDistinct()) {
 			projectplan = new SortPlan(tx, projectplan, data.fields());
