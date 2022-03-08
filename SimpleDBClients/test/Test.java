@@ -1,12 +1,8 @@
 import java.sql.*;
-import java.util.Scanner;
-import simpledb.jdbc.embedded.EmbeddedDriver;
 import simpledb.opt.JoinAlgoSelector;
 
-// 1. Recreate studentdb using embedded driver.
-// 2. Run Lab1Test, check if expected output is similar to commented code.
-// Note: Currently only works with basic planner, to be integrated in lab 7
-// using heuristic planner.
+// This class is responsible to store general static methods to be used by the
+// different LabTests.
 public class Test {
    private static final String DIVIDER = "=========================================";
    private static int testNumber = 0;

@@ -8,8 +8,6 @@ import simpledb.opt.JoinAlgoSelector;
 // Note: Currently only works with basic planner, to be integrated in lab 7
 // using heuristic planner.
 public class Lab4Test {
-   private static final String DIVIDER = "=========================================";
-   private static int testNumber = 0;
    
    public static void main(String[] args) {
 	  
