@@ -30,7 +30,7 @@ public class Lab4Test {
 //
 // ------------------- No indexes ------------------- 
     	  
-    	  doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where deptid = did");
+    	  Test.doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where deptid = did");
 // TEST1 - Equal
 // Note: indexjoin fails because there's no index
 //    	          title deptid    did
@@ -42,7 +42,7 @@ public class Lab4Test {
 //    	         acting     30     30
 //    	      elocution     30     30
     	  
-    	  doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where did < deptid");
+    	  Test.doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where did < deptid");
 // TEST2 - Less than
 // Note: indexjoin fails because there's no index
 //    	             title  deptid    did
@@ -54,7 +54,7 @@ public class Lab4Test {
 //    	           calculus     20     30
 //    	            algebra     20     30
     	    	  
-    	  doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where deptid <> did");
+    	  Test.doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where deptid <> did");
 // TEST3 - Not equal
 // Note: indexjoin fails because there's no index
 //    	 mergejoin fails because we don't support <>
@@ -69,7 +69,7 @@ public class Lab4Test {
     	    	  
 // ------------------- Hash index on sid ------------------- 
 
-    	  doTest(stmt, "select sname, sid, studentid, grade from student, enroll where studentid = sid indexjoin");
+    	  Test.doTest(stmt, "select sname, sid, studentid, grade from student, enroll where studentid = sid indexjoin");
 // TEST4 - Equal
 //          sname sid    majorid grade
 //          --------------------------
@@ -82,7 +82,7 @@ public class Lab4Test {
     	  
 // ------------------- BTree index on majorid ------------------- 
 
-    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid = did indexjoin");
+    	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid = did indexjoin");
 // TEST5 - Equal 
 //                  sname sid  majorid   did
 //          ---------------------------------
@@ -96,7 +96,7 @@ public class Lab4Test {
 //                  art      7      30     30
 //                  bob      5      30     30
     	  
-    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid < did indexjoin");
+    	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid < did indexjoin");
 // TEST6 - Less than (lhs index) 
 //                  sname sid  majorid   did
 //          ---------------------------------
@@ -110,7 +110,7 @@ public class Lab4Test {
 //                  art      7      30     30
 //                  bob      5      30     30
     	  
-    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where did > majorid indexjoin");
+    	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where did > majorid indexjoin");
 // TEST7 - Greater than (rhs index) 
 //          sname    sid majorid    did
 //          ---------------------------------
@@ -125,7 +125,7 @@ public class Lab4Test {
 //                  sue      4      20     30
 //                  amy      2      20     30
     	  
-    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid > did indexjoin");
+    	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid > did indexjoin");
 // TEST8 - Greater than (lhs index) 
 //                  sname sid  majorid   did
 //          ---------------------------------
@@ -139,7 +139,7 @@ public class Lab4Test {
 //                  art      7      30     30
 //                  bob      5      30     30
     	  
-    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where did < majorid indexjoin");
+    	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where did < majorid indexjoin");
 // TEST9 - Less than (rhs index) 
 //                  sname sid  majorid   did
 //          ---------------------------------
@@ -153,7 +153,7 @@ public class Lab4Test {
 //                  art      7      30     30
 //                  bob      5      30     30
     	  
-    	  doTest(stmt, "select sname, sid, majorid, did from student, dept where did <= majorid indexjoin");
+    	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where did <= majorid indexjoin");
 // TEST10 - Less than (rhs index) 
 //          sname    sid majorid    did
 //          ---------------------------------
@@ -177,7 +177,7 @@ public class Lab4Test {
     	  
 // ------------------- BTree index on majorid and Hash index on sid ------------------- 
 
-    	  doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
+    	  Test.doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
     	  		+ "student, enroll, dept where studentid = sid and majorid = did indexjoin");
 // TEST11 - Equal (hash) and equal (btree)
 //          sname    sid studentid grade majorid    did
@@ -189,7 +189,7 @@ public class Lab4Test {
 //                  sue      4         4     A      20     20
 //                  kim      6         6     A      20     20
     	  
-    	  doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
+    	  Test.doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
       	  		+ "student, enroll, dept where studentid = sid and did > majorid indexjoin");
 // TEST12 - Equal (hash) and greater than (btree)
 //          sname    sid studentid grade majorid    did
@@ -203,7 +203,7 @@ public class Lab4Test {
 //                  sue      4         4     A      20     30
 //                  kim      6         6     A      20     30
     	  
-    	  doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
+    	  Test.doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
         	  		+ "student, enroll, dept where studentid = sid and majorid >= did indexjoin");
 // TEST13 - Equal (hash)  and greater or equal to (btree)
 //          sname    sid studentid grade majorid    did
@@ -224,80 +224,5 @@ public class Lab4Test {
          e.printStackTrace();
       }
       sc.close();
-   }
-   
-   private static void doTest(Statement stmt, String cmd) {
-	  testNumber++;
- 	  System.out.println("TEST" + testNumber);
- 	  if (cmd.startsWith("select")) {
- 		  doQuery(stmt, cmd);
- 	  } else {
- 		  doUpdate(stmt, cmd);
- 	  }
- 	  
- 	  System.out.println(DIVIDER);
-   }
-   
-   private static void doJoinAlgoTest(Statement stmt, String cmd) {
-	  testNumber++;
-      for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
-     	  System.out.println("TEST" + testNumber + " " + selector);
-    	  doQuery(stmt, cmd + " " + selector);
-    	  System.out.println(DIVIDER);
-      }
- 	  System.out.println(DIVIDER);
-   }
-
-   private static void doQuery(Statement stmt, String cmd) {
-      try (ResultSet rs = stmt.executeQuery(cmd)) {
-         ResultSetMetaData md = rs.getMetaData();
-         int numcols = md.getColumnCount();
-         int totalwidth = 0;
-
-         // print header
-         for(int i=1; i<=numcols; i++) {
-            String fldname = md.getColumnName(i);
-            int width = md.getColumnDisplaySize(i);
-            totalwidth += width;
-            String fmt = "%" + width + "s";
-            System.out.format(fmt, fldname);
-         }
-         System.out.println();
-         for(int i=0; i<totalwidth; i++)
-            System.out.print("-");
-         System.out.println();
-
-         // print records
-         while(rs.next()) {
-            for (int i=1; i<=numcols; i++) {
-               String fldname = md.getColumnName(i);
-               int fldtype = md.getColumnType(i);
-               String fmt = "%" + md.getColumnDisplaySize(i);
-               if (fldtype == Types.INTEGER) {
-                  int ival = rs.getInt(fldname);
-                  System.out.format(fmt + "d", ival);
-               }
-               else {
-                  String sval = rs.getString(fldname);
-                  System.out.format(fmt + "s", sval);
-               }
-            }
-            System.out.println();
-         }
-      }
-      catch (SQLException e) {
-         System.out.println("SQL Exception: " + e.getMessage());
-      }
-   }
-
-   private static void doUpdate(Statement stmt, String cmd) {
-	  testNumber++;
-      try {
-         int howmany = stmt.executeUpdate(cmd);
-         System.out.println(howmany + " records processed");
-      }
-      catch (SQLException e) {
-         System.out.println("SQL Exception: " + e.getMessage());
-      }
    }
 }
