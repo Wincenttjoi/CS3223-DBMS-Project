@@ -65,6 +65,16 @@ public class Lab5Test {
 //		      2020      20         2
 //		      2020      30         1
 //		      2019      20         1
+			doTest(stmt, "select distinct gradyear, count(sid) from student where gradyear < 2021 group by gradyear order by countofsid desc");
+//		 gradyear countofsid
+//		 -------------------
+//		     2020          3
+//		     2019          1
+			doTest(stmt, "select distinct gradyear, max(sid) from student where majorid = 10 group by gradyear order by gradyear desc");
+//		 gradyear countofsid
+//		 -------------------
+//		     2022          3
+//		     2021          9
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -73,7 +83,7 @@ public class Lab5Test {
 
 	private static void doTest(Statement stmt, String cmd) {
 		testNumber++;
-		System.out.println("TEST" + testNumber);
+		System.out.println("TEST" + testNumber); 
 		if (cmd.startsWith("select")) {
 			doQuery(stmt, cmd);
 		} else {
