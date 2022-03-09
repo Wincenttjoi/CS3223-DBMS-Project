@@ -24,6 +24,7 @@ class TablePlanner {
    private Schema myschema;
    private Map<String,IndexInfo> indexes;
    private Transaction tx;
+   private String tblname;
 
 
    /**
@@ -39,6 +40,7 @@ class TablePlanner {
    public TablePlanner(String tblname, Predicate mypred, Transaction tx, MetadataMgr mdm) {
       this.mypred  = mypred;
       this.tx  = tx;
+      this.tblname = tblname;
       myplan   = new TablePlan(tx, tblname, mdm);
       myschema = myplan.schema();
       indexes  = mdm.getIndexInfo(tblname, tx);
@@ -92,6 +94,9 @@ class TablePlanner {
 	    	  break;
 	      case MERGEJOIN_PLAN:
 	    	  p = makeMergeJoin(current, currsch);
+	    	  if (p == null) {
+	    		  p = makeProductJoin(current, currsch);
+	    	  }
 	    	  break;
 	      case NESTEDJOIN_PLAN:
 	    	  p = makeNestedJoin(current, currsch);
@@ -141,14 +146,19 @@ class TablePlanner {
          String opr = mypred.getOperatorFromFieldComparison(fldname);
          IndexInfo ii = indexes.get(fldname);
 
-         if (outerfield != null && currsch.hasField(outerfield) && ii.supportsRangeSearch(opr)) {
-            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield, opr);
-            System.out.println("Indexjoin blocks accessed = " + p.blocksAccessed());
-     	    p = addSelectPred(p);
-            return addJoinPred(p, currsch);
+         if (outerfield != null && currsch.hasField(outerfield)) {
+        	 if (ii.supportsRangeSearch(opr)) {
+	            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield, opr);
+	            System.out.println("Indexjoin blocks accessed = " + p.blocksAccessed());
+	     	    p = addSelectPred(p);
+	            return addJoinPred(p, currsch);
+        	 } else {
+                 System.out.println("Indexjoin failed: " + opr + " not supported by indexjoin, using productjoin instead");
+        	 }
          }
       }
-      System.out.println("Indexjoin failed: No index in " + indexes.keySet() + " matches, using productjoin instead");
+      
+      System.out.println("Indexjoin failed: No index in " + tblname + " matches, using productjoin instead");
       return null;
    }
    
@@ -186,6 +196,7 @@ class TablePlanner {
 	   } else if (opr.equals("=") || opr.equals("<") || opr.equals("<=")) {
 		   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
 	   } else {
+	       System.out.println("Mergejoin failed: " + opr + " not supported by indexjoin, using productjoin instead");
 		   return null;
 	   }
        System.out.println("Mergejoin blocks accessed = " + p.blocksAccessed());
