@@ -20,19 +20,19 @@ public class Lab5Test {
 
 		try (Connection conn = d.connect(s, null); Statement stmt = conn.createStatement()) {
 
-			doTest(stmt, "select max(gradyear) from student");
+//			doTest(stmt, "select max(gradyear) from student");
 //        TEST1
 //    	  maxofgradyear
 //    	  -------------
 //    	           2022
 
-			doTest(stmt, "select count(sid), min(gradyear) from student");
+//			doTest(stmt, "select count(sid), min(gradyear) from student");
 //        TEST2
 //    	  countofsid minofgradyear
 //    	  ------------------------
 //    	          10	      2019
 		
-			doTest(stmt, "select gradyear, count(sid) from student group by gradyear");
+//			doTest(stmt, "select gradyear, count(sid) from student group by gradyear");
 //	      TEST3
 //	      gradyear countofsid
 //		  -------------------

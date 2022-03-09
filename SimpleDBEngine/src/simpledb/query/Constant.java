@@ -6,10 +6,15 @@ package simpledb.query;
  */
 public class Constant implements Comparable<Constant> {
    private Integer ival = null;
+   private Float fval = null;
    private String  sval = null;
    
    public Constant(Integer ival) {
       this.ival = ival;
+   }
+   
+   public Constant(Float fval) {
+      this.fval = fval;
    }
    
    public Constant(String sval) {
@@ -18,6 +23,10 @@ public class Constant implements Comparable<Constant> {
    
    public int asInt() {
       return ival;
+   }
+   
+   public float asFloat() {
+	   return fval;
    }
    
    public String asString() {

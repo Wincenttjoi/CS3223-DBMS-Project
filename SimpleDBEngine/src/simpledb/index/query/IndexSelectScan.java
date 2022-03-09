@@ -66,6 +66,14 @@ public class IndexSelectScan implements Scan {
    
    /**
     * Returns the value of the field of the current data record.
+    * @see simpledb.query.Scan#getFloat(java.lang.String)
+    */
+   public float getFloat(String fldname) {
+      return ts.getFloat(fldname);
+   }
+   
+   /**
+    * Returns the value of the field of the current data record.
     * @see simpledb.query.Scan#getString(java.lang.String)
     */
    public String getString(String fldname) {

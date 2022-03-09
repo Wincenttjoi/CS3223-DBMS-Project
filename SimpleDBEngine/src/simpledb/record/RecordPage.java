@@ -31,6 +31,17 @@ public class RecordPage {
       int fldpos = offset(slot) + layout.offset(fldname);
       return tx.getInt(blk, fldpos);
    }
+   
+   /**
+    * Return the float value stored for the
+    * specified field of a specified slot.
+    * @param fldname the name of the field.
+    * @return the float stored in that field
+    */
+   public float getFloat(int slot, String fldname) {
+      int fldpos = offset(slot) + layout.offset(fldname);
+      return tx.getFloat(blk, fldpos);
+   }
 
    /**
     * Return the string value stored for the

@@ -29,6 +29,14 @@ public interface Scan {
    public int getInt(String fldname);
    
    /**
+    * Return the value of the specified float field 
+    * in the current record.
+    * @param fldname the name of the field
+    * @return the field's float value in the current record
+    */
+   public float getFloat(String fldname);
+   
+   /**
     * Return the value of the specified string field 
     * in the current record.
     * @param fldname the name of the field

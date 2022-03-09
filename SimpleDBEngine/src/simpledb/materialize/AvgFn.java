@@ -8,8 +8,8 @@ import simpledb.query.*;
  */
 public class AvgFn implements AggregationFn {
    private String fldname;
-   private int sum;
-   private int num;
+   private float sum;
+   private float num;
    
    /**
     * Create a avg aggregation function for the specified field.

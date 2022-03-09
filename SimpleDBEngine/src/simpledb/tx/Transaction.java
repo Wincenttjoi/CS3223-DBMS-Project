@@ -118,6 +118,21 @@ public class Transaction {
    }
    
    /**
+    * Return the float value stored at the
+    * specified offset of the specified block.
+    * The method first obtains an SLock on the block,
+    * then it calls the buffer to retrieve the value.
+    * @param blk a reference to a disk block
+    * @param offset the byte offset within the block
+    * @return the float stored at that offset
+    */
+   public float getFloat(BlockId blk, int offset) {
+      concurMgr.sLock(blk);
+      Buffer buff = mybuffers.getBuffer(blk);
+      return buff.contents().getInt(offset);
+   }
+   
+   /**
     * Return the string value stored at the
     * specified offset of the specified block.
     * The method first obtains an SLock on the block,

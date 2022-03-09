@@ -48,6 +48,10 @@ public class TableScan implements UpdateScan {
    public int getInt(String fldname) {
       return rp.getInt(currentslot, fldname);
    }
+   
+   public float getFloat(String fldname) {
+      return rp.getFloat(currentslot, fldname);
+   }
 
    public String getString(String fldname) {
       return rp.getString(currentslot, fldname);
