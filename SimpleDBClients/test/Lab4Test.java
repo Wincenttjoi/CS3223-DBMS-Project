@@ -40,7 +40,7 @@ public class Lab4Test {
 //    	         acting     30     30
 //    	      elocution     30     30
     	  
-    	  Test.doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where did < deptid");
+    	  Test.doJoinAlgoTest(stmt, "select title, deptid, did from course, dept where deptid < did");
 // TEST2 - Less than
 // Note: indexjoin fails because there's no index
 //    	             title  deptid    did
@@ -56,20 +56,26 @@ public class Lab4Test {
 // TEST3 - Not equal
 // Note: indexjoin fails because there's no index
 //    	 mergejoin fails because we don't support <>
-//    	              title deptid    did
-//-----------------------------------------
-//    	         db systems     10     20
-//    	          compilers     10     20
-//    	         db systems     10     30
-//    	          compilers     10     30
-//    	           calculus     20     30
-//    	            algebra     20     30
+//          title deptid    did
+//-----------------------------------
+//     db systems     10     20
+//     db systems     10     30
+//      compilers     10     20
+//      compilers     10     30
+//       calculus     20     10
+//       calculus     20     30
+//        algebra     20     10
+//        algebra     20     30
+//         acting     30     10
+//         acting     30     20
+//      elocution     30     10
+//      elocution     30     20
     	    	  
 // ------------------- Hash index on sid ------------------- 
 
     	  Test.doTest(stmt, "select sname, sid, studentid, grade from student, enroll where studentid = sid indexjoin");
 // TEST4 - Equal
-//          sname sid    majorid grade
+//          sname sid    studentid grade
 //          --------------------------
 //          joe      1         1     A
 //          joe      1         1     C
@@ -96,17 +102,18 @@ public class Lab4Test {
     	  
     	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid < did indexjoin");
 // TEST6 - Less than (lhs index) 
-//                  sname sid  majorid   did
+//          sname    sid majorid    did
 //          ---------------------------------
-//                  lee      9      10     10
-//                  max      3      10     10
-//                  joe      1      10     10
-//                  pat      8      20     20
-//                  kim      6      20     20
-//                  sue      4      20     20
-//                  amy      2      20     20
-//                  art      7      30     30
-//                  bob      5      30     30
+//                  joe      1      10     20
+//                  max      3      10     20
+//                  lee      9      10     20
+//                  joe      1      10     30
+//                  amy      2      20     30
+//                  max      3      10     30
+//                  sue      4      20     30
+//                  kim      6      20     30
+//                  pat      8      20     30
+//                  lee      9      10     30
     	  
     	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where did > majorid indexjoin");
 // TEST7 - Greater than (rhs index) 
