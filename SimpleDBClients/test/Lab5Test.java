@@ -20,19 +20,19 @@ public class Lab5Test {
 
 		try (Connection conn = d.connect(s, null); Statement stmt = conn.createStatement()) {
 
-//			doTest(stmt, "select max(gradyear) from student");
+			doTest(stmt, "select max(gradyear) from student");
 //        TEST1
 //    	  maxofgradyear
 //    	  -------------
 //    	           2022
 
-//			doTest(stmt, "select count(sid), min(gradyear) from student");
+			doTest(stmt, "select count(sid), min(gradyear) from student");
 //        TEST2
 //    	  countofsid minofgradyear
 //    	  ------------------------
 //    	          10	      2019
 		
-//			doTest(stmt, "select gradyear, count(sid) from student group by gradyear");
+			doTest(stmt, "select gradyear, count(sid) from student group by gradyear");
 //	      TEST3
 //	      gradyear countofsid
 //		  -------------------
@@ -41,13 +41,13 @@ public class Lab5Test {
 //	          2021          3
 //	   	      2022          2
 
-			doTest(stmt, "select majorid, sum(gradyear), avg(gradyear), count(sid) from student group by majorid");
+			doTest(stmt, "select majorid, sum(gradyear), count(sid), avg(gradyear) from student group by majorid");
 //		  TEST4
-//		 majorid sumofgradyear avgofgradyear countofsid
+//		 majorid sumofgradyear countofsid avgofgradyear
 //		 ----------------------------------------------
-//		      10          6064          2021          3
-//		      20          8081          2020          4
-//		      30          4041          2020          2
+//		      10          6064          3       2021.33
+//		      20          8081          4       2020.25
+//		      30          4041          2       2020.50
 			doTest(stmt, "select gradyear from student group by gradyear");
 //		  gradyear
 //	      --------
@@ -70,11 +70,11 @@ public class Lab5Test {
 //		 -------------------
 //		     2020          3
 //		     2019          1
-			doTest(stmt, "select distinct gradyear, max(sid) from student where majorid = 10 group by gradyear order by gradyear desc");
-//		 gradyear countofsid
-//		 -------------------
-//		     2022          3
-//		     2021          9
+			doTest(stmt, "select distinct gradyear, avg(sid) from student where majorid = 10 group by gradyear order by gradyear desc");
+//		 gradyear maxofsid
+//		 -----------------
+//		     2022        3
+//		     2021        9
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -121,6 +121,9 @@ public class Lab5Test {
 					if (fldtype == Types.INTEGER) {
 						int ival = rs.getInt(fldname);
 						System.out.format(fmt + "d", ival);
+					} else if (fldtype == Types.FLOAT) {
+						float fval = rs.getFloat(fldname);
+						System.out.format(fmt + ".2f", fval);
 					} else {
 						String sval = rs.getString(fldname);
 						System.out.format(fmt + "s", sval);

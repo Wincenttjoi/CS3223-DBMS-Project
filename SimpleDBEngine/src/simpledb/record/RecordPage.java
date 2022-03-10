@@ -64,6 +64,17 @@ public class RecordPage {
       int fldpos = offset(slot) + layout.offset(fldname);
       tx.setInt(blk, fldpos, val, true);
    }
+   
+   /**
+    * Store a float at the specified field
+    * of the specified slot.
+    * @param fldname the name of the field
+    * @param val the float value stored in that field
+    */
+   public void setFloat(int slot, String fldname, float val) {
+      int fldpos = offset(slot) + layout.offset(fldname);
+      tx.setFloat(blk, fldpos, val, true);
+   }
 
    /**
     * Store a string at the specified field

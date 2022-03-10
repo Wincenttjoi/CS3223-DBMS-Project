@@ -28,6 +28,10 @@ public class Page {
    public void setInt(int offset, int n) {
       bb.putInt(offset, n);
    }
+   
+   public void setFloat(int offset, float n) {
+		bb.putFloat(offset, n);
+	}
 
    public byte[] getBytes(int offset) {
       bb.position(offset);

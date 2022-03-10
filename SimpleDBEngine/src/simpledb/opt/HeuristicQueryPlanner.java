@@ -29,7 +29,7 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 	public Plan createPlan(QueryData data, Transaction tx) {
 
 		// for debugging
-		System.out.println(data.toString());
+		// System.out.println(data.toString());
 
 		// Step 1: Create a TablePlanner object for each mentioned table
 		for (String tblname : data.tables()) {
@@ -50,27 +50,20 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 		}
 
 		// Step 4. Project on the field names and return
-		Plan projectplan = (!data.fields().isEmpty()) ? new ProjectPlan(currentplan, data.fields()) : currentplan;
+		Plan projectplan = new ProjectPlan(currentplan, data.fields());
 
 		// Step 5. Aggregate results on group fields and return (Lab5)
-		if (!data.aggFns().isEmpty()) {
-			if (!data.groupFields().isEmpty()) {
-				projectplan = new GroupByPlan(tx, projectplan, data.groupFields(), data.aggFns());
-			} else {
-				projectplan = new GroupByPlan(tx, projectplan, new ArrayList<String>(), data.aggFns());
-			}
-		} else {
-			if (!data.groupFields().isEmpty()) {
-				projectplan = new GroupByPlan(tx, projectplan, data.groupFields(), new ArrayList<AggregationFn>());
-			}
+		if (!data.aggFns().isEmpty() || !data.groupFields().isEmpty()) {
+			projectplan = new GroupByPlan(tx, projectplan, data.groupFields(), data.aggFns());
 		}
-
+		
+		// Step 6. Eliminate duplicate results and return (Lab6)
 		if (data.isDistinct()) {
 			projectplan = new SortPlan(tx, projectplan, data.fields());
 			projectplan = new DistinctPlan(projectplan);
 		}
 
-		// Step 6. Sort results on sort fields and return (Lab3)
+		// Step 7. Sort results on sort fields and return (Lab3)
 		if (!data.sortMap().isEmpty()) {
 			projectplan = new SortPlan(tx, projectplan, data.sortMap());
 		}

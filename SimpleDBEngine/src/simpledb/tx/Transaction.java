@@ -129,7 +129,7 @@ public class Transaction {
    public float getFloat(BlockId blk, int offset) {
       concurMgr.sLock(blk);
       Buffer buff = mybuffers.getBuffer(blk);
-      return buff.contents().getInt(offset);
+      return buff.contents().getFloat(offset);
    }
    
    /**
@@ -168,6 +168,30 @@ public class Transaction {
          lsn = recoveryMgr.setInt(buff, offset, val);
       Page p = buff.contents();
       p.setInt(offset, val);
+      buff.setModified(txnum, lsn);
+   }
+   
+   /**
+    * Store a float at the specified offset 
+    * of the specified block.
+    * The method first obtains an XLock on the block.
+    * It then reads the current value at that offset,
+    * puts it into an update log record, and 
+    * writes that record to the log.
+    * Finally, it calls the buffer to store the value,
+    * passing in the LSN of the log record and the transaction's id. 
+    * @param blk a reference to the disk block
+    * @param offset a byte offset within that block
+    * @param val the value to be stored
+    */
+   public void setFloat(BlockId blk, int offset, float val, boolean okToLog) {
+      concurMgr.xLock(blk);
+      Buffer buff = mybuffers.getBuffer(blk);
+      int lsn = -1;
+      if (okToLog)
+         lsn = recoveryMgr.setFloat(buff, offset, val);
+      Page p = buff.contents();
+      p.setFloat(offset, val);
       buff.setModified(txnum, lsn);
    }
    

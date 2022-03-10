@@ -70,6 +70,18 @@ public class RecoveryMgr {
       BlockId blk = buff.block();
       return SetIntRecord.writeToLog(lm, txnum, blk, offset, oldval);
    }
+   
+   /**
+    * Write a setfloat record to the log and return its lsn.
+    * @param buff the buffer containing the page
+    * @param offset the offset of the value in the page
+    * @param newval the value to be written
+    */
+   public int setFloat(Buffer buff, int offset, float newval) {
+      float oldval = buff.contents().getFloat(offset);
+      BlockId blk = buff.block();
+      return SetFloatRecord.writeToLog(lm, txnum, blk, offset, oldval);
+   }
 
    /**
     * Write a setstring record to the log and return its lsn.
