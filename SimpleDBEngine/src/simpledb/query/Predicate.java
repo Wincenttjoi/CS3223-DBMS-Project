@@ -131,7 +131,7 @@ public class Predicate {
       for (Term t : terms) {
          Constant c = t.comparesWithConstant(fldname);
          if (c != null)
-            return t.getOperator(fldname);
+            return t.getOperator(fldname, true);
       }
       return null;
    }
@@ -144,11 +144,11 @@ public class Predicate {
     * @param fldname the name of the field
     * @return either the constant or null
     */
-   public String getOperatorFromFieldComparison(String fldname) {
+   public String getOperatorFromFieldComparison(String fldname, boolean pushFieldLeft) {
       for (Term t : terms) {
          String s = t.comparesWithField(fldname);
          if (s != null)
-            return t.getOperator(fldname);
+            return t.getOperator(fldname, pushFieldLeft);
       }
       return null;
    }

@@ -114,14 +114,16 @@ public class Term {
    }
    
    /**
-    * Retrieve the operator where this term is of the form "F opr x"
+    * Retrieve the operator where this term is of the form "F opr x" or "x opr F"
     * where F is the specified field, opr is a operator and x is some constant or field.
-    * If so, the method returns that operator.
-    * If not, the method returns null.
+    * If pushFieldLeft is true, return a operator fits the first form
+    * If not, return a operator that fits the second.
+    * If fieldname is not found, return null
     * @param fldname the name of the field
+    * @param pushFieldLeft whether to push the fieldname left or right by inverting the operator if need be
     * @return either the operator or null
     */
-   public String getOperator(String fldname) {
+   public String getOperator(String fldname, boolean pushFieldLeft) {
 	  boolean isFldNameOnLHS;
       if (lhs.isFieldName() &&
           lhs.asFieldName().equals(fldname))
@@ -132,7 +134,7 @@ public class Term {
       else
          return null;
       
-      if (!isFldNameOnLHS) {
+      if (pushFieldLeft && !isFldNameOnLHS || !pushFieldLeft && isFldNameOnLHS) {
           switch (opr) {
 		      case "<" -> { return ">"; }
 		      case "<=" -> { return ">="; }

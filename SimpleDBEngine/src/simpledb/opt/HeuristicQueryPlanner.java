@@ -2,6 +2,7 @@ package simpledb.opt;
 
 import java.util.*;
 import simpledb.tx.Transaction;
+import simpledb.metadata.IndexInfo;
 import simpledb.metadata.MetadataMgr;
 import simpledb.parse.QueryData;
 import simpledb.plan.*;
@@ -14,6 +15,7 @@ import simpledb.materialize.*;
 public class HeuristicQueryPlanner implements QueryPlanner {
    private Collection<TablePlanner> tableplanners = new ArrayList<>();
    private MetadataMgr mdm;
+   private Map<String,IndexInfo> indexesInCurrentPlan = new HashMap<>();
    
    public HeuristicQueryPlanner(MetadataMgr mdm) {
       this.mdm = mdm;
@@ -31,7 +33,7 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       
 	  // for debugging
 //	   System.out.println(data.toString());
-	   
+	   	   
       // Step 1:  Create a TablePlanner object for each mentioned table
       for (String tblname : data.tables()) {
          TablePlanner tp = new TablePlanner(tblname, data.pred(), tx, mdm);
@@ -39,15 +41,16 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       }
       
       // Step 2:  Choose the lowest-size plan to begin the join order
-      Plan currentplan = getLowestSelectPlan();
+      Plan currentplan = getLowestSelectPlan(tx);
+      
       
       // Step 3:  Repeatedly add a plan to the join order
       while (!tableplanners.isEmpty()) {
-         Plan p = getLowestJoinPlan(currentplan, data.joinAlgoSelected());
+         Plan p = getLowestJoinPlan(currentplan, data.joinAlgoSelected(), tx);
          if (p != null)
             currentplan = p;
          else  // no applicable join
-            currentplan = getLowestProductPlan(currentplan);
+            currentplan = getLowestProductPlan(currentplan, tx);
       }
       
       // Step 4.  Project on the field names and return
@@ -63,11 +66,12 @@ public class HeuristicQueryPlanner implements QueryPlanner {
     	  projectplan = new SortPlan(tx, projectplan, data.sortMap());
       }
       
+      indexesInCurrentPlan.clear();
       return projectplan;
 
    }
    
-   private Plan getLowestSelectPlan() {
+   private Plan getLowestSelectPlan(Transaction tx) {
       TablePlanner besttp = null;
       Plan bestplan = null;
       for (TablePlanner tp : tableplanners) {
@@ -78,14 +82,15 @@ public class HeuristicQueryPlanner implements QueryPlanner {
          }
       }
       tableplanners.remove(besttp);
+      addIndexes(besttp.getTableName(), tx);
       return bestplan;
    }
    
-   private Plan getLowestJoinPlan(Plan current, JoinAlgoSelector joinAlgoSelected) {
+   private Plan getLowestJoinPlan(Plan current, JoinAlgoSelector joinAlgoSelected, Transaction tx) {
       TablePlanner besttp = null;
       Plan bestplan = null;
       for (TablePlanner tp : tableplanners) {
-         Plan plan = tp.makeJoinPlan(current, joinAlgoSelected);
+         Plan plan = tp.makeJoinPlan(current, joinAlgoSelected, indexesInCurrentPlan);
          if (plan != null && (bestplan == null || plan.recordsOutput() < bestplan.recordsOutput())) {
             besttp = tp;
             bestplan = plan;
@@ -93,10 +98,11 @@ public class HeuristicQueryPlanner implements QueryPlanner {
       }
       if (bestplan != null)
          tableplanners.remove(besttp);
+      	 addIndexes(besttp.getTableName(), tx);
       return bestplan;
    }
    
-   private Plan getLowestProductPlan(Plan current) {
+   private Plan getLowestProductPlan(Plan current, Transaction tx) {
       TablePlanner besttp = null;
       Plan bestplan = null;
       for (TablePlanner tp : tableplanners) {
@@ -107,11 +113,16 @@ public class HeuristicQueryPlanner implements QueryPlanner {
          }
       }
       tableplanners.remove(besttp);
+      addIndexes(besttp.getTableName(), tx);
       return bestplan;
    }
 
    public void setPlanner(Planner p) {
       // for use in planning views, which
       // for simplicity this code doesn't do.
+   }
+   
+   private void addIndexes(String tblname, Transaction tx) {
+	   indexesInCurrentPlan.putAll(mdm.getIndexInfo(tblname, tx));
    }
 }

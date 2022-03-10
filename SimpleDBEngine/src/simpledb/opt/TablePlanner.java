@@ -1,6 +1,8 @@
 package simpledb.opt;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,8 +68,10 @@ class TablePlanner {
     * The method returns null if no join is possible.
     * @param current the specified plan
     * @return a join plan of the plan and this table
-    */
-   public Plan makeJoinPlan(Plan current, JoinAlgoSelector joinAlgoSelected) {
+    */  
+
+   public Plan makeJoinPlan(Plan current, JoinAlgoSelector joinAlgoSelected,
+		   Map<String,IndexInfo> indexesInCurrentPlan) {
       Schema currsch = current.schema();
       Predicate joinpred = mypred.joinSubPred(myschema, currsch);
       Plan p;
@@ -75,7 +79,7 @@ class TablePlanner {
          return null;
             
       if (joinAlgoSelected == null) {
-	      Plan indexJoinPlan = makeIndexJoin(current, currsch);
+	      Plan indexJoinPlan = makeIndexJoin(current, currsch, indexesInCurrentPlan);
 	      Plan mergeJoinPlan = makeMergeJoin(current, currsch);
 	      Plan nestedJoinPlan = makeProductJoin(current, currsch);
 
@@ -87,7 +91,7 @@ class TablePlanner {
       
       switch (joinAlgoSelected) {
 	      case INDEXJOIN_PLAN:
-	    	  p = makeIndexJoin(current, currsch);
+	    	  p = makeIndexJoin(current, currsch, indexesInCurrentPlan);
 	    	  if (p == null) {
 	    		  p = makeProductJoin(current, currsch);
 	    	  }
@@ -140,25 +144,38 @@ class TablePlanner {
     * @param current the specified plan
     * @return a indexjoin plan of the specified plan and this table
     */
-   private Plan makeIndexJoin(Plan current, Schema currsch) {
-      for (String fldname : indexes.keySet()) {
+   private Plan makeIndexJoin(Plan current, Schema currsch, Map<String,IndexInfo> indexesInCurrentPlan) {
+	  Map<String, IndexInfo> allIndexes = Stream.concat(indexes.entrySet().stream(), indexesInCurrentPlan.entrySet().stream())
+               .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+	   
+      for (String fldname : allIndexes.keySet()) {
          String outerfield = mypred.comparesWithField(fldname);
-         String opr = mypred.getOperatorFromFieldComparison(fldname);
-         IndexInfo ii = indexes.get(fldname);
+         String opr = mypred.getOperatorFromFieldComparison(fldname, false);
+         IndexInfo ii = allIndexes.get(fldname);
+         boolean isIndexInCurrentPlan = indexesInCurrentPlan.keySet().contains(fldname);
 
-         if (outerfield != null && currsch.hasField(outerfield)) {
+         if (outerfield != null && 
+        		 (isIndexInCurrentPlan && myplan.schema().hasField(outerfield) ||
+        		 !isIndexInCurrentPlan && currsch.hasField(outerfield))) {
         	 if (ii.supportsRangeSearch(opr)) {
-	            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield, opr);
-	            System.out.println("Indexjoin blocks accessed = " + p.blocksAccessed());
-	     	    p = addSelectPred(p);
+    		    Plan lhsPlan, rhsPlan, p;
+    		    if (isIndexInCurrentPlan) {
+    			    lhsPlan = myplan;
+    			    rhsPlan = current;
+    		    } else {
+    			    lhsPlan = current;
+    			    rhsPlan = myplan;
+    		    }
+         		p = new IndexJoinPlan(lhsPlan, rhsPlan, ii, outerfield, opr);
+        		System.out.println("Indexjoin blocks accessed = " + p.blocksAccessed());
+           	    p = addSelectPred(p);
 	            return addJoinPred(p, currsch);
         	 } else {
                  System.out.println("Indexjoin failed: " + opr + " not supported by indexjoin, using productjoin instead");
         	 }
          }
       }
-      
-      System.out.println("Indexjoin failed: No index in " + tblname + " matches, using productjoin instead");
+      System.out.println("Indexjoin failed: No index in " + allIndexes + " matches, using productjoin instead");
       return null;
    }
    
@@ -175,9 +192,9 @@ class TablePlanner {
 	   String joinValLHS = joinTerm.getLHS().asFieldName();
 	   String joinValRHS = joinTerm.getRHS().asFieldName();
 	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
+	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS, true);
 	   
-	   Plan lhsPlan, rhsPlan;
+	   Plan lhsPlan, rhsPlan, p;
 	   if (isCurrentPlanOnRHS) {
 		   lhsPlan = myplan;
 		   rhsPlan = current;
@@ -186,7 +203,6 @@ class TablePlanner {
 		   rhsPlan = myplan;
 	   }
 	   
-	   Plan p;
 	   if (opr.equals(">")) {
 		   opr = "<";
 		   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
@@ -215,9 +231,9 @@ class TablePlanner {
 	   String joinValLHS = joinTerm.getLHS().asFieldName();
 	   String joinValRHS = joinTerm.getRHS().asFieldName();
 	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
+	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS, true);
 	   
-	   Plan lhsPlan, rhsPlan;
+	   Plan lhsPlan, rhsPlan, p;
 	   if (isCurrentPlanOnRHS) {
 		   lhsPlan = myplan;
 		   rhsPlan = current;
@@ -226,7 +242,7 @@ class TablePlanner {
 		   rhsPlan = myplan;
 	   }
 	   
-       Plan p = new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+       p = new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
 	   p = addSelectPred(p);
 	   return addJoinPred(p, currsch);
    }
@@ -245,5 +261,9 @@ class TablePlanner {
          return new SelectPlan(p, joinpred);
       else
          return p;
+   }
+   
+   public String getTableName() {
+	      return this.tblname;
    }
 }
