@@ -64,10 +64,10 @@ public class SelectPlan implements Plan {
     * @see simpledb.plan.Plan#distinctValues(java.lang.String)
     */
    public int distinctValues(String fldname) {
-      if (pred.equatesWithConstant(fldname) != null)
+      if (pred.comparesWithConstant(fldname) != null)
          return 1;
       else {
-         String fldname2 = pred.equatesWithField(fldname);
+         String fldname2 = pred.comparesWithField(fldname);
          if (fldname2 != null) 
             return Math.min(p.distinctValues(fldname),
                             p.distinctValues(fldname2));

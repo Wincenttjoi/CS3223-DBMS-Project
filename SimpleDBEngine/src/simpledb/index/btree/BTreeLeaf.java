@@ -4,6 +4,7 @@ import simpledb.file.BlockId;
 import simpledb.tx.Transaction;
 import simpledb.record.*;
 import simpledb.query.Constant;
+import simpledb.materialize.OprComparator;
 
 /**
  * An object that holds the contents of a B-tree leaf block.
@@ -13,6 +14,7 @@ public class BTreeLeaf {
    private Transaction tx;
    private Layout layout;
    private Constant searchkey;
+   private String opr;
    private BTPage contents;
    private int currentslot;
    private String filename;
@@ -26,13 +28,14 @@ public class BTreeLeaf {
     * @param searchkey the search key value
     * @param tx the calling transaction
     */
-   public BTreeLeaf(Transaction tx, BlockId blk, Layout layout, Constant searchkey) {
+   public BTreeLeaf(Transaction tx, BlockId blk, Layout layout, Constant searchkey, String opr) {
       this.tx = tx;
       this.layout = layout;
       this.searchkey = searchkey;
+      this.opr = opr;
       contents = new BTPage(tx, blk, layout);
-      currentslot = contents.findSlotBefore(searchkey);
-      filename = blk.fileName();            
+      currentslot = contents.findSlotBefore(searchkey, opr);
+      filename = blk.fileName();          
    }
 
    /**
@@ -50,12 +53,17 @@ public class BTreeLeaf {
     */
    public boolean next() {
       currentslot++;
+
       if (currentslot >= contents.getNumRecs()) 
          return tryOverflow();
-      else if (contents.getDataVal(currentslot).equals(searchkey))
-         return true;
-      else 
-         return tryOverflow();
+      else {
+    	  boolean matchesSearchKey = OprComparator.compare(contents.getDataVal(currentslot), searchkey, opr);
+    	  if (matchesSearchKey) {
+    		  return true;
+	      } else {
+	    	  return tryOverflow();
+	      }
+      }
    }
 
    /**
@@ -136,7 +144,8 @@ public class BTreeLeaf {
    private boolean tryOverflow() {
       Constant firstkey = contents.getDataVal(0);
       int flag = contents.getFlag();
-      if (!searchkey.equals(firstkey) || flag < 0)
+	  boolean matchesSearchKey = OprComparator.compare(firstkey, searchkey, opr);
+      if (!matchesSearchKey || flag < 0)
          return false;
       contents.close();
       BlockId nextblk = new BlockId(filename, flag);

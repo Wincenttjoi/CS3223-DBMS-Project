@@ -4,6 +4,7 @@ import simpledb.file.BlockId;
 import simpledb.query.Constant;
 import simpledb.tx.Transaction;
 import simpledb.record.Layout;
+import simpledb.materialize.OprComparator;
 
 /**
  * A B-tree directory block.
@@ -48,6 +49,16 @@ public class BTreeDir {
          contents.close();
          contents = new BTPage(tx, childblk, layout);
          childblk = findChildBlock(searchkey);
+      }
+      return childblk.number();
+   }
+   
+   public int search(Constant searchkey, String opr) {
+      BlockId childblk = findChildBlock(searchkey, opr);
+      while (contents.getFlag() > 0) {
+         contents.close();
+         contents = new BTPage(tx, childblk, layout);
+         childblk = findChildBlock(searchkey, opr);
       }
       return childblk.number();
    }
@@ -111,6 +122,16 @@ public class BTreeDir {
       int slot = contents.findSlotBefore(searchkey);
       if (contents.getDataVal(slot+1).equals(searchkey))
          slot++;
+      int blknum = contents.getChildNum(slot);
+      return new BlockId(filename, blknum);
+   }
+   
+   private BlockId findChildBlock(Constant searchkey, String opr) {
+      int slot = contents.findSlotBefore(searchkey, opr);
+      if (OprComparator.compare(contents.getDataVal(slot+1), searchkey, opr)) {
+    	  slot++;
+      }
+
       int blknum = contents.getChildNum(slot);
       return new BlockId(filename, blknum);
    }

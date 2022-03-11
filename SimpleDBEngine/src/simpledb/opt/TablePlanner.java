@@ -1,6 +1,5 @@
 package simpledb.opt;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,6 +10,7 @@ import simpledb.query.*;
 import simpledb.metadata.*;
 import simpledb.index.planner.*;
 import simpledb.materialize.MergeJoinPlan;
+import simpledb.materialize.NestedJoinPlan;
 import simpledb.multibuffer.MultibufferProductPlan;
 import simpledb.plan.*;
 
@@ -24,7 +24,9 @@ class TablePlanner {
    private Schema myschema;
    private Map<String,IndexInfo> indexes;
    private Transaction tx;
-   
+   private String tblname;
+
+
    /**
     * Creates a new table planner.
     * The specified predicate applies to the entire query.
@@ -38,6 +40,7 @@ class TablePlanner {
    public TablePlanner(String tblname, Predicate mypred, Transaction tx, MetadataMgr mdm) {
       this.mypred  = mypred;
       this.tx  = tx;
+      this.tblname = tblname;
       myplan   = new TablePlan(tx, tblname, mdm);
       myschema = myplan.schema();
       indexes  = mdm.getIndexInfo(tblname, tx);
@@ -64,24 +67,44 @@ class TablePlanner {
     * @param current the specified plan
     * @return a join plan of the plan and this table
     */
-   public Plan makeJoinPlan(Plan current) {
+   public Plan makeJoinPlan(Plan current, JoinAlgoSelector joinAlgoSelected) {
       Schema currsch = current.schema();
       Predicate joinpred = mypred.joinSubPred(myschema, currsch);
+      Plan p;
       if (joinpred == null)
          return null;
-     
-     Plan indexJoinPlan = makeIndexJoin(current, currsch);
- 	 Plan mergeJoinPlan = makeMergeJoin(current, currsch);
-     Plan nestedJoinPlan = makeProductJoin(current, currsch);
+            
+      if (joinAlgoSelected == null) {
+	      Plan indexJoinPlan = makeIndexJoin(current, currsch);
+	      Plan mergeJoinPlan = makeMergeJoin(current, currsch);
+	      Plan nestedJoinPlan = makeProductJoin(current, currsch);
 
-     Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan)
-    		 .filter((p) -> p != null)
-    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()))
-    	     .peek(x -> System.out.println(x.toString() + ". Blocks accessed: " + x.blocksAccessed()));
-     List<Plan> res = plans.collect(Collectors.toList());
-     
-     Plan bestPlan = res.get(0);
-     return bestPlan;
+	      Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan)
+	    		 .filter((p1) -> p1 != null)
+	    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()));
+	      return plans.collect(Collectors.toList()).get(0);
+      }
+      
+      switch (joinAlgoSelected) {
+	      case INDEXJOIN_PLAN:
+	    	  p = makeIndexJoin(current, currsch);
+	    	  if (p == null) {
+	    		  p = makeProductJoin(current, currsch);
+	    	  }
+	    	  break;
+	      case MERGEJOIN_PLAN:
+	    	  p = makeMergeJoin(current, currsch);
+	    	  if (p == null) {
+	    		  p = makeProductJoin(current, currsch);
+	    	  }
+	    	  break;
+	      case NESTEDJOIN_PLAN:
+	    	  p = makeNestedJoin(current, currsch);
+	    	  break;
+	      default:
+	    	  throw new RuntimeException();
+      }
+      return p;
    }
    
    /**
@@ -97,44 +120,115 @@ class TablePlanner {
    
    private Plan makeIndexSelect() {
       for (String fldname : indexes.keySet()) {
-         Constant val = mypred.equatesWithConstant(fldname);
-         if (val != null) {
-            IndexInfo ii = indexes.get(fldname);
-            System.out.println("index on " + fldname + " used");
-            return new IndexSelectPlan(myplan, ii, val);
+         Constant val = mypred.comparesWithConstant(fldname);
+         String opr = mypred.getOperatorFromConstantComparison(fldname);
+         IndexInfo ii = indexes.get(fldname);
+         
+         // use index select if operator isn't "!=" and if idxtype is hash, operator must be "="
+         if (val != null && ii.supportsRangeSearch(opr)) {
+            System.out.println("index select on " + fldname + opr + val);
+            return new IndexSelectPlan(myplan, ii, val, opr);
          }
       }
       return null;
    }
       
+   
+   /**
+    * Constructs a indexjoin plan of the specified plan and
+    * this table.
+    * @param current the specified plan
+    * @return a indexjoin plan of the specified plan and this table
+    */
    private Plan makeIndexJoin(Plan current, Schema currsch) {
       for (String fldname : indexes.keySet()) {
-         String outerfield = mypred.equatesWithField(fldname);
+         String outerfield = mypred.comparesWithField(fldname);
+         String opr = mypred.getOperatorFromFieldComparison(fldname);
+         IndexInfo ii = indexes.get(fldname);
+
          if (outerfield != null && currsch.hasField(outerfield)) {
-            IndexInfo ii = indexes.get(fldname);
-            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield);
-            p = addSelectPred(p);
-            return addJoinPred(p, currsch);
+        	 if (ii.supportsRangeSearch(opr)) {
+	            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield, opr);
+	            System.out.println("Indexjoin blocks accessed = " + p.blocksAccessed());
+	     	    p = addSelectPred(p);
+	            return addJoinPred(p, currsch);
+        	 } else {
+                 System.out.println("Indexjoin failed: " + opr + " not supported by indexjoin, using productjoin instead");
+        	 }
          }
       }
+      
+      System.out.println("Indexjoin failed: No index in " + tblname + " matches, using productjoin instead");
       return null;
    }
+   
+   /**
+    * Constructs a mergejoin plan of the specified plan and
+    * this table.
+    * @param current the specified plan
+    * @return a mergejoin plan of the specified plan and this table
+    */
    
    private Plan makeMergeJoin(Plan current, Schema currsch) {
 	   Predicate joinpred = mypred.joinSubPred(currsch, myschema);
 	   Term joinTerm = joinpred.getTerms().get(0);
 	   String joinValLHS = joinTerm.getLHS().asFieldName();
 	   String joinValRHS = joinTerm.getRHS().asFieldName();
-	   if (current.schema().fields().contains(joinValRHS)) {
-		   return new MergeJoinPlan(tx, current, myplan, joinValRHS, joinValLHS);
+	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
+	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
+	   
+	   Plan lhsPlan, rhsPlan;
+	   if (isCurrentPlanOnRHS) {
+		   lhsPlan = myplan;
+		   rhsPlan = current;
 	   } else {
-		   return new MergeJoinPlan(tx, current, myplan, joinValLHS, joinValRHS);
+		   lhsPlan = current;
+		   rhsPlan = myplan;
 	   }
+	   
+	   Plan p;
+	   if (opr.equals(">")) {
+		   opr = "<";
+		   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
+	   } else if (opr.equals(">=")) {
+		   opr = "<=";
+		   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
+	   } else if (opr.equals("=") || opr.equals("<") || opr.equals("<=")) {
+		   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+	   } else {
+	       System.out.println("Mergejoin failed: " + opr + " not supported by indexjoin, using productjoin instead");
+		   return null;
+	   }
+       System.out.println("Mergejoin blocks accessed = " + p.blocksAccessed());
+	   p = addSelectPred(p);
+	   return addJoinPred(p, currsch);
    }
    
    private Plan makeProductJoin(Plan current, Schema currsch) {
-      Plan p = makeProductPlan(current);
-      return addJoinPred(p, currsch);
+       Plan p = makeProductPlan(current);
+       return addJoinPred(p, currsch);
+   }
+   
+   private Plan makeNestedJoin(Plan current, Schema currsch) {
+	   Predicate joinpred = mypred.joinSubPred(currsch, myschema);
+	   Term joinTerm = joinpred.getTerms().get(0);
+	   String joinValLHS = joinTerm.getLHS().asFieldName();
+	   String joinValRHS = joinTerm.getRHS().asFieldName();
+	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
+	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
+	   
+	   Plan lhsPlan, rhsPlan;
+	   if (isCurrentPlanOnRHS) {
+		   lhsPlan = myplan;
+		   rhsPlan = current;
+	   } else {
+		   lhsPlan = current;
+		   rhsPlan = myplan;
+	   }
+	   
+       Plan p = new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+	   p = addSelectPred(p);
+	   return addJoinPred(p, currsch);
    }
    
    private Plan addSelectPred(Plan p) {

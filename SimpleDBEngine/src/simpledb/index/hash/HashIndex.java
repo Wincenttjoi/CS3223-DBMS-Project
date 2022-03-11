@@ -47,6 +47,14 @@ public class HashIndex implements Index {
 		String tblname = idxname + bucket;
 		ts = new TableScan(tx, tblname, layout);
 	}
+	
+	public void beforeFirst(Constant searchkey, String opr) {
+		close();
+		this.searchkey = searchkey;
+		int bucket = searchkey.hashCode() % NUM_BUCKETS;
+		String tblname = idxname + bucket;
+		ts = new TableScan(tx, tblname, layout);
+	}
 
 	/**
 	 * Moves to the next record having the search key.

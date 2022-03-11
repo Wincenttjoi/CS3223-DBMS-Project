@@ -76,7 +76,26 @@ public class BTreeIndex implements Index {
       int blknum = root.search(searchkey);
       root.close();
       BlockId leafblk = new BlockId(leaftbl, blknum);
-      leaf = new BTreeLeaf(tx, leafblk, leafLayout, searchkey);
+      leaf = new BTreeLeaf(tx, leafblk, leafLayout, searchkey, "=");
+   }
+   
+   /**
+    * Traverse the directory to find the leaf block corresponding
+    * to the specified search key.
+    * The method then opens a page for that leaf block, and
+    * positions the page before the first record (if any)
+    * having that search key.
+    * The leaf page is kept open, for use by the methods next
+    * and getDataRid.
+    * @see simpledb.index.Index#beforeFirst(simpledb.query.Constant)
+    */
+   public void beforeFirst(Constant searchkey, String opr) {
+      close();
+      BTreeDir root = new BTreeDir(tx, rootblk, dirLayout);
+      int blknum = root.search(searchkey, opr);
+      root.close();
+      BlockId leafblk = new BlockId(leaftbl, blknum);
+      leaf = new BTreeLeaf(tx, leafblk, leafLayout, searchkey, opr);
    }
 
    /**
@@ -153,6 +172,7 @@ public class BTreeIndex implements Index {
     * @return the estimated traversal cost
     */
    public static int searchCost(int numblocks, int rpb) {
+	  if (numblocks == 0) return 1;
       return 1 + (int)(Math.log(numblocks) / Math.log(rpb));
    }
 }
