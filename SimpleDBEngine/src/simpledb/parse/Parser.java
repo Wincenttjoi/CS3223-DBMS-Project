@@ -5,7 +5,11 @@ import java.util.regex.Pattern;
 
 import simpledb.query.*;
 import simpledb.record.*;
+import simpledb.tx.Transaction;
 import simpledb.materialize.*;
+import simpledb.opt.*;
+import simpledb.plan.Plan;
+import simpledb.plan.ProjectPlan;
 
 /**
  * The SimpleDB parser.
@@ -103,6 +107,14 @@ public class Parser {
 			pred.conjoinWith(predicate());
 		}
 
+		JoinAlgoSelector joinAlgoSelected = null;
+		for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
+			if (lex.matchKeyword(selector.toString())) {
+				lex.eatKeyword(selector.toString());
+				joinAlgoSelected = selector;
+			}
+		}
+
 		List<String> groupFields = new ArrayList<>();
 		if (lex.matchKeyword("group")) {
 			lex.eatKeyword("group");
@@ -117,7 +129,7 @@ public class Parser {
 			sortMap = sortList();
 		}
 
-		return new QueryData(isDistinct, fields, aggFns, tables, pred, groupFields, sortMap);
+		return new QueryData(isDistinct, fields, aggFns, tables, pred, groupFields, sortMap, joinAlgoSelected);
 	}
 
 	private List<List<String>> selectList() {

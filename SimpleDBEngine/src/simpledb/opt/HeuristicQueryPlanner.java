@@ -42,7 +42,7 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 
 		// Step 3: Repeatedly add a plan to the join order
 		while (!tableplanners.isEmpty()) {
-			Plan p = getLowestJoinPlan(currentplan);
+			Plan p = getLowestJoinPlan(currentplan, data.joinAlgoSelected());
 			if (p != null)
 				currentplan = p;
 			else // no applicable join
@@ -56,7 +56,7 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 		if (!data.aggFns().isEmpty() || !data.groupFields().isEmpty()) {
 			projectplan = new GroupByPlan(tx, projectplan, data.groupFields(), data.aggFns());
 		}
-		
+
 		// Step 6. Eliminate duplicate results and return (Lab6)
 		if (data.isDistinct()) {
 			projectplan = new SortPlan(tx, projectplan, data.fields());
@@ -69,7 +69,6 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 		}
 
 		return projectplan;
-
 	}
 
 	private Plan getLowestSelectPlan() {
@@ -86,11 +85,11 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 		return bestplan;
 	}
 
-	private Plan getLowestJoinPlan(Plan current) {
+	private Plan getLowestJoinPlan(Plan current, JoinAlgoSelector joinAlgoSelected) {
 		TablePlanner besttp = null;
 		Plan bestplan = null;
 		for (TablePlanner tp : tableplanners) {
-			Plan plan = tp.makeJoinPlan(current);
+			Plan plan = tp.makeJoinPlan(current, joinAlgoSelected);
 			if (plan != null && (bestplan == null || plan.recordsOutput() < bestplan.recordsOutput())) {
 				besttp = tp;
 				bestplan = plan;
@@ -119,4 +118,5 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 		// for use in planning views, which
 		// for simplicity this code doesn't do.
 	}
+
 }

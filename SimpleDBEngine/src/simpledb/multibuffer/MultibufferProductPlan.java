@@ -118,6 +118,6 @@ public class MultibufferProductPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   String stmt = "Multibuffer Product Plan used";
+	   System.out.println("Multibuffer Product Plan used between " + lhs + " and " + rhs);
    }
 }

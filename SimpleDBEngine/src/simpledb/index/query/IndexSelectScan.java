@@ -14,6 +14,7 @@ public class IndexSelectScan implements Scan {
    private TableScan ts;
    private Index idx;
    private Constant val;
+   private String opr;
    
    /**
     * Creates an index select scan for the specified
@@ -21,10 +22,11 @@ public class IndexSelectScan implements Scan {
     * @param idx the index
     * @param val the selection constant
     */
-   public IndexSelectScan(TableScan ts, Index idx, Constant val) {
+   public IndexSelectScan(TableScan ts, Index idx, Constant val, String opr) {
       this.ts  = ts;
       this.idx = idx;
       this.val = val;
+      this.opr = opr;
       beforeFirst();
    }
    
@@ -35,7 +37,7 @@ public class IndexSelectScan implements Scan {
     * @see simpledb.query.Scan#beforeFirst()
     */
    public void beforeFirst() {
-      idx.beforeFirst(val);
+      idx.beforeFirst(val, opr);
    }
    
    /**

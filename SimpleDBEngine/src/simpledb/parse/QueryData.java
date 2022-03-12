@@ -4,6 +4,7 @@ import java.util.*;
 
 import simpledb.materialize.AggregationFn;
 import simpledb.query.*;
+import simpledb.opt.JoinAlgoSelector;
 
 /**
  * Data for the SQL <i>select</i> statement.
@@ -18,12 +19,13 @@ public class QueryData {
 	private Predicate pred;
 	private List<String> groupFields;
 	private Map<String, Boolean> sortMap;
+	private JoinAlgoSelector joinAlgoSelected;
 
 	/**
 	 * Saves the field, distinct, table list and predicate.
 	 */
 	public QueryData(boolean isDistinct, List<String> fields, List<AggregationFn> aggFns, Collection<String> tables,
-			Predicate pred, List<String> groupFields, Map<String, Boolean> sortMap) {
+			Predicate pred, List<String> groupFields, Map<String, Boolean> sortMap, JoinAlgoSelector joinAlgoSelected) {
 		this.isDistinct = isDistinct;
 		this.fields = fields;
 		this.aggFns = aggFns;
@@ -31,8 +33,9 @@ public class QueryData {
 		this.pred = pred;
 		this.groupFields = groupFields;
 		this.sortMap = sortMap;
+		this.joinAlgoSelected = joinAlgoSelected;
 	}
-
+	
 	/**
 	 * Returns the distinct mentioned in the select clause.
 	 * 
@@ -95,6 +98,15 @@ public class QueryData {
 	 */
 	public Map<String, Boolean> sortMap() {
 		return sortMap;
+	}
+	
+	/**
+	 * Returns the join algorithm selected by user for purposes of testing
+	 * 
+	 * @return the join algorithm selected
+	 */
+	public JoinAlgoSelector joinAlgoSelected() {
+		return joinAlgoSelected;
 	}
 
 	public String toString() {

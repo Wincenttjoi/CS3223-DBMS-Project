@@ -15,7 +15,7 @@ public class CreateStudentDB {
          System.out.println("Table STUDENT created.");
          
          // Create index
-         s = "create index majorid_idx on student (majorid) using hash";
+         s = "create index majorid_idx on student (majorid) using btree";
          stmt.executeUpdate(s);
          System.out.println("Majorid index created");
          
