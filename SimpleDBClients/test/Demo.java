@@ -91,7 +91,7 @@ public class Demo {
 //          sue      4      20
 //          amy      2      20
     	  
-    	  Test.doTest(stmt, "select sname, sid, majorid from student where majorid < 20");
+    	  Test.doTest(stmt, "select sname, sid, majorid from student where majorid > 20");
 // TEST7
 //          sname    sid majorid
 //          --------------------------
