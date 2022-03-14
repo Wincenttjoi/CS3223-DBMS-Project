@@ -18,7 +18,6 @@ public class DemoSingleTable {
       try (Connection conn = d.connect(s, null);
           Statement stmt = conn.createStatement()) {
     	  
-//		  For reference
     	  // TEST1: Basic query showing duplicates
     	  Test.doTest(stmt, "select did, dname from dept");
 //    	    did                     dname

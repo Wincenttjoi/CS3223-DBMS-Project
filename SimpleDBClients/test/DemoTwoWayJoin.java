@@ -3,7 +3,7 @@ import java.util.Scanner;
 import simpledb.jdbc.embedded.EmbeddedDriver;
 
 /**
- * The following class is for demonstration of single table queries purposes.
+ * The following class is for demonstration of two way table queries purposes.
  */
 public class DemoTwoWayJoin {
    
@@ -18,8 +18,7 @@ public class DemoTwoWayJoin {
       try (Connection conn = d.connect(s, null);
           Statement stmt = conn.createStatement()) {
     	  
-//		  For reference
-    	  // TEST1: Single Join student and dept
+    	  // TEST1: Two Way Join student and dept
     	  Test.doJoinAlgoTest(stmt, "select sid, majorid, did, dname from student, dept "
     	  		+ "where majorid = did and sid <= 10");
 //    	    sid majorid    did                     dname
@@ -35,7 +34,7 @@ public class DemoTwoWayJoin {
 //    	          9     300    300                 Marketing
 //    	         10      10     10                       Law
 
-    	  // TEST2: Single Join student and dept with order by
+    	  // TEST2: Two Way Join student and dept with order by
     	  Test.doJoinAlgoTest(stmt, "select sid, majorid, did, dname from student, dept "
     	  		+ "where majorid = did and sid <= 10 order by majorid asc");
 //    	    sid majorid    did                     dname
@@ -51,7 +50,7 @@ public class DemoTwoWayJoin {
 //    	          7     430    430      Chemical Engineering
 //    	          3     430    430      Chemical Engineering
     	  
-    	  // TEST3: Single Join dept and course with 3 conditions
+    	  // TEST3: Two Way Join dept and course with 3 conditions
     	  Test.doJoinAlgoTest(stmt, "select dname, did, deptid, title from course, dept "
     	  		+ "where did = deptid and did >= 110 and did <= 250");
 //		          dname    did deptid                          title
