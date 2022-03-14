@@ -164,7 +164,7 @@ public class DemoSingleTable {
     	  Test.doTest(stmt, "select sectid, courseid, prof, yearoffered from section "
     	  		+ "where yearoffered <> 2020 and courseid >= 332 order by yearoffered asc, sectid desc");
 //    	  sectid courseid                      prof yearoffered
-//    	  ------------------------------------------------------
+//    	  ------------------------------------------------------ 
 //    	      393      332                Ted Cullen        2016
 //    	      343      512               Maya Tucker        2016
 //    	      143      472                   Cole Li        2016

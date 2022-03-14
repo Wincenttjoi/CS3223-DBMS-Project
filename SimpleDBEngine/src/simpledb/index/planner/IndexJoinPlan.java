@@ -4,6 +4,7 @@ import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.metadata.IndexInfo;
 import simpledb.plan.Plan;
+import simpledb.plan.TablePlan;
 import simpledb.index.Index;
 import simpledb.index.query.IndexJoinScan;
 
@@ -95,7 +96,8 @@ public class IndexJoinPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Index join Plan used between " + p1.toString() + " and " + 
-   p2.toString() + " on " + this.joinfield + this.opr + this.ii.getFieldName());
+	   System.out.println("Index join Plan used between " + ((TablePlan) p1).getTableName() + " and " + 
+			   ((TablePlan) p2).getTableName() + " on " 
+			   + this.joinfield + this.opr + this.ii.getFieldName());
    }
 }
