@@ -10,7 +10,7 @@ public class CreateStudentDBDemo {
 
       try (Connection conn = d.connect(url, null);
             Statement stmt = conn.createStatement()) {
-         String s = "create table STUDENT(SId int, SName varchar(30), MajorId int, GradYear int)";
+         String s = "create table STUDENT(SId int, SName varchar(25), MajorId int, GradYear int)";
          stmt.executeUpdate(s);
          System.out.println("Table STUDENT created.");
          
@@ -80,10 +80,15 @@ public class CreateStudentDBDemo {
             stmt.executeUpdate(s + studvals[i]);
          System.out.println("STUDENT records inserted.");
 
-         s = "create table DEPT(DId int, DName varchar(30))";
+         s = "create table DEPT(DId int, DName varchar(25))";
          stmt.executeUpdate(s);
          System.out.println("Table DEPT created.");
 
+         // Create index
+         s = "create index dname_index on dept (dname) using btree";
+         stmt.executeUpdate(s);
+         System.out.println("Dname index created");
+         
          s = "insert into DEPT(DId, DName) values ";
          String[] deptvals = {
         		 "(10, 'Law')",
@@ -141,7 +146,7 @@ public class CreateStudentDBDemo {
             stmt.executeUpdate(s + deptvals[i]);
          System.out.println("DEPT records inserted.");
 
-         s = "create table COURSE(CId int, Title varchar(40), DeptId int)";
+         s = "create table COURSE(CId int, Title varchar(30), DeptId int)";
          stmt.executeUpdate(s);
          System.out.println("Table COURSE created.");
 
@@ -203,7 +208,7 @@ public class CreateStudentDBDemo {
             stmt.executeUpdate(s + coursevals[i]);
          System.out.println("COURSE records inserted.");
 
-         s = "create table SECTION(SectId int, CourseId int, Prof varchar(8), YearOffered int)";
+         s = "create table SECTION(SectId int, CourseId int, Prof varchar(25), YearOffered int)";
          stmt.executeUpdate(s);
          System.out.println("Table SECTION created.");
 
