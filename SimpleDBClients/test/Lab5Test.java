@@ -70,7 +70,7 @@ public class Lab5Test {
 //		 -------------------
 //		     2020          3
 //		     2019          1
-			doTest(stmt, "select distinct gradyear, avg(sid) from student where majorid = 10 group by gradyear order by gradyear desc");
+			doTest(stmt, "select distinct gradyear, avg(sid) from student where majorid = 10 group by gradyear order by avgofsid desc");
 //		 gradyear maxofsid
 //		 -----------------
 //		     2022        3

@@ -31,12 +31,12 @@ public class SimpleIJ {
          }
 
 			// TODO: Insert query for testing here
-//			String cmd = "select majorid, avg(gradyear) from student group by majorid order by majorid";
+//			String cmd = "select majorid, avg(gradyear) from student group by majorid order by avgofgradyear";
 //			if (cmd.startsWith("select")) {
 //				doQuery(stmt, cmd);
 //			} else {
 //				doUpdate(stmt, cmd);
-//			}
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
