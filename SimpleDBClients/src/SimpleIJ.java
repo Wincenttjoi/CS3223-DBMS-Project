@@ -36,7 +36,7 @@ public class SimpleIJ {
 //				doQuery(stmt, cmd);
 //			} else {
 //				doUpdate(stmt, cmd);
-			}
+//			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
