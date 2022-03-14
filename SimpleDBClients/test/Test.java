@@ -19,47 +19,48 @@ public class Test {
  	  System.out.println(DIVIDER);
    }
 
-   public static void doQuery(Statement stmt, String cmd) {
-      try (ResultSet rs = stmt.executeQuery(cmd)) {
-         ResultSetMetaData md = rs.getMetaData();
-         int numcols = md.getColumnCount();
-         int totalwidth = 0;
+	public static void doQuery(Statement stmt, String cmd) {
+		try (ResultSet rs = stmt.executeQuery(cmd)) {
+			ResultSetMetaData md = rs.getMetaData();
+			int numcols = md.getColumnCount();
+			int totalwidth = 0;
 
-         // print header
-         for(int i=1; i<=numcols; i++) {
-            String fldname = md.getColumnName(i);
-            int width = md.getColumnDisplaySize(i);
-            totalwidth += width;
-            String fmt = "%" + width + "s";
-            System.out.format(fmt, fldname);
-         }
-         System.out.println();
-         for(int i=0; i<totalwidth; i++)
-            System.out.print("-");
-         System.out.println();
+			// print header
+			for (int i = 1; i <= numcols; i++) {
+				String fldname = md.getColumnName(i);
+				int width = md.getColumnDisplaySize(i);
+				totalwidth += width;
+				String fmt = "%" + width + "s";
+				System.out.format(fmt, fldname);
+			}
+			System.out.println();
+			for (int i = 0; i < totalwidth; i++)
+				System.out.print("-");
+			System.out.println();
 
-         // print records
-         while(rs.next()) {
-            for (int i=1; i<=numcols; i++) {
-               String fldname = md.getColumnName(i);
-               int fldtype = md.getColumnType(i);
-               String fmt = "%" + md.getColumnDisplaySize(i);
-               if (fldtype == Types.INTEGER) {
-                  int ival = rs.getInt(fldname);
-                  System.out.format(fmt + "d", ival);
-               }
-               else {
-                  String sval = rs.getString(fldname);
-                  System.out.format(fmt + "s", sval);
-               }
-            }
-            System.out.println();
-         }
-      }
-      catch (SQLException e) {
-         System.out.println("SQL Exception: " + e.getMessage());
-      }
-   }
+			// print records
+			while (rs.next()) {
+				for (int i = 1; i <= numcols; i++) {
+					String fldname = md.getColumnName(i);
+					int fldtype = md.getColumnType(i);
+					String fmt = "%" + md.getColumnDisplaySize(i);
+					if (fldtype == Types.INTEGER) {
+						int ival = rs.getInt(fldname);
+						System.out.format(fmt + "d", ival);
+					} else if (fldtype == Types.FLOAT) {
+						float fval = rs.getFloat(fldname);
+						System.out.format(fmt + ".2f", fval);
+					} else {
+						String sval = rs.getString(fldname);
+						System.out.format(fmt + "s", sval);
+					}
+				}
+				System.out.println();
+			}
+		} catch (SQLException e) {
+			System.out.println("SQL Exception: " + e.getMessage());
+		}
+	}
 
    public static void doUpdate(Statement stmt, String cmd) {
 	  testNumber++;
