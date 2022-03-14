@@ -17,26 +17,26 @@ public class SimpleIJ {
 		try (Connection conn = d.connect(s, null); Statement stmt = conn.createStatement()) {
 
 			// ORIGINAL CODE, UNCOMMENT FOR SUBMISSION
-//    	 System.out.print("\nSQL> ");
-//         while (sc.hasNextLine()) {
-//            // process one line of input
-//            String cmd = sc.nextLine().trim();
-//            if (cmd.startsWith("exit"))
-//               break;
-//            else if (cmd.startsWith("select"))
-//               doQuery(stmt, cmd);
-//            else
-//               doUpdate(stmt, cmd);
-//            System.out.print("\nSQL> ");
-//         }
+    	 System.out.print("\nSQL> ");
+         while (sc.hasNextLine()) {
+            // process one line of input
+            String cmd = sc.nextLine().trim();
+            if (cmd.startsWith("exit"))
+               break;
+            else if (cmd.startsWith("select"))
+               doQuery(stmt, cmd);
+            else
+               doUpdate(stmt, cmd);
+            System.out.print("\nSQL> ");
+         }
 
 			// TODO: Insert query for testing here
-			String cmd = "select sid, max(gradyear) from student";
-			if (cmd.startsWith("select")) {
-				doQuery(stmt, cmd);
-			} else {
-				doUpdate(stmt, cmd);
-			}
+//			String cmd = "select majorid, avg(gradyear) from student group by majorid order by majorid";
+//			if (cmd.startsWith("select")) {
+//				doQuery(stmt, cmd);
+//			} else {
+//				doUpdate(stmt, cmd);
+//			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
