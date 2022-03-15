@@ -3,6 +3,7 @@ package simpledb.materialize;
 import simpledb.tx.Transaction;
 import simpledb.record.*;
 import simpledb.plan.Plan;
+import simpledb.plan.TablePlan;
 import simpledb.query.*;
 
 /**

@@ -2,3 +2,9 @@
 /network/
 /Lab6Test.class
 /Test.class
+/Lab4Test.class
+/Demo.class
+/DemoSingleTable.class
+/DemoTwoWayJoin.class
+/DemoFourWayJoin.class
+*.tbl
