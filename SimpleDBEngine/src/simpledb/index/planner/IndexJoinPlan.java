@@ -102,6 +102,6 @@ public class IndexJoinPlan implements Plan {
 
 	   System.out.println(toStringUnqualified + " made on " + p1String + " and " + 
 			   p2String + " with predicate " 
-			   + this.joinfield + this.opr + this.ii.getFieldName());
+			   + this.joinfield + " " + this.opr + " " + this.ii.getFieldName());
    }
 }

@@ -96,6 +96,6 @@ public class NestedJoinPlan implements Plan {
 	   String p1String = p1.toString().substring(p1.toString().lastIndexOf(".")+1);
 	   String p2String = p2.toString().substring(p2.toString().lastIndexOf(".")+1);
 	   System.out.println(toStringUnqualified + " made on " + fldname1 + " of " + 
-			   p1String + opr + fldname2 + " of " + p2String);
+			   p1String + " " + opr + " " + fldname2 + " of " + p2String);
    }
 }

@@ -88,6 +88,6 @@ public class IndexSelectPlan implements Plan {
 	   String toStringUnqualified = this.toString().substring(this.toString().lastIndexOf(".")+1);
 	   String p1String = p.toString().substring(p.toString().lastIndexOf(".")+1);
 	   System.out.println(toStringUnqualified + " made on table " + p1String +
-			   " with predicate " + ii.getFieldName() + opr + val);
+			   " with predicate " + ii.getFieldName()+ " " + this.opr + " " + this.val);
    }
 }
