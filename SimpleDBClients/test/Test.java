@@ -11,11 +11,11 @@ public class Test {
    
    public static void doTest(Statement stmt, String cmd) {
 	  testNumber++;
- 	  System.out.println("TEST" + testNumber);
- 	  if (cmd.startsWith("select")) {
- 		  doQuery(stmt, cmd);
- 	  } else {
+ 	  System.out.println("TEST" + testNumber + ": " + cmd);
+ 	  if (cmd.startsWith("create")) {
  		  doUpdate(stmt, cmd);
+ 	  } else {
+ 		  doQuery(stmt, cmd);
  	  }
  	  System.out.println(DIVIDER);
    }
@@ -97,8 +97,8 @@ public class Test {
    public static void doJoinAlgoTest(Statement stmt, String cmd) {
 	  testNumber++;
       for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
-     	  System.out.println("TEST" + testNumber + " " + selector);
-    	  doQuery(stmt, cmd + " " + selector);
+     	  System.out.println("TEST" + testNumber + ": " + selector + " " + cmd);
+    	  doQuery(stmt, selector + " " + cmd);
     	  System.out.println(DIVIDER);
       }
    }
