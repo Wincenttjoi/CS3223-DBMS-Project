@@ -133,7 +133,7 @@ public class DemoSingleTable {
 //				  Chemical Engineering
 //					        Accounting
     	  
-    	  // TEST6: Order By of multiple attributes and non-inequality >
+    	  // TEST6: Order By of multiple attributes and non-inequality >, yearoffered index used
     	  Test.doTest(stmt, "select sectid, courseid, prof, yearoffered from section "
     	  		+ "where yearoffered > 2019 order by yearoffered asc, sectid desc");
 //    	  sectid courseid                      prof yearoffered
@@ -159,25 +159,28 @@ public class DemoSingleTable {
 //    	       93      132             Hakim Collins        2021
 //    	       23      222               Kelvin Wong        2021
     	 
-    	  // TEST7: Order By of multiple attributes and non-inequality <> >=
+    	  // TEST7: Order By of multiple attributes and non-inequality <> < with index desc order
     	  Test.doTest(stmt, "select sectid, courseid, prof, yearoffered from section "
-    	  		+ "where yearoffered <> 2020 and courseid >= 332 order by yearoffered asc, sectid desc");
+    	  		+ "where yearoffered < 2020 and courseid <> 332 order by yearoffered desc, sectid desc");
 //    	  sectid courseid                      prof yearoffered
-//    	  ------------------------------------------------------ 
-//    	      393      332                Ted Cullen        2016
-//    	      343      512               Maya Tucker        2016
-//    	      143      472                   Cole Li        2016
-//    	       63      472           Garfield Hebert        2016
+//    	  ------------------------------------------------------
+//    	      363      142             Beatrix Oneal        2018
+//    	      303      252                Rohan Drew        2018
+//    	      253      462             Kelise Berger        2018
+//    	      173      102               Sheikh Rowe        2018
+//    	      113      502             Raihan Baxter        2018
 //    	      513      372              Wincent Tjoi        2017
 //    	      463      372             Cecil Derrick        2017
-//    	      253      462             Kelise Berger        2018
-//    	      113      502             Raihan Baxter        2018
-//    	      373      402            Nellie Wiggins        2019
-//    	      353      382               Alaya Frost        2019
-//    	      133      372         Abdurahman Holman        2019
-//    	      103      442           Janae Gillespie        2019
-//    	      273      362              Gabija Baird        2021
-//    	      223      452              Kaydee Parks        2021
+//    	      383      302            Haidar Merrill        2017
+//    	      313      112           Beatriz Shields        2017
+//    	      233       12            Gracey Peacock        2017
+//    	      433       52                Jibril Ali        2016
+//    	      343      512               Maya Tucker        2016
+//    	      323      132              Sianna Reyes        2016
+//    	      143      472                   Cole Li        2016
+//    	       63      472           Garfield Hebert        2016
+//    	       43      112               Dina Warner        2016
+//    	       33      242              Wincent Tjoi        2016
     	  
     	  // TODO: Add tests of aggregate function with/without group,
     	  // aggn fn with/without group combined with order by and distinct
