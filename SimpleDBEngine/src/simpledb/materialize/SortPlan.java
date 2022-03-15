@@ -174,6 +174,8 @@ public class SortPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Sort Plan used");
+	   String toStringUnqualified = this.toString().substring(this.toString().lastIndexOf(".")+1);
+	   String p1String = p.toString().substring(p.toString().lastIndexOf(".")+1);
+	   System.out.println(toStringUnqualified + " used on " + p1String);
    }
 }

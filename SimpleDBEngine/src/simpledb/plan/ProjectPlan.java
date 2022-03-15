@@ -75,11 +75,10 @@ public class ProjectPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   String stmt = "Project Plan used on fields of ";
-	   for (String fields : schema.fields()) {
-		   stmt += fields + ", ";
-	   }
-	   stmt = stmt.substring(0, stmt.length() - 2);
+	   String stmt = this.toString().substring(this.toString().lastIndexOf(".")+1)
+			   + " made on " + schema.fields();
+	   String p1 = p.toString().substring(p.toString().lastIndexOf(".")+1);
+	   stmt += (" on " + p1);
 	   System.out.println(stmt);
    }
 }

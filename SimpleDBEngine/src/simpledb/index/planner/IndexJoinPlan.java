@@ -96,8 +96,12 @@ public class IndexJoinPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Index join Plan used between " + ((TablePlan) p1).getTableName() + " and " + 
-			   ((TablePlan) p2).getTableName() + " on " 
+	   String toStringUnqualified = this.toString().substring(this.toString().lastIndexOf(".")+1);
+	   String p1String = p1.toString().substring(p1.toString().lastIndexOf(".")+1);
+	   String p2String = p2.toString().substring(p2.toString().lastIndexOf(".")+1);
+
+	   System.out.println(toStringUnqualified + " made on " + p1String + " and " + 
+			   p2String + " with predicate " 
 			   + this.joinfield + this.opr + this.ii.getFieldName());
    }
 }

@@ -80,6 +80,6 @@ public class TablePlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Table Plan used on table " + tblname);
+	   System.out.println(this.toString().substring(this.toString().lastIndexOf(".")+1) + " used on " + tblname + " table");
    }
 }

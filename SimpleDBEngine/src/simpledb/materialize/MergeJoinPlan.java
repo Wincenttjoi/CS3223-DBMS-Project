@@ -110,7 +110,10 @@ public class MergeJoinPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Merge join plan used on " + fldname1 + opr + fldname2);
-   }
+	   String toStringUnqualified = this.toString().substring(this.toString().lastIndexOf(".")+1);
+	   String p1String = p1.toString().substring(p1.toString().lastIndexOf(".")+1);
+	   String p2String = p2.toString().substring(p2.toString().lastIndexOf(".")+1);
+	   System.out.println(toStringUnqualified + " made on " + fldname1 + " of " + 
+			   p1String + opr + fldname2 + " of " + p2String);   }
 }
 
