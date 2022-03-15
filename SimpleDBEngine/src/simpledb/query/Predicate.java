@@ -24,6 +24,14 @@ public class Predicate {
    public Predicate(Term t) {
       terms.add(t);
    }
+   
+   /**
+    * Create a predicate containing a multiple term.
+    * @param List<Term> list of terms
+    */
+   public Predicate(List<Term> t) {
+	   terms.addAll(t);
+   }
 
    /**
     * Modifies the predicate to be the conjunction of
@@ -151,6 +159,26 @@ public class Predicate {
             return t.getOperator(fldname);
       }
       return null;
+   }
+   
+   /**
+    * Removes term in the predicate that no longer needed
+    * @param fldname
+    * @return Predicate
+    */
+   public Predicate removeSelectField(String fldname) {
+	   List<Term> newTerms = new ArrayList<>();
+	   for (Term t : terms) {
+		   Expression lhs = t.getLHS();
+		   Expression rhs = t.getRHS();
+		   if ((lhs.isFieldName() && !lhs.asFieldName().equals(fldname)) || 
+				   (rhs.isFieldName() && !rhs.asFieldName().equals(fldname))) {
+			   newTerms.add(t);
+		   }
+		   
+	   }
+	   Predicate result = new Predicate(newTerms);
+	   return result;
    }
    
    /**
