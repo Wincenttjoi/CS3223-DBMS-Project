@@ -191,7 +191,7 @@ public class Lab1Test {
 //        sname  
 //        ------
     	  
-//    	  doTest(stmt, "select sname from student where sname = 'jonah'");
+    	  Test.doTest(stmt, "select sid, sname, majorid from student where majorid > 10 and sname != 'bob'");
 // TEST18
 //        sname  
 //        ------
