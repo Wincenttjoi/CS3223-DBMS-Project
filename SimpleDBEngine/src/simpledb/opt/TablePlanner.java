@@ -11,7 +11,7 @@ import simpledb.metadata.*;
 import simpledb.index.planner.*;
 import simpledb.materialize.MergeJoinPlan;
 import simpledb.materialize.NestedJoinPlan;
-//import simpledb.materialize.HashJoinPlan;
+import simpledb.materialize.HashJoinPlan;
 import simpledb.multibuffer.MultibufferProductPlan;
 import simpledb.plan.*;
 
@@ -79,7 +79,7 @@ class TablePlanner {
 			Plan indexJoinPlan = makeIndexJoin(current, currsch);
 			Plan mergeJoinPlan = makeMergeJoin(current, currsch);
 			Plan nestedJoinPlan = makeProductJoin(current, currsch);
-//			Plan hashJoinPlan = makeHashJoin(current, currsch);
+			Plan hashJoinPlan = makeHashJoin(current, currsch);
 
 			Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan).filter((p1) -> p1 != null)
 					.sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()));
@@ -102,9 +102,12 @@ class TablePlanner {
 		case NESTEDJOIN_PLAN:
 			p = makeNestedJoin(current, currsch);
 			break;
-//		case HASHJOIN_PLAN:
-//			p = makeHashJoin(current, currsch);
-//			break;
+		case HASHJOIN_PLAN:
+			p = makeHashJoin(current, currsch);
+			if (p == null) {
+				p = makeProductJoin(current, currsch);
+			}
+			break;
 		default:
 			throw new RuntimeException();
 		}
@@ -235,57 +238,42 @@ class TablePlanner {
 		return addJoinPred(p, currsch);
 	}
 
-//	/**
-//	 * Constructs a hashjoin plan of the specified plan and this table.
-//	 * 
-//	 * @param current the specified plan
-//	 * @return a hashjoin plan of the specified plan and this table
-//	 */
-//	private Plan makeHashJoin(Plan current, Schema currsch) {
-////		Let T1 and T2 be the tables to be joined.
-////		1. Choose a value k that is less than the number of available buffers.
-////		2. If the size of T2 is no more than k blocks, then:
-////		a) Join T1 and T2, using a multibuffer product followed by a selection on the join predicate.
-////		b) Return. // Otherwise:
-////		3. Choose a hash function that returns a value between 0 and k-1.
-////		4. For the table T1:
-////		a) Open a scan for k temporary tables.
-////		b) For each record of T1:
-////		i. Hash the record’s join field, to get the hash value h.
-////		ii. Copy the record to the hth temporary table.
-////		b) Close the temporary table scans.
-////		5. Repeat Step 4 for the table T2.
-////		6. For each i between 0 and k-1:
-////		a) Let Vi be the ith temporary table of T1.
-////		b) Let Wi be the ith temporary table of T2.
-////		c) Recursively perform the hashjoin of Vi and Wi.
-//		Predicate joinpred = mypred.joinSubPred(currsch, myschema);
-//		Term joinTerm = joinpred.getTerms().get(0);
-//		String joinValLHS = joinTerm.getLHS().asFieldName();
-//		String joinValRHS = joinTerm.getRHS().asFieldName();
-//		String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
-//		boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-//		
-//		Plan lhsPlan, rhsPlan;
-//		if (isCurrentPlanOnRHS) {
-//			lhsPlan = myplan;
-//			rhsPlan = current;
-//		} else {
-//			lhsPlan = current;
-//			rhsPlan = myplan;
-//		}
-//		
-//		Plan p;
-//		if (opr.equals("=")) {
-//			p = new HashJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
-//		} else {
-//			System.out.println("Hashjoin failed: " + opr + " not supported by hashjoin, using productjoin instead");
-//			return null;
-//		}
-//		System.out.println("Hashjoin blocks accessed = " + p.blocksAccessed());
-//		p = addSelectPred(p);
-//		return addJoinPred(p, currsch);
-//	}
+	/**
+	 * Constructs a hashjoin plan of the specified plan and this table.
+	 * 
+	 * @param current the specified plan
+	 * @return a hashjoin plan of the specified plan and this table
+	 */
+	private Plan makeHashJoin(Plan current, Schema currsch) {
+		Predicate joinpred = mypred.joinSubPred(currsch, myschema);
+		Term joinTerm = joinpred.getTerms().get(0);
+		String joinValLHS = joinTerm.getLHS().asFieldName();
+		String joinValRHS = joinTerm.getRHS().asFieldName();
+		String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
+		boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
+
+		Plan lhsPlan, rhsPlan;
+		if (isCurrentPlanOnRHS) {
+			lhsPlan = myplan;
+			rhsPlan = current;
+		} else {
+			lhsPlan = current;
+			rhsPlan = myplan;
+		}
+		
+		if (tx.availableBuffs() >= Math.sqrt(lhsPlan.blocksAccessed())) {
+			System.out.println("Hashjoin failed: not enough buffer size available for hashjoin, using productjoin instead");
+			return null;
+		} else if (opr.equals("=")) {
+			System.out.println("Hashjoin failed: " + opr + " not supported by hashjoin, using productjoin instead");
+			return null;
+		}
+		int numPart = tx.availableBuffs() - 1; // max # of partitions <= B - 1
+		Plan p = new HashJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr, numPart);
+		System.out.println("Hashjoin blocks accessed = " + p.blocksAccessed());
+		p = addSelectPred(p);
+		return addJoinPred(p, currsch);
+	}
 
 	private Plan addSelectPred(Plan p) {
 		Predicate selectpred = mypred.selectSubPred(myschema);
