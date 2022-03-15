@@ -1,10 +1,12 @@
 import java.sql.*;
+import java.util.concurrent.TimeUnit;
+
 import simpledb.opt.JoinAlgoSelector;
 
 // This class is responsible to store general static methods to be used by the
 // different LabTests.
 public class Test {
-   private static final String DIVIDER = "=========================================";
+   private static final String DIVIDER = "========================================= \n" ;
    private static int testNumber = 0;
    
    public static void doTest(Statement stmt, String cmd) {
@@ -15,11 +17,12 @@ public class Test {
  	  } else {
  		  doUpdate(stmt, cmd);
  	  }
- 	  
  	  System.out.println(DIVIDER);
    }
 
    public static void doQuery(Statement stmt, String cmd) {
+	  // Start timer
+	  long startTime = System.nanoTime();
       try (ResultSet rs = stmt.executeQuery(cmd)) {
          ResultSetMetaData md = rs.getMetaData();
          int numcols = md.getColumnCount();
@@ -55,6 +58,15 @@ public class Test {
             }
             System.out.println();
          }
+         // Stops timer
+	     long endTime = System.nanoTime();
+ 	     long duration = endTime - startTime;
+ 	     if (duration >= 2000000) {
+ 		     System.out.println("The total time taken for query is: " + TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS) + "ms");
+ 	     } else {
+ 		     System.out.println("The total time taken for query is: " + duration + "ns");
+ 	     }
+
       }
       catch (SQLException e) {
          System.out.println("SQL Exception: " + e.getMessage());
@@ -64,7 +76,17 @@ public class Test {
    public static void doUpdate(Statement stmt, String cmd) {
 	  testNumber++;
       try {
+    	 // Start timer
+    	 long startTime = System.nanoTime();
          int howmany = stmt.executeUpdate(cmd);
+         // Stops timer
+	     long endTime = System.nanoTime();
+ 	     long duration = endTime - startTime;
+ 	     if (duration >= 2000000) {
+ 		     System.out.println("The total time taken for update is: " + TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS) + "ms");
+ 	     } else {
+ 		     System.out.println("The total time taken for update is: " + duration + "ns");
+ 	     }
          System.out.println(howmany + " records processed");
       }
       catch (SQLException e) {
@@ -79,6 +101,5 @@ public class Test {
     	  doQuery(stmt, cmd + " " + selector);
     	  System.out.println(DIVIDER);
       }
- 	  System.out.println(DIVIDER);
    }
 }
