@@ -19,7 +19,7 @@ public class CreateStudentDB {
          stmt.executeUpdate(s);
          System.out.println("Majorid index created");
          
-         s = "create index studentid_idx on student (SId) using hash";
+         s = "create index studentid_idx on student (SId) using btree";
          stmt.executeUpdate(s);
          System.out.println("Sid index created");
 

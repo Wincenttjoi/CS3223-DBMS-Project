@@ -76,7 +76,8 @@ class IndexMgr {
          IndexInfo ii = new IndexInfo(idxname, fldname, tblLayout.schema(), tx, tblsi);
          ii.setIdxType(idxtype);
          result.put(fldname, ii);
-         printIndexInfo(tblname, idxname, fldname, idxtype);
+         // For debugging
+         // printIndexInfo(tblname, idxname, fldname, idxtype);
       }
       ts.close();
       return result;
