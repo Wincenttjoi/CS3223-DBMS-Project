@@ -160,6 +160,13 @@ public class Term {
    }
    
    /**
+    * @return opr
+    */
+   public String getOpr() {
+	   return opr;
+   }
+   
+   /**
     * Return true if both of the term's expressions
     * apply to the specified schema.
     * @param sch the schema

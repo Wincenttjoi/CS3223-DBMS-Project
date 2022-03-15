@@ -127,7 +127,7 @@ class TablePlanner {
          // use index select if operator isn't "!=" and if idxtype is hash, operator must be "="
          if (val != null && ii.supportsRangeSearch(opr)) {
 //            System.out.println("index select on " + fldname + opr + val);
-        	mypred = mypred.removeSelectField(fldname);
+        	mypred = mypred.removeSelectField(fldname, val, opr);
             return new IndexSelectPlan(myplan, ii, val, opr);
          }
       }

@@ -166,13 +166,14 @@ public class Predicate {
     * @param fldname
     * @return Predicate
     */
-   public Predicate removeSelectField(String fldname) {
+   public Predicate removeSelectField(String fldname, Constant cnst, String opr) {
 	   List<Term> newTerms = new ArrayList<>();
 	   for (Term t : terms) {
 		   Expression lhs = t.getLHS();
 		   Expression rhs = t.getRHS();
-		   if ((lhs.isFieldName() && !lhs.asFieldName().equals(fldname)) || 
-				   (rhs.isFieldName() && !rhs.asFieldName().equals(fldname))) {
+		   if (lhs.isFieldName() && !lhs.asFieldName().equals(fldname) ||
+				   rhs.isFieldName() && !rhs.asFieldName().equals(fldname) ||
+				   !t.getOperator(fldname).equals(opr)) {
 			   newTerms.add(t);
 		   }
 		   
