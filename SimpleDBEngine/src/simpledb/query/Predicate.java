@@ -172,7 +172,7 @@ public class Predicate {
 		   Expression lhs = t.getLHS();
 		   Expression rhs = t.getRHS();
 		   if (lhs.isFieldName() && !lhs.asFieldName().equals(fldname) ||
-				   rhs.isFieldName() && !rhs.asFieldName().equals(fldname) ||
+				   rhs.asConstant() != null && !rhs.asConstant().equals(cnst) ||
 				   !t.getOperator(fldname).equals(opr)) {
 			   newTerms.add(t);
 		   }
