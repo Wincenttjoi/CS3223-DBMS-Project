@@ -105,31 +105,22 @@ class TablePlanner {
       switch (joinAlgoSelected) {
 	      case INDEXJOIN_PLAN:
 	    	  p = makeIndexJoin(current, currsch);
-	    	  Term joinTermIndex = joinTermsToRemove[joinAlgoSelected.ordinal()];
-	    	  if (p == null) {
-	    		  p = makeProductJoin(current, currsch);
-	    	  } else {
-	    		  p = addSubpredicatesWithoutJoinTerm(p, joinTermIndex, currsch);
-	    	  }
+	    	  if (p == null)
+	    		  return makeProductJoin(current, currsch);
 	    	  break;
 	      case MERGEJOIN_PLAN:
 	    	  p = makeMergeJoin(current, currsch);
-	    	  Term joinTermMerge = joinTermsToRemove[joinAlgoSelected.ordinal()];
-	    	  if (p == null) {
-	    		  p = makeProductJoin(current, currsch);
-	    	  } else {
-	    		  p = addSubpredicatesWithoutJoinTerm(p, joinTermMerge, currsch);
-	    	  }
+	    	  if (p == null)
+	    		  return makeProductJoin(current, currsch);
 	    	  break;
 	      case NESTEDJOIN_PLAN:
 	    	  p = makeNestedJoin(current, currsch);
-	    	  Term joinTermNested = joinTermsToRemove[joinAlgoSelected.ordinal()];
-    		  p = addSubpredicatesWithoutJoinTerm(p, joinTermNested, currsch);
 	    	  break;
 	      default:
 	    	  throw new RuntimeException();
       }
-
+	  Term joinTermUsed = joinTermsToRemove[joinAlgoSelected.ordinal()];
+	  p = addSubpredicatesWithoutJoinTerm(p, joinTermUsed, currsch);
       return p;
    }
    
