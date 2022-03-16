@@ -31,7 +31,7 @@ public class SimpleIJ {
          }
 
 			// TODO: Insert query for testing here
-//			String cmd = "select sid, max(gradyear) from student";
+//			String cmd = "select majorid, avg(gradyear) from student group by majorid order by avgofgradyear";
 //			if (cmd.startsWith("select")) {
 //				doQuery(stmt, cmd);
 //			} else {
