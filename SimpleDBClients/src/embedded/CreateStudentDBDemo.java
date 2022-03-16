@@ -85,9 +85,9 @@ public class CreateStudentDBDemo {
          System.out.println("Table DEPT created.");
 
          // Create index
-         s = "create index dname_index on dept (dname) using btree";
+         s = "create index did_index on dept (did) using hash";
          stmt.executeUpdate(s);
-         System.out.println("Dname index created");
+         System.out.println("Did index created");
          
          s = "insert into DEPT(DId, DName) values ";
          String[] deptvals = {
