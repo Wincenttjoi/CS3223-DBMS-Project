@@ -77,6 +77,22 @@ public class SortPlan implements Plan {
    }
    
    /**
+    * Estimates the number of block accesses to sort
+    * The formula is:
+    * <pre> B(sort(p)) = 2 * B(p) * (1 + ceil(log(ceil(B(p)/bufferSize) on base bufferSize-1)) </pre>
+    * It includes the one-time cost
+    * of materializing and sorting the records.
+    * @see simpledb.plan.Plan#blocksAccessed()
+    */
+   
+   public int blocksAccessedWithSortCost() {
+      Plan mp = new MaterializePlan(tx, p); // not opened; just for analysis
+      int runCount = (int) Math.ceil((double)p.blocksAccessed() / (double)tx.availableBuffs());
+      int numOfMergePasses = (int) Math.ceil((double)Math.log(runCount) / (double)Math.log(tx.availableBuffs()-1));
+      return 2 * mp.blocksAccessed() * (1 + numOfMergePasses);
+   }
+   
+   /**
     * Return the number of records in the sorted table,
     * which is the same as in the underlying query.
     * @see simpledb.plan.Plan#recordsOutput()
