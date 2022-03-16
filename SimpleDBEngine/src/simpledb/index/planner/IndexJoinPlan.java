@@ -96,8 +96,7 @@ public class IndexJoinPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Index join Plan used between " + ((TablePlan) p2).getTableName() + " and " + 
-			   ((TablePlan) p1).getTableName() + " on " 
-			   + this.ii.getFieldName() + this.opr + this.joinfield);
+	   System.out.println("Index join Plan used on " + this.ii.getFieldName() + 
+			   this.opr + this.joinfield);
    }
 }
