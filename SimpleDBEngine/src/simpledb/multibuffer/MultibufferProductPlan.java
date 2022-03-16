@@ -118,10 +118,6 @@ public class MultibufferProductPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   String toStringUnqualified = this.toString().substring(this.toString().lastIndexOf(".")+1);
-	   String p1String = lhs.toString().substring(lhs.toString().lastIndexOf(".")+1);
-	   String p2String = rhs.toString().substring(rhs.toString().lastIndexOf(".")+1);
-	   
-	   System.out.println(toStringUnqualified + " used between " + p1String + " and " + p2String);
+	   System.out.println("Multibuffer Product Plan used between " + lhs + " and " + rhs);
    }
 }

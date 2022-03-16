@@ -82,10 +82,15 @@ public class ProductPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   String toStringUnqualified = this.toString().substring(this.toString().lastIndexOf(".")+1);
-	   String p1String = p1.toString().substring(p1.toString().lastIndexOf(".")+1);
-	   String p2String = p2.toString().substring(p2.toString().lastIndexOf(".")+1);
-	   String stmt = toStringUnqualified + " made on " + p1String + " and " + p2String;
+	   String stmt = "Product Plan used across fields ";
+	   for (String field1 : p1.schema().fields()) {
+		   stmt += field1 + ", ";
+	   }
+	   stmt += " and fields ";
+	   for (String field2 : p2.schema().fields()) {
+		   stmt += field2 + ", ";
+	   }
+	   stmt = stmt.substring(0, stmt.length() - 2);
 	   System.out.println(stmt);
    }
 }

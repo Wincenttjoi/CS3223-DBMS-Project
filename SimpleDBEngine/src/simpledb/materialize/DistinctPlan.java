@@ -80,9 +80,6 @@ public class DistinctPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   String toStringUnqualified = this.toString().substring(this.toString().lastIndexOf(".")+1);
-	   String p1String = p.toString().substring(p.toString().lastIndexOf(".")+1);
-	   System.out.println(toStringUnqualified + " made on " + fields + " of " + 
-			   p1String);
+	   System.out.println("Distinct Plan used");
    }
 }

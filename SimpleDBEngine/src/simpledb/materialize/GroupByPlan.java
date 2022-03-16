@@ -105,9 +105,6 @@ public class GroupByPlan implements Plan {
     */
    public void printPlan() {
 	   // TODO: to include the aggregation functions and groupfields
-	   String toStringUnqualified = this.toString().substring(this.toString().lastIndexOf(".")+1);
-	   String p1String = p.toString().substring(p.toString().lastIndexOf(".")+1);
-	   System.out.println(toStringUnqualified + " made on " + groupfields + " of " + 
-			   p1String);
+	   System.out.println("Group By Plan used");
    }
 }

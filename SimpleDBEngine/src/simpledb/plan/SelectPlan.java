@@ -89,8 +89,6 @@ public class SelectPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   String toStringUnqualified = this.toString().substring(this.toString().lastIndexOf(".")+1);
-	   String p1 = p.toString().substring(p.toString().lastIndexOf(".")+1);
-	   System.out.println(toStringUnqualified + " made on " + p1 + " with predicate " + pred.toString());
+	   System.out.println("Select Plan used on predicate " + pred.toString());
    }
 }
