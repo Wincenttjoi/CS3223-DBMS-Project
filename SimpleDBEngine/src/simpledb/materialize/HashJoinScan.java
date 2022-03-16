@@ -88,8 +88,7 @@ public class HashJoinScan implements Scan {
 			}
 			// close current set of partitions
 			// and open scan on the next set of partitions
-			s1.close();
-			s2.close();
+			close();
 			s1 = (UpdateScan) part1.get(partId).open();
 			s2 = (UpdateScan) part2.get(partId).open();
 			nomore1 = !(s1.next());
