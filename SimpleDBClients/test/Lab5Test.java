@@ -30,7 +30,7 @@ public class Lab5Test {
 //        TEST2
 //    	  countofsid minofgradyear
 //    	  ------------------------
-//    	          10	      2019
+//    	           9	      2019
 		
 			doTest(stmt, "select gradyear, count(sid) from student group by gradyear");
 //	      TEST3
