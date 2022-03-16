@@ -30,6 +30,8 @@ class TablePlanner {
    private String tblname;
    private String tab = ">>";
    private Term[] joinTermsToRemove = new Term[4];
+   private Term selectTermToRemove;
+   private Term joinTermSelectedToRemove;
 
    /**
     * Creates a new table planner.
@@ -89,7 +91,7 @@ class TablePlanner {
 	    		 .filter((p1) -> p1 != null)
 	    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()));
 	      Plan bestPlan = plansStream.collect(Collectors.toList()).get(0);
-	      mypred.removeTerm(joinTermsToRemove[plans.indexOf(bestPlan)]);
+	      joinTermSelectedToRemove = joinTermsToRemove[plans.indexOf(bestPlan)];
 	      return bestPlan;
       }
       
@@ -140,8 +142,7 @@ class TablePlanner {
          
          // use index select if operator isn't "!=" and if idxtype is hash, operator must be "="
          if (val != null && ii.supportsRangeSearch(opr)) {
-//            System.out.println("index select on " + fldname + opr + val);
-        	mypred.removeTerm(new Term(fldname, val, opr));
+        	selectTermToRemove = new Term(fldname, val, opr);
             return new IndexSelectPlan(myplan, ii, val, opr);
          }
       }
@@ -216,7 +217,7 @@ class TablePlanner {
 	   }
        System.out.println(tab + "Mergejoin blocks accessed = " + p.blocksAccessed());
        joinTermsToRemove[JoinAlgoSelector.MERGEJOIN_PLAN.ordinal()] = 
-    		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
+    		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), joinTerm.getOpr());
 	   return p;
    }
    
@@ -270,6 +271,21 @@ class TablePlanner {
    private Plan completeJoin(Plan p, JoinAlgoSelector selected, Schema currsch) {
  	  mypred.removeTerm(joinTermsToRemove[selected.ordinal()]);
 	  p = addSelectPred(p);
-	  return addJoinPred(p, currsch);
+	  p = addJoinPred(p,currsch);
+	  mypred.conjoinWith(new Predicate(joinTermsToRemove[selected.ordinal()]));
+	  joinTermSelectedToRemove = joinTermsToRemove[selected.ordinal()];
+	  return p;
+   }
+   
+   public void removeSelectTerm() {
+	   if (selectTermToRemove != null) {
+		   mypred.removeTerm(selectTermToRemove);
+	   }
+   }
+   
+   public void removeJoinTerm() {
+	   if (joinTermSelectedToRemove != null) {
+		   mypred.removeTerm(joinTermSelectedToRemove);
+	   }
    }
 }
