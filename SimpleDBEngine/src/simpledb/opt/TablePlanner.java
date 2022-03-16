@@ -31,7 +31,6 @@ class TablePlanner {
    private String tab = ">>";
    private Term[] joinTermsToRemove = new Term[4];
    private Term selectTermToRemove;
-   private Term joinTermSelectedToRemove;
 
    /**
     * Creates a new table planner.
@@ -63,10 +62,9 @@ class TablePlanner {
          p = addSelectPred(myplan);
 	  }  else {
 		 // create a plan without the select term first, before restoring it.
-	     Term termToRestore = selectTermToRemove;
-	     removeSelectTerm();
+		 mypred.removeTerm(selectTermToRemove);
 	     p = addSelectPred(p);
-	     mypred.conjoinWith(new Predicate(termToRestore));
+	     mypred.conjoinWith(new Predicate(selectTermToRemove));
 	  }
       return p;
    }
@@ -98,7 +96,8 @@ class TablePlanner {
 	    		 .filter((p1) -> p1 != null)
 	    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()));
 	      Plan bestPlan = plansStream.collect(Collectors.toList()).get(0);
-	      joinTermSelectedToRemove = joinTermsToRemove[plans.indexOf(bestPlan)];
+	      Term joinTermSelectedToRemove = joinTermsToRemove[plans.indexOf(bestPlan)];
+	      bestPlan = addSubpredicatesWithoutJoinTerm(bestPlan, joinTermSelectedToRemove, currsch);
 	      return bestPlan;
       }
       
@@ -279,19 +278,6 @@ class TablePlanner {
 	  p = addSelectPred(p);
 	  p = addJoinPred(p,currsch);
 	  mypred.conjoinWith(new Predicate(joinTerm));
-	  joinTermSelectedToRemove = joinTerm;
 	  return p;
-   }
-   
-   public void removeSelectTerm() {
-	   if (selectTermToRemove != null) {
-		   mypred.removeTerm(selectTermToRemove);
-	   }
-   }
-   
-   public void removeJoinTerm() {
-	   if (joinTermSelectedToRemove != null) {
-		   mypred.removeTerm(joinTermSelectedToRemove);
-	   }
    }
 }
