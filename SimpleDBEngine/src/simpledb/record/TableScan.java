@@ -1,14 +1,15 @@
 package simpledb.record;
 
 import static java.sql.Types.INTEGER;
+import static java.sql.Types.FLOAT;
 
 import simpledb.file.BlockId;
 import simpledb.query.*;
 import simpledb.tx.Transaction;
 
 /**
- * Provides the abstraction of an arbitrarily large array
- * of records.
+ * Provides the abstraction of an arbitrarily large array of records.
+ * 
  * @author sciore
  */
 public class TableScan implements UpdateScan {
@@ -55,13 +56,19 @@ public class TableScan implements UpdateScan {
    public String getString(String fldname) {
       return rp.getString(currentslot, fldname);
    }
+   
+	public float getFloat(String fldname) {
+		return rp.getFloat(currentslot, fldname);
+	}
 
-   public Constant getVal(String fldname) {
-      if (layout.schema().type(fldname) == INTEGER)
-         return new Constant(getInt(fldname));
-      else
-         return new Constant(getString(fldname));
-   }
+	public Constant getVal(String fldname) {
+		if (layout.schema().type(fldname) == INTEGER)
+			return new Constant(getInt(fldname));
+		else if (layout.schema().type(fldname) == FLOAT)
+			return new Constant(getFloat(fldname));
+		else
+			return new Constant(getString(fldname));
+	}
 
    public boolean hasField(String fldname) {
       return layout.schema().hasField(fldname);
@@ -85,13 +92,19 @@ public class TableScan implements UpdateScan {
    public void setString(String fldname, String val) {
       rp.setString(currentslot, fldname, val);
    }
+   
+	public void setFloat(String fldname, float val) {
+		rp.setFloat(currentslot, fldname, val);
+	}
 
-   public void setVal(String fldname, Constant val) {
-      if (layout.schema().type(fldname) == INTEGER)
-         setInt(fldname, val.asInt());
-      else
-         setString(fldname, val.asString());
-   }
+	public void setVal(String fldname, Constant val) {
+		if (layout.schema().type(fldname) == INTEGER)
+			setInt(fldname, val.asInt());
+		else if (layout.schema().type(fldname) == FLOAT)
+			setFloat(fldname, val.asFloat());
+		else
+			setString(fldname, val.asString());
+	}
    
    public void setTupleExist(boolean bln) {
 	   this.isTupleExist = bln;

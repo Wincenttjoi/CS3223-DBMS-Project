@@ -43,6 +43,10 @@ public class SelectScan implements UpdateScan {
 	public int getInt(String fldname) {
 		return s.getInt(fldname);
 	}
+	
+	public float getFloat(String fldname) {
+		return s.getFloat(fldname);
+	}
 
 	public String getString(String fldname) {
 		return s.getString(fldname);

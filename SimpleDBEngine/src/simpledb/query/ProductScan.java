@@ -61,6 +61,19 @@ public class ProductScan implements Scan {
       else
          return s2.getInt(fldname);
    }
+   
+   /** 
+    * Return the float value of the specified field.
+    * The value is obtained from whichever scan
+    * contains the field.
+    * @see simpledb.query.Scan#getFloat(java.lang.String)
+    */
+   public float getFloat(String fldname) {
+      if (s1.hasField(fldname))
+         return s1.getFloat(fldname);
+      else
+         return s2.getFloat(fldname);
+   }
 
    /** 
     * Returns the string value of the specified field.

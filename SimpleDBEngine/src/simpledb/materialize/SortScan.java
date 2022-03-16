@@ -117,6 +117,15 @@ public class SortScan implements Scan {
    }
    
    /**
+    * Get the float value of the specified field
+    * of the current scan.
+    * @see simpledb.query.Scan#getFloat(java.lang.String)
+    */
+   public float getFloat(String fldname) {
+      return currentscan.getFloat(fldname);
+   }
+   
+   /**
     * Get the string value of the specified field
     * of the current scan.
     * @see simpledb.query.Scan#getString(java.lang.String)

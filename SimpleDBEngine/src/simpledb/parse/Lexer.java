@@ -9,9 +9,10 @@ import java.io.*;
  */
 public class Lexer {
    private Collection<String> keywords;
-   private Collection<Character> equality_keywords;
+   private Collection<Character> equalityKeywords;
    private Collection<String> idxType;
    private Collection<String> sortType;
+   private Collection<String> aggType;
    private StreamTokenizer tok;
    
    /**
@@ -23,6 +24,7 @@ public class Lexer {
       initOperators();
       initIdxType();
       initSortType();
+      initAggType();
       tok = new StreamTokenizer(new StringReader(s));
       tok.ordinaryChar('.');   //disallow "." in identifiers
       tok.wordChars('_', '_'); //allow "_" in identifiers
@@ -47,8 +49,16 @@ public class Lexer {
     * @return true if the current token is an integer
     */
    public boolean matchIntConstant() {
-      return tok.ttype == StreamTokenizer.TT_NUMBER;
+	   return tok.ttype == StreamTokenizer.TT_NUMBER;
    }
+   
+//   /**
+//    * Returns true if the current token is a float.
+//    * @return true if the current token is a float
+//    */
+//   public boolean matchFloatConstant() {
+//      return tok.ttype == StreamTokenizer.TT_NUMBER;
+//   }
    
    /**
     * Returns true if the current token is a string.
@@ -83,7 +93,7 @@ public class Lexer {
     * @return true if that keyword is the current token
     */
    public boolean matchOpr(char c) {
-      return equality_keywords.contains(c);
+      return equalityKeywords.contains(c);
    }
    
    /**
@@ -100,7 +110,8 @@ public class Lexer {
     * @return true if the current token is a sort type
     */
    public boolean matchSortType() {
-      return  tok.ttype==StreamTokenizer.TT_WORD && sortType.contains(tok.sval);
+      return  tok.ttype==StreamTokenizer.TT_WORD 
+    		  && sortType.contains(tok.sval);
    }
    
    /**
@@ -109,6 +120,15 @@ public class Lexer {
     */
    public boolean matchEnd() {
       return  tok.ttype==StreamTokenizer.TT_EOF;
+   }
+   
+   /**
+    * Returns true if the current token is a legal aggregate keyword.
+    * @return true if the current token is an identifier
+    */
+   public boolean matchAggType() {
+      return tok.ttype == StreamTokenizer.TT_WORD 
+    		  && aggType.contains(tok.sval);
    }
    
 //Methods to "eat" the current token
@@ -138,6 +158,20 @@ public class Lexer {
       nextToken();
       return i;
    }
+   
+//   /**
+//    * Throws an exception if the current token is not 
+//    * a float. 
+//    * Otherwise, returns that integer and moves to the next token.
+//    * @return the integer value of the current token
+//    */
+//   public float eatFloatConstant() {
+//      if (!matchFloatConstant())
+//         throw new BadSyntaxException();
+//      float i = (float) tok.nval;
+//      nextToken();
+//      return i;
+//   }
    
    /**
     * Throws an exception if the current token is not 
@@ -199,7 +233,7 @@ public class Lexer {
 		  opr += c2;
 		  nextToken();
 	  }
-	  validate_equality(opr);
+	  validateEquality(opr);
 	  return opr;
    }
    
@@ -233,6 +267,44 @@ public class Lexer {
       return s.equals("asc");
    }
    
+   /**
+    * Throws an exception if the current token is not the
+    * terminal token.
+    */
+   public void eatEnd() {
+	  if (!matchEnd())
+		 throw new BadSyntaxException();
+   }
+   
+   /**
+    * Throws an exception if the current token is not 
+    * an aggregate type. 
+    * Otherwise, returns the aggregate type string 
+    * and moves to the next token.
+    * @return the string value of the current token
+    */
+   public String eatAggType() {
+	   if (!matchAggType())
+	       throw new BadSyntaxException();
+	    String s = tok.sval;
+	    nextToken();
+	    return s;
+   }
+   
+   /**
+    * Throws an exception if the current token is not 
+    * an aggregate field. 
+    * Otherwise, returns the aggregate field string 
+    * and moves to the next token.
+    * @return the string value of the current token
+    */
+   public String eatAggField() {
+	  eatDelim('(');
+	  String s = eatId();
+	  eatDelim(')');
+	  return s;
+   }
+   
    private void nextToken() {
       try {
          tok.nextToken();
@@ -243,14 +315,14 @@ public class Lexer {
    }
    
    private void initKeywords() {
-      keywords = Arrays.asList("select", "from", "where", "and",
+	   keywords = Arrays.asList("select", "distinct", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
-                               "create", "table", "int", "varchar", "view", "as", "index", "using", "on",
-                               "order", "by", "distinct", "indexjoin", "mergejoin", "nestedjoin");
+                               "create", "table", "int", "varchar", "float", "view", "as", "index", "using", "on",
+                               "order", "group", "by", "distinct", "indexjoin", "mergejoin", "nestedjoin");
    }
    
    private void initOperators() {
-	   equality_keywords = Arrays.asList('=', '>', '<', '!');
+	   equalityKeywords = Arrays.asList('=', '>', '<', '!');
    }
    
    private void initIdxType() {
@@ -261,9 +333,13 @@ public class Lexer {
 	   sortType = Arrays.asList("asc", "desc");
    }
    
-   private void validate_equality(String opr) {
-	   Collection<String> is_equality = Arrays.asList("=", "<", ">", ">=", "<=", "!=", "<>");
-	   if (!is_equality.contains(opr)) {
+   private void initAggType() {
+	   aggType = Arrays.asList("sum", "count", "avg", "min", "max");
+   }
+   
+   private void validateEquality(String opr) {
+	   Collection<String> isEquality = Arrays.asList("=", "<", ">", ">=", "<=", "!=", "<>");
+	   if (!isEquality.contains(opr)) {
 		   throw new BadSyntaxException();
 	   }
    }
