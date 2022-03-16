@@ -28,7 +28,7 @@ public class Lab5Test {
 //        TEST2
 //    	  countofsid minofgradyear
 //    	  ------------------------
-//    	          10	      2019
+//    	           9	      2019
 		
 			Test.doTest(stmt, "select gradyear, count(sid) from student group by gradyear");
 //	      TEST3
@@ -36,7 +36,7 @@ public class Lab5Test {
 //		  -------------------
 //		      2019          1
 //	  	      2020          3
-//	          2021          3
+//	              2021          3
 //	   	      2022          2
 
 			Test.doTest(stmt, "select majorid, sum(gradyear), count(sid), avg(gradyear) from student group by majorid");
