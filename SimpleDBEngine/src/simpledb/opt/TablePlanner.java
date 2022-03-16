@@ -25,6 +25,7 @@ class TablePlanner {
    private Map<String,IndexInfo> indexes;
    private Transaction tx;
    private String tblname;
+   private String tab = ">>";
 
 
    /**
@@ -126,7 +127,6 @@ class TablePlanner {
          
          // use index select if operator isn't "!=" and if idxtype is hash, operator must be "="
          if (val != null && ii.supportsRangeSearch(opr)) {
-//            System.out.println("index select on " + fldname + opr + val);
             return new IndexSelectPlan(myplan, ii, val, opr);
          }
       }
@@ -149,11 +149,11 @@ class TablePlanner {
          if (outerfield != null && currsch.hasField(outerfield)) {
         	 if (ii.supportsRangeSearch(opr)) {
 	            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield, opr);
-	            System.out.println("Indexjoin blocks accessed = " + p.blocksAccessed());
+	            System.out.println(tab + "Indexjoin blocks accessed = " + p.blocksAccessed());
 	     	    p = addSelectPred(p);
 	            return addJoinPred(p, currsch);
         	 } else {
-                 System.out.println("Indexjoin failed: " + opr + " not supported by indexjoin, using productjoin instead");
+                 System.out.println("Indexjoin failed: " + opr + " not supported by " + ii.getFieldName() + ", using productjoin instead");
         	 }
          }
       }
@@ -196,17 +196,19 @@ class TablePlanner {
 	   } else if (opr.equals("=") || opr.equals("<") || opr.equals("<=")) {
 		   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
 	   } else {
-	       System.out.println("Mergejoin failed: " + opr + " not supported by indexjoin, using productjoin instead");
+	       System.out.println("Mergejoin failed: " + opr + " not supported, using productjoin instead");
 		   return null;
 	   }
-       System.out.println("Mergejoin blocks accessed = " + p.blocksAccessed());
+       System.out.println(tab + "Mergejoin blocks accessed = " + p.blocksAccessed());
 	   p = addSelectPred(p);
 	   return addJoinPred(p, currsch);
    }
    
    private Plan makeProductJoin(Plan current, Schema currsch) {
        Plan p = makeProductPlan(current);
-       return addJoinPred(p, currsch);
+       p = addJoinPred(p, currsch);
+       System.out.println(tab + "Productjoin blocks accessed = " + p.blocksAccessed());
+       return p;
    }
    
    private Plan makeNestedJoin(Plan current, Schema currsch) {
@@ -227,6 +229,7 @@ class TablePlanner {
 	   }
 	   
        Plan p = new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+       System.out.println(tab + "Nestedjoin blocks accessed = " + p.blocksAccessed());
 	   p = addSelectPred(p);
 	   return addJoinPred(p, currsch);
    }

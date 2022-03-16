@@ -58,6 +58,15 @@ public class Parser {
 // Methods for parsing queries
    
    public QueryData query() {
+      JoinAlgoSelector joinAlgoSelected = null;
+      for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
+    	  if (lex.matchKeyword(selector.toString())) {
+              lex.eatKeyword(selector.toString());
+              joinAlgoSelected = selector;
+              break;
+    	  }
+      }
+	   
       lex.eatKeyword("select");
       boolean isDistinct = false;
       if (lex.matchKeyword("distinct")) {
@@ -77,21 +86,12 @@ public class Parser {
          lex.eatKeyword("where");
          pred.conjoinWith(predicate());
       }
-      
-      JoinAlgoSelector joinAlgoSelected = null;
-      for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
-    	  if (lex.matchKeyword(selector.toString())) {
-              lex.eatKeyword(selector.toString());
-              joinAlgoSelected = selector;
-    	  }
-      }
-      
+
       if (lex.matchKeyword("order")) {
           lex.eatKeyword("order");
           lex.eatKeyword("by");
           sortMap = sortList();
        }
-      
       
       return new QueryData(fields, isDistinct, tables, pred, sortMap, joinAlgoSelected);
    }

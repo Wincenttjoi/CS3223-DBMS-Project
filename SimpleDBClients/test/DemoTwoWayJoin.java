@@ -36,7 +36,7 @@ public class DemoTwoWayJoin {
 
     	  // TEST2: Two Way Join student and dept with order by
     	  Test.doJoinAlgoTest(stmt, "select sid, majorid, did, dname from student, dept "
-    	  		+ "where majorid = did and sid <= 10 order by majorid asc");
+    	  		+ "where majorid = did and sid <= 10 order by majorid");
 //    	    sid majorid    did                     dname
 //    	    ------------------------------------------------
 //    	         10      10     10                       Law
