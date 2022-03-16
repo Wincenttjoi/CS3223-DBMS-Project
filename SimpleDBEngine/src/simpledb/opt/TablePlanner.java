@@ -60,7 +60,7 @@ class TablePlanner {
    public Plan makeSelectPlan() {
       Plan p = makeIndexSelect();
       if (p == null) {
-         p = myplan;
+         p = addSelectPred(myplan);
 	  }  else {
 		 // create a plan without the select term first, before restoring it.
 	     Term termToRestore = selectTermToRemove;
