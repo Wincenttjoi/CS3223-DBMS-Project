@@ -128,7 +128,7 @@ class TablePlanner {
          // use index select if operator isn't "!=" and if idxtype is hash, operator must be "="
          if (val != null && ii.supportsRangeSearch(opr)) {
 //            System.out.println("index select on " + fldname + opr + val);
-        	mypred = mypred.removeSelectField(fldname, val, opr);
+        	mypred.removeSelectField(fldname, val, opr);
             return new IndexSelectPlan(myplan, ii, val, opr);
          }
       }
@@ -152,15 +152,16 @@ class TablePlanner {
         	 if (ii.supportsRangeSearch(opr)) {
 	            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield, opr);
 	            System.out.println(tab + "Indexjoin blocks accessed = " + p.blocksAccessed());
+	        	 mypred.removeJoinTerm(fldname, outerfield, opr);
 	     	    p = addSelectPred(p);
 	            return addJoinPred(p, currsch);
         	 } else {
-                 System.out.println("Indexjoin failed: " + opr + " not supported by " + ii.getFieldName() + ", using productjoin instead");
+                 System.out.println(tab + "Indexjoin failed: " + opr + " not supported by " + ii.getFieldName() + ", using productjoin instead");
         	 }
          }
       }
       
-      System.out.println("Indexjoin failed: No index in " + tblname + " matches, using productjoin instead");
+      System.out.println(tab + "Indexjoin failed: No index in " + tblname + " matches, using productjoin instead");
       return null;
    }
    
@@ -176,9 +177,9 @@ class TablePlanner {
 	   Term joinTerm = joinpred.getTerms().get(0);
 	   String joinValLHS = joinTerm.getLHS().asFieldName();
 	   String joinValRHS = joinTerm.getRHS().asFieldName();
+	   String opr = joinTerm.getOpr();
 	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
-	   
+
 	   Plan lhsPlan, rhsPlan;
 	   if (isCurrentPlanOnRHS) {
 		   lhsPlan = myplan;
@@ -198,10 +199,11 @@ class TablePlanner {
 	   } else if (opr.equals("=") || opr.equals("<") || opr.equals("<=")) {
 		   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
 	   } else {
-	       System.out.println("Mergejoin failed: " + opr + " not supported, using productjoin instead");
+	       System.out.println(tab + "Mergejoin failed: " + opr + " not supported, using productjoin instead");
 		   return null;
 	   }
        System.out.println(tab + "Mergejoin blocks accessed = " + p.blocksAccessed());
+   	   mypred.removeJoinTerm(joinValLHS, joinValRHS, opr);
 	   p = addSelectPred(p);
 	   return addJoinPred(p, currsch);
    }
@@ -218,8 +220,8 @@ class TablePlanner {
 	   Term joinTerm = joinpred.getTerms().get(0);
 	   String joinValLHS = joinTerm.getLHS().asFieldName();
 	   String joinValRHS = joinTerm.getRHS().asFieldName();
+	   String opr = joinTerm.getOpr();
 	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-	   String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
 	   
 	   Plan lhsPlan, rhsPlan;
 	   if (isCurrentPlanOnRHS) {
@@ -232,6 +234,7 @@ class TablePlanner {
 	   
        Plan p = new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
        System.out.println(tab + "Nestedjoin blocks accessed = " + p.blocksAccessed());
+   	   mypred.removeJoinTerm(joinValLHS, joinValRHS, opr);
 	   p = addSelectPred(p);
 	   return addJoinPred(p, currsch);
    }

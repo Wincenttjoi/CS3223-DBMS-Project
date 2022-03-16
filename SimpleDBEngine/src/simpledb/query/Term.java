@@ -146,6 +146,48 @@ public class Term {
    }
    
    /**
+    * Returns true if this term's lhs, rhs and opr matches the parameters in either order
+    */
+   public boolean matches(String fldname, Constant cnst, String opr) {
+	  String reversedOpr;
+      switch (opr) {
+		      case "<" -> { reversedOpr = ">"; }
+		      case "<=" -> { reversedOpr = ">="; }
+		      case ">" -> { reversedOpr = "<"; }
+		      case ">=" -> { reversedOpr = "<="; }
+		      default -> { reversedOpr = opr; }
+      }
+	  boolean sameOrder = lhs.isFieldName() && lhs.asFieldName().equals(fldname) && 
+			   !rhs.isFieldName() && rhs.asConstant().equals(cnst) &&
+			   this.opr.equals(opr);
+	  boolean reversedOrder = !lhs.isFieldName() && lhs.asConstant().equals(cnst) && 
+			   rhs.isFieldName() && rhs.asFieldName().equals(fldname) &&
+			   this.opr.equals(reversedOpr);
+      return sameOrder || reversedOrder;
+   }
+   
+   /**
+    * Returns true if this term's lhs, rhs and opr matches the parameters in either order
+    */
+   public boolean matches(String fldname1, String fldname2, String opr) {
+	  String reversedOpr;
+      switch (opr) {
+		      case "<" -> { reversedOpr = ">"; }
+		      case "<=" -> { reversedOpr = ">="; }
+		      case ">" -> { reversedOpr = "<"; }
+		      case ">=" -> { reversedOpr = "<="; }
+		      default -> { reversedOpr = opr; }
+      }
+	  boolean sameOrder = lhs.isFieldName() && lhs.asFieldName().equals(fldname1) && 
+			   rhs.isFieldName() && rhs.asFieldName().equals(fldname2) &&
+			   this.opr.equals(opr);
+	  boolean reversedOrder = lhs.isFieldName() && lhs.asFieldName().equals(fldname2) && 
+			   rhs.isFieldName() && rhs.asFieldName().equals(fldname1) &&
+			   this.opr.equals(reversedOpr);
+      return sameOrder || reversedOrder;
+   }
+   
+   /**
     * @return LHS expression
     */
    public Expression getLHS() {

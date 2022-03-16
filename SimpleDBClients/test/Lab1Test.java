@@ -218,12 +218,17 @@ public class Lab1Test {
 //                  art      7      30
 //                  bob      5      30
     	  
-    	  Test.doTest(stmt, "select sname, sid, majorid from student where 10 < majorid and majorid > 20");
+    	  Test.doTest(stmt, "select sname, sid, majorid from student where 10 < majorid and majorid > 10");
 // TEST21
 //          sname    sid majorid
 //          --------------------------
+//                  pat      8      20
+//                  kim      6      20
+//                  sue      4      20
+//                  amy      2      20
 //                  art      7      30
 //                  bob      5      30
+    	  
 
       }
       catch (SQLException e) {

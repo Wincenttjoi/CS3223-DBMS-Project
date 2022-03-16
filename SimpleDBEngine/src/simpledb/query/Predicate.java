@@ -163,25 +163,24 @@ public class Predicate {
    
    /**
     * Removes term in the predicate that no longer needed
-    * @param fldname
-    * @return Predicate
+    * @param fldname1 fldname the name of the field
+    * @param cnst the constant
+    * @param opr the operator
     */
-   public Predicate removeSelectField(String fldname, Constant cnst, String opr) {
-	   List<Term> newTerms = new ArrayList<>();
-	   for (Term t : terms) {
-		   Expression lhs = t.getLHS();
-		   Expression rhs = t.getRHS();
-		   if (lhs.isFieldName() && !lhs.asFieldName().equals(fldname) ||
-				   rhs.asConstant() != null && !rhs.asConstant().equals(cnst) ||
-				   !t.getOperator(fldname).equals(opr)) {
-			   newTerms.add(t);
-		   }
-		   
-	   }
-	   Predicate result = new Predicate(newTerms);
-	   return result;
+   public void removeSelectField(String fldname, Constant cnst, String opr) {
+	   this.terms.removeIf(t -> t.matches(fldname, cnst, opr));
    }
    
+   /**
+    * Removes term in the predicate that no longer needed
+    * @param fldname1 fldname the name of the field
+    * @param fldname2 fldname the name of the field
+    * @param opr the operator
+    */
+   public void removeJoinTerm(String fldname1, String fldname2, String opr) {
+	   this.terms.removeIf(t -> t.matches(fldname1, fldname2, opr));
+   }
+
    /**
     * Determine if there is a term of the form "F1 opr F2"
     * where F1 is the specified field, opr is a operator and F2 is another field.
