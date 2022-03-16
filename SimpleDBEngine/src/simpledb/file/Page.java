@@ -20,10 +20,18 @@ public class Page {
    public int getInt(int offset) {
       return bb.getInt(offset);
    }
+   
+   public float getFloat(int offset) {
+      return bb.getFloat(offset);
+   }
 
    public void setInt(int offset, int n) {
       bb.putInt(offset, n);
    }
+   
+   public void setFloat(int offset, float n) {
+		bb.putFloat(offset, n);
+	}
 
    public byte[] getBytes(int offset) {
       bb.position(offset);

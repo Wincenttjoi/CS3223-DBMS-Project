@@ -174,6 +174,7 @@ public class SortPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Sort Plan used");
+	   String stmt = "Sort Plan used";
+	   System.out.println(stmt);
    }
 }

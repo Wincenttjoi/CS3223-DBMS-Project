@@ -80,6 +80,17 @@ public class IndexJoinScan implements Scan {
    }
    
    /**
+    * Returns the float value of the specified field.
+    * @see simpledb.query.Scan#getVal(java.lang.String)
+    */
+   public float getFloat(String fldname) {
+      if (rhs.hasField(fldname))
+         return rhs.getFloat(fldname);
+      else  
+         return lhs.getFloat(fldname);
+   }
+   
+   /**
     * Returns the Constant value of the specified field.
     * @see simpledb.query.Scan#getVal(java.lang.String)
     */

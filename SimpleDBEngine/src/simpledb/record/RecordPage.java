@@ -31,6 +31,17 @@ public class RecordPage {
       int fldpos = offset(slot) + layout.offset(fldname);
       return tx.getInt(blk, fldpos);
    }
+   
+   /**
+    * Return the float value stored for the
+    * specified field of a specified slot.
+    * @param fldname the name of the field.
+    * @return the float stored in that field
+    */
+   public float getFloat(int slot, String fldname) {
+      int fldpos = offset(slot) + layout.offset(fldname);
+      return tx.getFloat(blk, fldpos);
+   }
 
    /**
     * Return the string value stored for the
@@ -52,6 +63,17 @@ public class RecordPage {
    public void setInt(int slot, String fldname, int val) {
       int fldpos = offset(slot) + layout.offset(fldname);
       tx.setInt(blk, fldpos, val, true);
+   }
+   
+   /**
+    * Store a float at the specified field
+    * of the specified slot.
+    * @param fldname the name of the field
+    * @param val the float value stored in that field
+    */
+   public void setFloat(int slot, String fldname, float val) {
+      int fldpos = offset(slot) + layout.offset(fldname);
+      tx.setFloat(blk, fldpos, val, true);
    }
 
    /**
