@@ -14,83 +14,85 @@ public class HashJoinScan implements Scan {
 	private String fldname1, fldname2;
 	private Map<Integer, TempTable> part1, part2;
 	private int k;
-	private Map<Integer, ArrayList<Scan>> hashTables;
 	private HashComparator comp;
-
-	private String opr;
-	
-	private int partId = 0;
+	private boolean nomore1;
+	private int partId;
 
 	/**
-	 * Create a hashjoin scan having the two underlying scans.
+	 * Create a hashjoin scan having the two underlying scans on the first set of
+	 * partitions.
 	 * 
-	 * @param s1       the LHS scan
-	 * @param s2       the RHS scan
+	 * @param part1    the LHS partitions (temporary tables)
+	 * @param part2    the RHS partitions (temporary tables)
 	 * @param fldname1 the LHS join field
 	 * @param fldname2 the RHS join field
 	 * @param opr      the relational operator between join fields
 	 * @param k        the number of partitions
 	 */
-	public HashJoinScan(Scan s1, Scan s2, String fldname1, String fldname2, Map<Integer, TempTable> part1,
-			Map<Integer, TempTable> part2, int k, String opr) {
-		this.s1 = s1;
-		this.s2 = s2;
+	public HashJoinScan(Map<Integer, TempTable> part1, Map<Integer, TempTable> part2, String fldname1, String fldname2,
+			int k) {
+		this.s1 = (UpdateScan) part1.get(partId).open();
+		this.s2 = (UpdateScan) part2.get(partId).open();
 		this.fldname1 = fldname1;
 		this.fldname2 = fldname2;
 		this.part1 = part1;
 		this.part2 = part2;
 		this.k = k;
-		this.comp = new HashComparator(fldname1, fldname2, k);
-		this.opr = opr;
-		s1 = (UpdateScan) part1.get(partId).open();
-		s2 = (UpdateScan) part2.get(partId).open();
-		initializeHashTables();
+		this.comp = new HashComparator(fldname1, fldname2, (k - 1)); // hash to hash table using different hash function
+		this.nomore1 = false;
+		this.partId = 0;
 		beforeFirst();
 	}
 
-	private void initializeHashTables() {
-		this.hashTables = new HashMap<>();
-		IntStream.range(0, (this.k - 1)).forEach(i -> hashTables.put(i, new ArrayList<Scan>()));
-		return;
-	}
-
 	/**
-	 * Position the scan before its first record. In particular, the LHS scan and
-	 * the RHS scan is positioned before its first record.
+	 * Position the scan before its first record. In particular, the LHS scan is
+	 * positioned at its first record and the RHS scan is positioned before its
+	 * first record.
 	 * 
 	 * @see simpledb.query.Scan#beforeFirst()
 	 */
 	public void beforeFirst() {
 		s1.beforeFirst();
+		nomore1 = !(s1.next());
 		s2.beforeFirst();
 	}
 
 	/**
-	 * Move the scan to the next record. The method moves to the next RHS record, if
-	 * possible. Otherwise, it moves to the next LHS record and the first RHS
-	 * record. If there are no more LHS records, the method returns false.
+	 * Move the scan to the next record within the current set of partitions. The
+	 * method moves to the next RHS record, if possible. Otherwise, it moves to the
+	 * next LHS record and the first RHS record within the current set of
+	 * partitions. If there are no more LHS records, close the current scan and open
+	 * new scan on the next set of partitions. If there are no more partitions, the
+	 * method returns false.
 	 * 
 	 * @see simpledb.query.Scan#next()
 	 */
 	public boolean next() {
-//		populate the hashTables
-//		while (s1.next()) {
-//			Constant val = s1.getVal(fldname1);
-//			int offset = val.hashCode() & (k - 1);
-//			this.hashTables.get(offset).add(s1);
-//		}
-		while (partId <= k) {
+		while (true) {
 			do {
+				if (nomore1) {
+					break;
+				}
 				while (s2.next()) {
+					// probing phase
+					// check if both records hash to the same hash table
 					if (comp.compare(s1, s2) == 0) {
 						return true;
 					}
 				}
 				s2.beforeFirst();
 			} while (s1.next());
-			partId ++;
+			partId++;
+			if (partId >= k) {
+				break;
+			}
+			// close current set of partitions
+			// and open scan on the next set of partitions
+			s1.close();
+			s2.close();
 			s1 = (UpdateScan) part1.get(partId).open();
 			s2 = (UpdateScan) part2.get(partId).open();
+			nomore1 = !(s1.next());
 		}
 		return false;
 	}

@@ -296,7 +296,7 @@ public class Lexer {
 	   keywords = Arrays.asList("select", "distinct", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
                                "create", "table", "int", "varchar", "view", "as", "index", "using", "on",
-                               "order", "group", "by", "distinct", "indexjoin", "mergejoin", "nestedjoin");
+                               "order", "group", "by", "distinct", "indexjoin", "mergejoin", "nestedjoin", "hashjoin");
    }
    
    private void initOperators() {

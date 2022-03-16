@@ -81,7 +81,7 @@ class TablePlanner {
 			Plan nestedJoinPlan = makeProductJoin(current, currsch);
 			Plan hashJoinPlan = makeHashJoin(current, currsch);
 
-			Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan).filter((p1) -> p1 != null)
+			Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan, hashJoinPlan).filter((p1) -> p1 != null)
 					.sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()));
 			return plans.collect(Collectors.toList()).get(0);
 		}
@@ -261,10 +261,10 @@ class TablePlanner {
 			rhsPlan = myplan;
 		}
 		
-		if (tx.availableBuffs() >= Math.sqrt(lhsPlan.blocksAccessed())) {
+		if (tx.availableBuffs() < Math.sqrt(lhsPlan.blocksAccessed())) {
 			System.out.println("Hashjoin failed: not enough buffer size available for hashjoin, using productjoin instead");
 			return null;
-		} else if (opr.equals("=")) {
+		} else if (!opr.equals("=")) {
 			System.out.println("Hashjoin failed: " + opr + " not supported by hashjoin, using productjoin instead");
 			return null;
 		}

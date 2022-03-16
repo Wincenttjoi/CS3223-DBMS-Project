@@ -21,25 +21,8 @@ public class HashJoinPlan implements Plan {
 	private Schema sch2 = new Schema();
 	private Schema finalSch = new Schema();
 	private String opr;
-	private HashComparator comp;
-
-//	 * Let T1 and T2 be the tables to be joined.
-//	 1. Choose a value k that is less than the number of available buffers.
-//	 2. If the size of T2 is no more than k blocks, then:
-//	 a) Join T1 and T2, using a multibuffer product followed by a selection on the join predicate.
-//	 b) Return. // Otherwise:
-//	 3. Choose a hash function that returns a value between 0 and k-1.
-//	 4. For the table T1:
-//	 a) Open a scan for k temporary tables.
-//	 b) For each record of T1:
-//	 i. Hash the record’s join field, to get the hash value h.
-//	 ii. Copy the record to the hth temporary table.
-//	 b) Close the temporary table scans.
-//	 5. Repeat Step 4 for the table T2.
-//	 6. For each i between 0 and k-1:
-//	 a) Let Vi be the ith temporary table of T1.
-//	 b) Let Wi be the ith temporary table of T2.
-//	 c) Recursively perform the hashjoin of Vi and Wi.
+	private HashComparator comp1;
+	private HashComparator comp2;
 
 	/**
 	 * Creates a hashjoin plan for the two specified queries.
@@ -60,7 +43,8 @@ public class HashJoinPlan implements Plan {
 		this.fldname2 = fldname2;
 		this.k = k;
 		this.opr = opr;
-		this.comp = new HashComparator(fldname1, fldname2, k);
+		this.comp1 = new HashComparator(fldname1, fldname1, k);
+		this.comp2 = new HashComparator(fldname2, fldname2, k);
 		sch1 = p1.schema();
 		sch2 = p2.schema();
 		finalSch.addAll(p1.schema());
@@ -77,10 +61,10 @@ public class HashJoinPlan implements Plan {
 	public Scan open() {
 		Scan s1 = p1.open();
 		Scan s2 = p2.open();
-		Map<Integer, TempTable> part1 = splitIntoPartitions(s1, fldname1, sch1);
-		Map<Integer, TempTable> part2 = splitIntoPartitions(s2, fldname2, sch2);
+		Map<Integer, TempTable> part1 = splitIntoPartitions(s1, fldname1, sch1, comp1);
+		Map<Integer, TempTable> part2 = splitIntoPartitions(s2, fldname2, sch2, comp2);
 		printPlan();
-		return new HashJoinScan(s1, s2, fldname1, fldname2, part1, part2, k, opr);
+		return new HashJoinScan(part1, part2, fldname1, fldname2, k);
 	}
 
 	/**
@@ -133,7 +117,7 @@ public class HashJoinPlan implements Plan {
 		return finalSch;
 	}
 
-	private Map<Integer, TempTable> splitIntoPartitions(Scan src, String fldname, Schema sch) {
+	private Map<Integer, TempTable> splitIntoPartitions(Scan src, String fldname, Schema sch, HashComparator comp) {
 		Map<Integer, TempTable> temps = initializePartitions(tx, sch, k);
 		src.beforeFirst();
 		if (!src.next())
