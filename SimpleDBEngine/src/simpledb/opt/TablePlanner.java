@@ -1,5 +1,8 @@
 package simpledb.opt;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,7 +29,7 @@ class TablePlanner {
    private Transaction tx;
    private String tblname;
    private String tab = ">>";
-
+   private Term[] joinTermsToRemove = new Term[4];
 
    /**
     * Creates a new table planner.
@@ -78,12 +81,16 @@ class TablePlanner {
       if (joinAlgoSelected == null) {
 	      Plan indexJoinPlan = makeIndexJoin(current, currsch);
 	      Plan mergeJoinPlan = makeMergeJoin(current, currsch);
-	      Plan nestedJoinPlan = makeProductJoin(current, currsch);
-
-	      Stream<Plan> plans = Stream.of(indexJoinPlan, mergeJoinPlan, nestedJoinPlan)
+	      Plan nestedJoinPlan = makeNestedJoin(current, currsch);
+    	  List <Plan> plans = new ArrayList<Plan>(Arrays.asList(
+    			  indexJoinPlan, mergeJoinPlan, nestedJoinPlan));
+    	  
+	      Stream<Plan> plansStream = plans.stream()
 	    		 .filter((p1) -> p1 != null)
 	    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()));
-	      return plans.collect(Collectors.toList()).get(0);
+	      Plan bestPlan = plansStream.collect(Collectors.toList()).get(0);
+	      mypred.removeTerm(joinTermsToRemove[plans.indexOf(bestPlan)]);
+	      return bestPlan;
       }
       
       switch (joinAlgoSelected) {
@@ -91,20 +98,26 @@ class TablePlanner {
 	    	  p = makeIndexJoin(current, currsch);
 	    	  if (p == null) {
 	    		  p = makeProductJoin(current, currsch);
+	    	  } else {
+	    		  p = completeJoin(p, joinAlgoSelected, currsch);
 	    	  }
 	    	  break;
 	      case MERGEJOIN_PLAN:
 	    	  p = makeMergeJoin(current, currsch);
 	    	  if (p == null) {
 	    		  p = makeProductJoin(current, currsch);
+	    	  } else {
+	    		  p = completeJoin(p, joinAlgoSelected, currsch);
 	    	  }
 	    	  break;
 	      case NESTEDJOIN_PLAN:
 	    	  p = makeNestedJoin(current, currsch);
+    		  p = completeJoin(p, joinAlgoSelected, currsch);
 	    	  break;
 	      default:
 	    	  throw new RuntimeException();
       }
+
       return p;
    }
    
@@ -128,7 +141,7 @@ class TablePlanner {
          // use index select if operator isn't "!=" and if idxtype is hash, operator must be "="
          if (val != null && ii.supportsRangeSearch(opr)) {
 //            System.out.println("index select on " + fldname + opr + val);
-        	mypred.removeSelectField(fldname, val, opr);
+        	mypred.removeTerm(new Term(fldname, val, opr));
             return new IndexSelectPlan(myplan, ii, val, opr);
          }
       }
@@ -152,15 +165,14 @@ class TablePlanner {
         	 if (ii.supportsRangeSearch(opr)) {
 	            Plan p = new IndexJoinPlan(current, myplan, ii, outerfield, opr);
 	            System.out.println(tab + "Indexjoin blocks accessed = " + p.blocksAccessed());
-	        	 mypred.removeJoinTerm(fldname, outerfield, opr);
-	     	    p = addSelectPred(p);
-	            return addJoinPred(p, currsch);
+	            joinTermsToRemove[JoinAlgoSelector.INDEXJOIN_PLAN.ordinal()] = 
+	         		   new Term(new Expression(fldname), new Expression(outerfield), opr);
+	            return p;
         	 } else {
                  System.out.println(tab + "Indexjoin failed: " + opr + " not supported by " + ii.getFieldName() + ", using productjoin instead");
         	 }
          }
       }
-      
       System.out.println(tab + "Indexjoin failed: No index in " + tblname + " matches, using productjoin instead");
       return null;
    }
@@ -203,9 +215,9 @@ class TablePlanner {
 		   return null;
 	   }
        System.out.println(tab + "Mergejoin blocks accessed = " + p.blocksAccessed());
-   	   mypred.removeJoinTerm(joinValLHS, joinValRHS, opr);
-	   p = addSelectPred(p);
-	   return addJoinPred(p, currsch);
+       joinTermsToRemove[JoinAlgoSelector.MERGEJOIN_PLAN.ordinal()] = 
+    		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
+	   return p;
    }
    
    private Plan makeProductJoin(Plan current, Schema currsch) {
@@ -234,9 +246,9 @@ class TablePlanner {
 	   
        Plan p = new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
        System.out.println(tab + "Nestedjoin blocks accessed = " + p.blocksAccessed());
-   	   mypred.removeJoinTerm(joinValLHS, joinValRHS, opr);
-	   p = addSelectPred(p);
-	   return addJoinPred(p, currsch);
+       joinTermsToRemove[JoinAlgoSelector.NESTEDJOIN_PLAN.ordinal()] = 
+    		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
+	   return p;
    }
    
    private Plan addSelectPred(Plan p) {
@@ -253,5 +265,11 @@ class TablePlanner {
          return new SelectPlan(p, joinpred);
       else
          return p;
+   }
+   
+   private Plan completeJoin(Plan p, JoinAlgoSelector selected, Schema currsch) {
+ 	  mypred.removeTerm(joinTermsToRemove[selected.ordinal()]);
+	  p = addSelectPred(p);
+	  return addJoinPred(p, currsch);
    }
 }

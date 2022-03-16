@@ -160,26 +160,6 @@ public class Predicate {
       }
       return null;
    }
-   
-   /**
-    * Removes term in the predicate that no longer needed
-    * @param fldname1 fldname the name of the field
-    * @param cnst the constant
-    * @param opr the operator
-    */
-   public void removeSelectField(String fldname, Constant cnst, String opr) {
-	   this.terms.removeIf(t -> t.matches(fldname, cnst, opr));
-   }
-   
-   /**
-    * Removes term in the predicate that no longer needed
-    * @param fldname1 fldname the name of the field
-    * @param fldname2 fldname the name of the field
-    * @param opr the operator
-    */
-   public void removeJoinTerm(String fldname1, String fldname2, String opr) {
-	   this.terms.removeIf(t -> t.matches(fldname1, fldname2, opr));
-   }
 
    /**
     * Determine if there is a term of the form "F1 opr F2"
@@ -205,6 +185,14 @@ public class Predicate {
     */
    public List<Term> getTerms() {
       return terms;
+   }
+   
+   /**
+    * Removes term in the predicate that no longer needed
+    * @param term to be removed
+    */
+   public void removeTerm(Term term) {
+	   this.terms.removeIf(t -> t.matches(term));
    }
 
    public String toString() {
