@@ -229,6 +229,13 @@ public class Lab1Test {
 //                  art      7      30
 //                  bob      5      30
     	  
+    	  Test.doTest(stmt, "select sid, studentid, sname, grade from student, enroll where sid = 1 and studentid = 1");
+// TEST21 - 2 indexes
+//    	    sid studentid      sname grade
+//    	    ----------------------------------
+//    	          1         1        joe     A
+//    	          1         1        joe     C
+    	  
 
       }
       catch (SQLException e) {

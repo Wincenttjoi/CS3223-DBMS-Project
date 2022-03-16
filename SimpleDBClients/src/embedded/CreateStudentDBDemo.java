@@ -216,6 +216,10 @@ public class CreateStudentDBDemo {
          s = "create index yearoffered_idx on section (yearoffered) using btree";
          stmt.executeUpdate(s);
          System.out.println("yearoffered btree index created");
+         
+         s = "create index courseid_idx on section(courseid) using btree";
+         stmt.executeUpdate(s);
+         System.out.println("courseid hash index created");
 
          s = "insert into SECTION(SectId, CourseId, Prof, YearOffered) values ";
          String[] sectvals = {

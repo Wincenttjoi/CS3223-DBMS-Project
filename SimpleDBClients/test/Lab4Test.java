@@ -182,7 +182,7 @@ public class Lab4Test {
     	  
 // ------------------- BTree index on majorid and Hash index on sid ------------------- 
 
-    	  Test.doTest(stmt, "indexjoin select sname, sid, studentid, grade, majorid, did from "
+    	  Test.doJoinAlgoTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
     	  		+ "student, enroll, dept where studentid = sid and majorid = did");
 // TEST11 - Equal (hash) and equal (btree)
 //          sname    sid studentid grade majorid    did
@@ -194,7 +194,7 @@ public class Lab4Test {
 //                  sue      4         4     A      20     20
 //                  kim      6         6     A      20     20
     	  
-    	  Test.doTest(stmt, "indexjoin select sname, sid, studentid, grade, majorid, did from "
+    	  Test.doJoinAlgoTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
       	  		+ "student, enroll, dept where studentid = sid and did > majorid");
 // TEST12 - Equal (hash) and greater than (btree)
 //          sname    sid studentid grade majorid    did
@@ -208,7 +208,7 @@ public class Lab4Test {
 //                  sue      4         4     A      20     30
 //                  kim      6         6     A      20     30
     	  
-    	  Test.doTest(stmt, "indexjoin select sname, sid, studentid, grade, majorid, did from "
+    	  Test.doJoinAlgoTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
         	  		+ "student, enroll, dept where studentid = sid and majorid >= did");
 // TEST13 - Equal (hash)  and greater or equal to (btree)
 //          sname    sid studentid grade majorid    did
@@ -223,6 +223,9 @@ public class Lab4Test {
 //                  sue      4         4     B      20     20
 //                  sue      4         4     A      20     20
 //                  amy      2         2    B+      20     20
+    	  
+    	  Test.doJoinAlgoTest(stmt, "select sname, sid, majorid, did from "
+        	  		+ "student, dept where did > majorid");
     	  
       }
       catch (SQLException e) {
