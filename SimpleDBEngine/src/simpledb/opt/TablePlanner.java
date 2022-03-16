@@ -281,7 +281,7 @@ class TablePlanner {
 		}
 		int numPart = tx.availableBuffs() - 1; // max # of partitions <= B - 1
 		Plan p = new HashJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr, numPart);
-		System.out.println("Hashjoin blocks accessed = " + p.blocksAccessed());
+		System.out.println(tab + "Hashjoin blocks accessed = " + p.blocksAccessed());
 		p = addSelectPred(p);
 		return addJoinPred(p, currsch);
 	}
