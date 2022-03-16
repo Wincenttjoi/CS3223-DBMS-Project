@@ -11,11 +11,11 @@ public class Test {
    
    public static void doTest(Statement stmt, String cmd) {
 	  testNumber++;
- 	  System.out.println("TEST" + testNumber);
- 	  if (cmd.startsWith("select")) {
- 		  doQuery(stmt, cmd);
- 	  } else {
+ 	  System.out.println("TEST" + testNumber + ": " + cmd);
+ 	  if (cmd.startsWith("create")) {
  		  doUpdate(stmt, cmd);
+ 	  } else {
+ 		  doQuery(stmt, cmd);
  	  }
  	  System.out.println(DIVIDER);
    }
@@ -24,6 +24,8 @@ public class Test {
 	  // Start timer
 	  long startTime = System.nanoTime();
       try (ResultSet rs = stmt.executeQuery(cmd)) {
+    	 stopTimer(startTime);
+  	     
          ResultSetMetaData md = rs.getMetaData();
          int numcols = md.getColumnCount();
          int totalwidth = 0;
@@ -58,14 +60,6 @@ public class Test {
             }
             System.out.println();
          }
-         // Stops timer
-	     long endTime = System.nanoTime();
- 	     long duration = endTime - startTime;
- 	     if (duration >= 2000000) {
- 		     System.out.println("The total time taken for query is: " + TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS) + "ms");
- 	     } else {
- 		     System.out.println("The total time taken for query is: " + duration + "ns");
- 	     }
 
       }
       catch (SQLException e) {
@@ -80,13 +74,7 @@ public class Test {
     	 long startTime = System.nanoTime();
          int howmany = stmt.executeUpdate(cmd);
          // Stops timer
-	     long endTime = System.nanoTime();
- 	     long duration = endTime - startTime;
- 	     if (duration >= 2000000) {
- 		     System.out.println("The total time taken for update is: " + TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS) + "ms");
- 	     } else {
- 		     System.out.println("The total time taken for update is: " + duration + "ns");
- 	     }
+	     stopTimer(startTime);
          System.out.println(howmany + " records processed");
       }
       catch (SQLException e) {
@@ -97,9 +85,20 @@ public class Test {
    public static void doJoinAlgoTest(Statement stmt, String cmd) {
 	  testNumber++;
       for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
-     	  System.out.println("TEST" + testNumber + " " + selector);
-    	  doQuery(stmt, cmd + " " + selector);
+     	  System.out.println("TEST" + testNumber + ": " + selector + " " + cmd);
+    	  doQuery(stmt, selector + " " + cmd);
     	  System.out.println(DIVIDER);
       }
+   }
+   
+   private static void stopTimer(long startTime) {
+         // Stops timer
+	     long endTime = System.nanoTime();
+	     long duration = endTime - startTime;
+	     if (duration >= 2000000) {
+		     System.out.println("The total time taken for query is: " + TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS) + "ms");
+	     } else {
+		     System.out.println("The total time taken for query is: " + duration + "ns");
+	     }
    }
 }

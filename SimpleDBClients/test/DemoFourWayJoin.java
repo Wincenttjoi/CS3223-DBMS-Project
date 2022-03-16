@@ -74,7 +74,7 @@ public class DemoFourWayJoin {
     	  // TEST2: Four Way table queries, with distinct and double order by
     	  Test.doJoinAlgoTest(stmt, "select distinct majorid, did, deptid, dname, title, cid, courseid "
     	  		+ "from student, dept, course, section "
-    	  		+ "where majorid = did and did = deptid and cid = courseid order by dname asc, title asc");
+    	  		+ "where majorid = did and did = deptid and cid = courseid order by dname, title");
 //    	  majorid    did deptid                     dname                          title    cid courseid
 //    	  -----------------------------------------------------------------------------------------------
 //    	       100    100    100                Accounting              Corporate Finance    102      102
