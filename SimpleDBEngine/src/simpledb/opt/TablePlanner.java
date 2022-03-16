@@ -59,9 +59,16 @@ class TablePlanner {
     */
    public Plan makeSelectPlan() {
       Plan p = makeIndexSelect();
-      if (p == null)
+      if (p == null) {
          p = myplan;
-      return addSelectPred(p);
+	  }  else {
+		 // create a plan without the select term first, before restoring it.
+	     Term termToRestore = selectTermToRemove;
+	     removeSelectTerm();
+	     p = addSelectPred(p);
+	     mypred.conjoinWith(new Predicate(termToRestore));
+	  }
+      return p;
    }
    
    /**
@@ -98,23 +105,26 @@ class TablePlanner {
       switch (joinAlgoSelected) {
 	      case INDEXJOIN_PLAN:
 	    	  p = makeIndexJoin(current, currsch);
+	    	  Term joinTermIndex = joinTermsToRemove[joinAlgoSelected.ordinal()];
 	    	  if (p == null) {
 	    		  p = makeProductJoin(current, currsch);
 	    	  } else {
-	    		  p = completeJoin(p, joinAlgoSelected, currsch);
+	    		  p = addSubpredicatesWithoutJoinTerm(p, joinTermIndex, currsch);
 	    	  }
 	    	  break;
 	      case MERGEJOIN_PLAN:
 	    	  p = makeMergeJoin(current, currsch);
+	    	  Term joinTermMerge = joinTermsToRemove[joinAlgoSelected.ordinal()];
 	    	  if (p == null) {
 	    		  p = makeProductJoin(current, currsch);
 	    	  } else {
-	    		  p = completeJoin(p, joinAlgoSelected, currsch);
+	    		  p = addSubpredicatesWithoutJoinTerm(p, joinTermMerge, currsch);
 	    	  }
 	    	  break;
 	      case NESTEDJOIN_PLAN:
 	    	  p = makeNestedJoin(current, currsch);
-    		  p = completeJoin(p, joinAlgoSelected, currsch);
+	    	  Term joinTermNested = joinTermsToRemove[joinAlgoSelected.ordinal()];
+    		  p = addSubpredicatesWithoutJoinTerm(p, joinTermNested, currsch);
 	    	  break;
 	      default:
 	    	  throw new RuntimeException();
@@ -268,12 +278,17 @@ class TablePlanner {
          return p;
    }
    
-   private Plan completeJoin(Plan p, JoinAlgoSelector selected, Schema currsch) {
- 	  mypred.removeTerm(joinTermsToRemove[selected.ordinal()]);
+	/**
+	 * Allows a new plan to be created without the joinTerm used by
+	 * the selected join algorithm from the predicate.
+	 * 
+	 */
+    private Plan addSubpredicatesWithoutJoinTerm(Plan p, Term joinTerm, Schema currsch) {
+ 	  mypred.removeTerm(joinTerm);
 	  p = addSelectPred(p);
 	  p = addJoinPred(p,currsch);
-	  mypred.conjoinWith(new Predicate(joinTermsToRemove[selected.ordinal()]));
-	  joinTermSelectedToRemove = joinTermsToRemove[selected.ordinal()];
+	  mypred.conjoinWith(new Predicate(joinTerm));
+	  joinTermSelectedToRemove = joinTerm;
 	  return p;
    }
    
