@@ -76,8 +76,19 @@ class IndexMgr {
          IndexInfo ii = new IndexInfo(idxname, fldname, tblLayout.schema(), tx, tblsi);
          ii.setIdxType(idxtype);
          result.put(fldname, ii);
+         // For debugging
+         // printIndexInfo(tblname, idxname, fldname, idxtype);
       }
       ts.close();
       return result;
+   }
+   
+   /**
+    * Prints the index information that is used to display query plan.c
+    */
+   private void printIndexInfo(String tblname, String idxname, String fldname, String idxtype) {
+	   String str = idxname + " used on field: " + fldname + ", on table: " + tblname 
+			   + ", of index type: " + idxtype;
+	   System.out.println(str);
    }
 }

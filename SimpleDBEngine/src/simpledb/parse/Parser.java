@@ -79,6 +79,14 @@ public class Parser {
 // Methods for parsing queries
 
 	public QueryData query() {
+		JoinAlgoSelector joinAlgoSelected = null;
+		for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
+			if (lex.matchKeyword(selector.toString())) {
+				lex.eatKeyword(selector.toString());
+				joinAlgoSelected = selector;
+				break;
+			}
+		}
 		lex.eatKeyword("select");
 		boolean isDistinct = false;
 		if (lex.matchKeyword("distinct")) {
@@ -107,14 +115,6 @@ public class Parser {
 		if (lex.matchKeyword("where")) {
 			lex.eatKeyword("where");
 			pred.conjoinWith(predicate());
-		}
-
-		JoinAlgoSelector joinAlgoSelected = null;
-		for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
-			if (lex.matchKeyword(selector.toString())) {
-				lex.eatKeyword(selector.toString());
-				joinAlgoSelected = selector;
-			}
 		}
 
 		List<String> groupFields = new ArrayList<>();
@@ -312,7 +312,7 @@ public class Parser {
 		if (lex.matchKeyword("int")) {
 			lex.eatKeyword("int");
 			schema.addIntField(fldname);
-		} else if (lex.matchKeyword("float")){
+		} else if (lex.matchKeyword("float")) {
 			lex.eatKeyword("float");
 			schema.addFloatField(fldname);
 		} else {
