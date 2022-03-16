@@ -15,7 +15,6 @@ public class SortPlan implements Plan {
    private Plan p;
    private Schema sch;
    private RecordComparator comp;
-   private int runCount;
    
    /**
     * Create a sort plan for the specified query.
@@ -56,7 +55,6 @@ public class SortPlan implements Plan {
    public Scan open() {
       Scan src = p.open();
       List<TempTable> runs = splitIntoRuns(src);
-      runCount = runs.size();
       src.close();
       while (runs.size() > 1)
          runs = doAMergeIteration(runs);
@@ -81,17 +79,16 @@ public class SortPlan implements Plan {
    /**
     * Estimates the number of block accesses to sort
     * The formula is:
-    * <pre> B(sort(p)) = 2 * B(p) * (1 + log(runs(p) on base rpb-1) </pre>
+    * <pre> B(sort(p)) = 2 * B(p) * (1 + log(runs(p) on base blockSize-1) </pre>
     * It includes the one-time cost
     * of materializing and sorting the records.
     * @see simpledb.plan.Plan#blocksAccessed()
     */
    
-   public int blocksAccessedWithSort() {
+   public int blocksAccessedWithSortCost() {
       Plan mp = new MaterializePlan(tx, p); // not opened; just for analysis
-      Layout layout = new Layout(p.schema());
-      double rpb = (double) (tx.blockSize() / layout.slotSize());
-      int numOfMergePasses = (int) Math.ceil(Math.log(runCount) / Math.log(rpb-1));
+      int runCount = (int) Math.ceil((double)p.blocksAccessed() / (double)tx.availableBuffs());
+      int numOfMergePasses = (int) Math.ceil((double)Math.log(runCount) / (double)Math.log(tx.availableBuffs()-1));
       return 2 * mp.blocksAccessed() * (1 + numOfMergePasses);
    }
    
