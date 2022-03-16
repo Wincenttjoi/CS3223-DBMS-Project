@@ -81,6 +81,10 @@ public class CreateStudentDB {
          s = "create table ENROLL(EId int, StudentId int, SectionId int, Grade varchar(2))";
          stmt.executeUpdate(s);
          System.out.println("Table ENROLL created.");
+         
+         s = "create index enroll_idx on enroll (studentid) using hash";
+         stmt.executeUpdate(s);
+         System.out.println("studentid index created");
 
          s = "insert into ENROLL(EId, StudentId, SectionId, Grade) values ";
          String[] enrollvals = {"(14, 1, 13, 'A')",
