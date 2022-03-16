@@ -75,6 +75,7 @@ public class Parser {
 	}
 
 // Methods for parsing queries
+<<<<<<< HEAD
 
 	public QueryData query() {
 		lex.eatKeyword("select");
@@ -189,6 +190,94 @@ public class Parser {
 		return M;
 	}
 
+=======
+   
+   public QueryData query() {
+      JoinAlgoSelector joinAlgoSelected = null;
+      for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
+    	  if (lex.matchKeyword(selector.toString())) {
+              lex.eatKeyword(selector.toString());
+              joinAlgoSelected = selector;
+              break;
+    	  }
+      }
+	   
+      lex.eatKeyword("select");
+      boolean isDistinct = false;
+      if (lex.matchKeyword("distinct")) {
+    	  isDistinct = true;
+    	  lex.eatKeyword("distinct");
+      }
+      List<String> fields = selectList();
+      lex.eatKeyword("from");
+      Predicate pred = new Predicate();
+      
+      Collection<String> tables = tableList();
+      pred.conjoinWith(currPred);
+      currPred = new Predicate();
+      
+      Map<String,Boolean> sortMap = new LinkedHashMap<>();
+      if (lex.matchKeyword("where")) {
+         lex.eatKeyword("where");
+         pred.conjoinWith(predicate());
+      }
+
+      if (lex.matchKeyword("order")) {
+          lex.eatKeyword("order");
+          lex.eatKeyword("by");
+          sortMap = sortList();
+       }
+      
+      return new QueryData(fields, isDistinct, tables, pred, sortMap, joinAlgoSelected);
+   }
+   
+   private List<String> selectList() {
+      List<String> L = new ArrayList<String>();
+      L.add(field());
+      if (lex.matchDelim(',')) {
+         lex.eatDelim(',');
+         L.addAll(selectList());
+      }
+      return L;
+   }
+   
+   private Collection<String> tableList() {
+      Collection<String> L = new ArrayList<String>();
+      L.add(lex.eatId());
+      
+      while (lex.matchKeyword("join")) {
+          lex.eatKeyword("join");
+    	  L.add(lex.eatId());
+    	  lex.eatKeyword("on");
+    	  currPred.conjoinWith(predicate());
+       }
+      
+      if (lex.matchDelim(',')) {
+         lex.eatDelim(',');
+         L.addAll(tableList());
+      }
+      return L;
+   }
+   
+   private Map<String,Boolean> sortList() {
+	  // parse order by clause
+	  Map<String,Boolean> M = new LinkedHashMap<>(); 
+	  String sField = field();
+	  Boolean sType = true; // sort type is ascending by default
+      if (lex.matchSortType()) {
+    	  sType = lex.eatSortType();
+      } else if (!lex.matchDelim(',') && !lex.matchEnd()) {
+    	  throw new BadSyntaxException();
+      }
+      M.put(sField, sType);
+      if (lex.matchDelim(',')) {
+         lex.eatDelim(',');
+         M.putAll(sortList());
+      }
+      return M;
+   }
+   
+>>>>>>> main
 // Methods for parsing the various update commands
 
 	public Object updateCmd() {

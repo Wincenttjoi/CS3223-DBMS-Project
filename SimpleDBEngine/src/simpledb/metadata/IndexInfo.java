@@ -45,6 +45,14 @@ public class IndexInfo {
 	   this.idxtype = idxtype;
    }
    
+   public String getIdxType() {
+	   return idxtype;
+   }
+   
+   public String getIdxName() {
+	   return idxname;
+   }
+   
    /**
     * Open the index described by this object.
     * @return the Index object associated with this information

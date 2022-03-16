@@ -4,6 +4,7 @@ import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.metadata.IndexInfo;
 import simpledb.plan.Plan;
+import simpledb.plan.TablePlan;
 import simpledb.index.Index;
 import simpledb.index.query.IndexSelectScan;
 
@@ -84,7 +85,8 @@ public class IndexSelectPlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Index Select Plan used for plan " + p.toString() +
-			   " with value of " + val.toString());
+	   System.out.println("Index Select Plan used for table " + ((TablePlan) p).getTableName() +
+			   " of field " + ii.getFieldName() + opr + val + ", index accessed: " 
+			   + ii.getIdxName() + ", index type: " + ii.getIdxType());
    }
 }

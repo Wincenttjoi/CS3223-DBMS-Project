@@ -2,7 +2,11 @@ package simpledb.materialize;
 
 import simpledb.tx.Transaction;
 import simpledb.record.*;
+
+import java.util.List;
+
 import simpledb.plan.Plan;
+import simpledb.plan.TablePlan;
 import simpledb.query.*;
 
 /**
@@ -90,6 +94,13 @@ public class MaterializePlan implements Plan {
     * Prints the plan that is being used.
     */
    public void printPlan() {
-	   System.out.println("Materialized Plan used");
+	   String str = "Materialized Plan created with fields [";
+	   List<String> fldnames = srcplan.schema().fields();
+	   for (String fldname : fldnames) {
+		   str += fldname + ", ";
+	   }
+	   str = str.substring(0, str.length() - 2);
+	   str += "]";
+	   System.out.println(str);
    }
 }

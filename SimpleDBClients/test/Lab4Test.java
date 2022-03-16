@@ -92,8 +92,13 @@ public class Lab4Test {
 
 // ------------------- Hash index on sid ------------------- 
 
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, studentid, grade from student, enroll where studentid = sid indexjoin");
 // TEST6 - Equal
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, studentid, grade from student, enroll where studentid = sid");
+// TEST4 - Equal
+>>>>>>> main
 //          sname sid    studentid grade
 //          --------------------------
 //          joe      1         1     A
@@ -105,8 +110,13 @@ public class Lab4Test {
     	  
 // ------------------- BTree index on majorid ------------------- 
 
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid = did indexjoin");
 // TEST7 - Equal 
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, majorid, did from student, dept where majorid = did");
+// TEST5 - Equal 
+>>>>>>> main
 //                  sname sid  majorid   did
 //          ---------------------------------
 //                  lee      9      10     10
@@ -119,8 +129,13 @@ public class Lab4Test {
 //                  art      7      30     30
 //                  bob      5      30     30
     	  
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid < did indexjoin");
 // TEST8 - Less than (lhs index) 
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, majorid, did from student, dept where majorid < did");
+// TEST6 - Less than (lhs index) 
+>>>>>>> main
 //          sname    sid majorid    did
 //          ---------------------------------
 //                  joe      1      10     20
@@ -134,8 +149,13 @@ public class Lab4Test {
 //                  pat      8      20     30
 //                  lee      9      10     30
     	  
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where did > majorid indexjoin");
 // TEST9 - Greater than (rhs index) 
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, majorid, did from student, dept where did > majorid");
+// TEST7 - Greater than (rhs index) 
+>>>>>>> main
 //          sname    sid majorid    did
 //          ---------------------------------
 //                  lee      9      10     20
@@ -149,8 +169,13 @@ public class Lab4Test {
 //                  sue      4      20     30
 //                  amy      2      20     30
     	  
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where majorid > did indexjoin");
 // TEST10 - Greater than (lhs index) 
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, majorid, did from student, dept where majorid > did");
+// TEST8 - Greater than (lhs index) 
+>>>>>>> main
 //                  sname sid  majorid   did
 //          ---------------------------------
 //                  lee      9      10     10
@@ -163,8 +188,13 @@ public class Lab4Test {
 //                  art      7      30     30
 //                  bob      5      30     30
     	  
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where did < majorid indexjoin");
 // TEST11 - Less than (rhs index) 
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, majorid, did from student, dept where did < majorid");
+// TEST9 - Less than (rhs index) 
+>>>>>>> main
 //                  sname sid  majorid   did
 //          ---------------------------------
 //                  lee      9      10     10
@@ -177,8 +207,13 @@ public class Lab4Test {
 //                  art      7      30     30
 //                  bob      5      30     30
     	  
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, majorid, did from student, dept where did <= majorid indexjoin");
 // TEST12 - Less than (rhs index) 
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, majorid, did from student, dept where did <= majorid and did<=majorid");
+// TEST10 - Less than (rhs index) 
+>>>>>>> main
 //          sname    sid majorid    did
 //          ---------------------------------
 //                  lee      9      10     10
@@ -201,9 +236,15 @@ public class Lab4Test {
     	  
 // ------------------- BTree index on majorid and Hash index on sid ------------------- 
 
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
     	  		+ "student, enroll, dept where studentid = sid and majorid = did indexjoin");
 // TEST13 - Equal (hash) and equal (btree)
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, studentid, grade, majorid, did from "
+    	  		+ "student, enroll, dept where studentid = sid and majorid = did");
+// TEST11 - Equal (hash) and equal (btree)
+>>>>>>> main
 //          sname    sid studentid grade majorid    did
 //          -------------------------------------------------
 //                  joe      1         1     A      10     10
@@ -213,9 +254,15 @@ public class Lab4Test {
 //                  sue      4         4     A      20     20
 //                  kim      6         6     A      20     20
     	  
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
       	  		+ "student, enroll, dept where studentid = sid and did > majorid indexjoin");
 // TEST14 - Equal (hash) and greater than (btree)
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, studentid, grade, majorid, did from "
+      	  		+ "student, enroll, dept where studentid = sid and did > majorid");
+// TEST12 - Equal (hash) and greater than (btree)
+>>>>>>> main
 //          sname    sid studentid grade majorid    did
 //          -------------------------------------------------
 //                  joe      1         1     A      10     20
@@ -227,9 +274,15 @@ public class Lab4Test {
 //                  sue      4         4     A      20     30
 //                  kim      6         6     A      20     30
     	  
+<<<<<<< HEAD
     	  Test.doTest(stmt, "select sname, sid, studentid, grade, majorid, did from "
         	  		+ "student, enroll, dept where studentid = sid and majorid >= did indexjoin");
 // TEST15 - Equal (hash)  and greater or equal to (btree)
+=======
+    	  Test.doTest(stmt, "indexjoin select sname, sid, studentid, grade, majorid, did from "
+        	  		+ "student, enroll, dept where studentid = sid and majorid >= did");
+// TEST13 - Equal (hash)  and greater or equal to (btree)
+>>>>>>> main
 //          sname    sid studentid grade majorid    did
 //          -------------------------------------------------
 //                  joe      1         1     A      10     10
