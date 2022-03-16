@@ -7,8 +7,6 @@ import simpledb.jdbc.embedded.EmbeddedDriver;
 // Note: When selecting group fields and aggregate fields together, 
 // the order of the fields are not maintained.
 public class Lab5Test {
-	private static final String DIVIDER = "=========================================";
-	private static int testNumber = 0;
 
 	public static void main(String[] args) {
 
@@ -75,11 +73,11 @@ public class Lab5Test {
 //		     2019          1
 			
 			Test.doTest(stmt, "select distinct gradyear, avg(sid) from student where majorid = 10 group by gradyear order by avgofsid desc");
-//		 gradyear maxofsid
+//		 gradyear avgofsid
 //		 -----------------
-//		     2022        3
-//		     2021        9
-			
+//		     2021     5.00
+//		     2022     3.00
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

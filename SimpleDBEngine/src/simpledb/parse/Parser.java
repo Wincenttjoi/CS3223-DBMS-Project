@@ -47,6 +47,8 @@ public class Parser {
 	public Constant constant() {
 		if (lex.matchStringConstant())
 			return new Constant(lex.eatStringConstant());
+//		else if (lex.matchFloatConstant())
+//			return new Constant(lex.eatFloatConstant());
 		else
 			return new Constant(lex.eatIntConstant());
 	}
@@ -310,6 +312,9 @@ public class Parser {
 		if (lex.matchKeyword("int")) {
 			lex.eatKeyword("int");
 			schema.addIntField(fldname);
+		} else if (lex.matchKeyword("float")){
+			lex.eatKeyword("float");
+			schema.addFloatField(fldname);
 		} else {
 			lex.eatKeyword("varchar");
 			lex.eatDelim('(');

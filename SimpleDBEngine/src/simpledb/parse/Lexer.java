@@ -49,8 +49,16 @@ public class Lexer {
     * @return true if the current token is an integer
     */
    public boolean matchIntConstant() {
-      return tok.ttype == StreamTokenizer.TT_NUMBER;
+	   return tok.ttype == StreamTokenizer.TT_NUMBER;
    }
+   
+//   /**
+//    * Returns true if the current token is a float.
+//    * @return true if the current token is a float
+//    */
+//   public boolean matchFloatConstant() {
+//      return tok.ttype == StreamTokenizer.TT_NUMBER;
+//   }
    
    /**
     * Returns true if the current token is a string.
@@ -150,6 +158,20 @@ public class Lexer {
       nextToken();
       return i;
    }
+   
+//   /**
+//    * Throws an exception if the current token is not 
+//    * a float. 
+//    * Otherwise, returns that integer and moves to the next token.
+//    * @return the integer value of the current token
+//    */
+//   public float eatFloatConstant() {
+//      if (!matchFloatConstant())
+//         throw new BadSyntaxException();
+//      float i = (float) tok.nval;
+//      nextToken();
+//      return i;
+//   }
    
    /**
     * Throws an exception if the current token is not 
@@ -295,7 +317,7 @@ public class Lexer {
    private void initKeywords() {
 	   keywords = Arrays.asList("select", "distinct", "from", "where", "and",
                                "insert", "into", "values", "delete", "update", "set", 
-                               "create", "table", "int", "varchar", "view", "as", "index", "using", "on",
+                               "create", "table", "int", "varchar", "float", "view", "as", "index", "using", "on",
                                "order", "group", "by", "distinct", "indexjoin", "mergejoin", "nestedjoin");
    }
    

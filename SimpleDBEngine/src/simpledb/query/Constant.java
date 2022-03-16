@@ -38,8 +38,13 @@ public class Constant implements Comparable<Constant> {
 		Constant c = (Constant) obj;
 		if (c == null) {
 			return false;
+		} else if (ival != null) {
+			return ival.equals(c.ival);
+		} else if (fval != null) {
+			return fval.equals(c.fval);
+		} else {
+			return sval.equals(c.sval);
 		}
-		return (ival != null) ? ival.equals(c.ival) : sval.equals(c.sval);
 	}
 
 	public int compareTo(Constant c) {
