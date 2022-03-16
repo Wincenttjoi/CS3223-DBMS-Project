@@ -53,7 +53,7 @@ public class MergeJoinPlan implements Plan {
       printPlan();
       return new MergeJoinScan(s1, s2, fldname1, fldname2, opr);
    }
-   
+
    /**
     * Return the number of block accesses required to
     * mergejoin the sorted tables.
@@ -68,9 +68,10 @@ public class MergeJoinPlan implements Plan {
    public int blocksAccessed() {
 	  SortPlan p1 = (SortPlan) this.p1;
 	  SortPlan p2 = (SortPlan) this.p2;
-      return p1.blocksAccessedWithSort() + p2.blocksAccessedWithSort() + 
+      return p1.blocksAccessedWithSortCost() + p2.blocksAccessedWithSortCost() + 
     		  this.p1.blocksAccessed() + this.p2.blocksAccessed();
    }
+   
    
    /**
     * Return the number of records in the join.

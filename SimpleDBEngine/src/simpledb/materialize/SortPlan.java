@@ -79,7 +79,7 @@ public class SortPlan implements Plan {
    /**
     * Estimates the number of block accesses to sort
     * The formula is:
-    * <pre> B(sort(p)) = 2 * B(p) * (1 + log(runs(p) on base blockSize-1) </pre>
+    * <pre> B(sort(p)) = 2 * B(p) * (1 + ceil(log(ceil(B(p)/bufferSize) on base bufferSize-1)) </pre>
     * It includes the one-time cost
     * of materializing and sorting the records.
     * @see simpledb.plan.Plan#blocksAccessed()
