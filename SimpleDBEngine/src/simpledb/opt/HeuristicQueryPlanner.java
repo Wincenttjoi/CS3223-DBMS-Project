@@ -82,6 +82,7 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 			}
 		}
 		tableplanners.remove(besttp);
+		besttp.removeSelectTerm();
 		return bestplan;
 	}
 
@@ -95,8 +96,10 @@ public class HeuristicQueryPlanner implements QueryPlanner {
 				bestplan = plan;
 			}
 		}
-		if (bestplan != null)
+		if (bestplan != null) {
 			tableplanners.remove(besttp);
+			besttp.removeJoinTerm();
+		}
 		return bestplan;
 	}
 

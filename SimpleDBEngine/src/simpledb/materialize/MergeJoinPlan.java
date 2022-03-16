@@ -53,21 +53,25 @@ public class MergeJoinPlan implements Plan {
       printPlan();
       return new MergeJoinScan(s1, s2, fldname1, fldname2, opr);
    }
-   
+
    /**
-    * Return the number of block acceses required to
+    * Return the number of block accesses required to
     * mergejoin the sorted tables.
-    * Since a mergejoin can be preformed with a single
-    * pass through each table, the method returns
-    * the sum of the block accesses of the 
-    * materialized sorted tables.
-    * It does <i>not</i> include the one-time cost
+    * It includes the one-time cost
     * of materializing and sorting the records.
+    * The formula is:
+    * <pre> B(mergejoin(p1,p2,fldname1,fldname2)) = B(sort(p1, fldname1)) 
+    *       + B(sort(p2, fldname2)) + B(p1) + B(p2) </pre>
+    * We assume the best case scenario for merging
     * @see simpledb.plan.Plan#blocksAccessed()
     */
    public int blocksAccessed() {
-      return p1.blocksAccessed() + p2.blocksAccessed();
+	  SortPlan p1 = (SortPlan) this.p1;
+	  SortPlan p2 = (SortPlan) this.p2;
+      return p1.blocksAccessedWithSortCost() + p2.blocksAccessedWithSortCost() + 
+    		  this.p1.blocksAccessed() + this.p2.blocksAccessed();
    }
+   
    
    /**
     * Return the number of records in the join.
