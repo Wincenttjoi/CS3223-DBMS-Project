@@ -191,10 +191,7 @@ public class Lab1Test {
 //        sname  
 //        ------
     	  
-//    	  doTest(stmt, "select sname from student where sname = 'jonah'");
-// TEST18
-//        sname  
-//        ------
+
 
 
       }

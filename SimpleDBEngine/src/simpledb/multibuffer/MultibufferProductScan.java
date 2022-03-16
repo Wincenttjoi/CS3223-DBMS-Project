@@ -54,6 +54,9 @@ public class MultibufferProductScan implements Scan {
     * @see simpledb.query.Scan#next()
     */
    public boolean next() {
+	  if (lhsscan != null && !((TableScan) lhsscan).getTupleExist()) {
+		  return false;
+	  }
       while (!prodscan.next()) 
          if (!useNextChunk())
          return false;

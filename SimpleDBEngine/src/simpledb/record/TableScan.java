@@ -17,6 +17,7 @@ public class TableScan implements UpdateScan {
    private RecordPage rp;
    private String filename;
    private int currentslot;
+   private boolean isTupleExist;
 
    public TableScan(Transaction tx, String tblname, Layout layout) {
       this.tx = tx;
@@ -26,6 +27,7 @@ public class TableScan implements UpdateScan {
          moveToNewBlock();
       else 
          moveToBlock(0);
+      this.isTupleExist = false;
    }
 
    // Methods that implement Scan
@@ -42,6 +44,7 @@ public class TableScan implements UpdateScan {
          moveToBlock(rp.block().number()+1);
          currentslot = rp.nextAfter(currentslot);
       }
+      isTupleExist = true;
       return true;
    }
 
@@ -62,6 +65,10 @@ public class TableScan implements UpdateScan {
 
    public boolean hasField(String fldname) {
       return layout.schema().hasField(fldname);
+   }
+   
+   public boolean getTupleExist() {
+	   return isTupleExist;
    }
 
    public void close() {
@@ -84,6 +91,10 @@ public class TableScan implements UpdateScan {
          setInt(fldname, val.asInt());
       else
          setString(fldname, val.asString());
+   }
+   
+   public void setTupleExist(boolean bln) {
+	   this.isTupleExist = bln;
    }
 
    public void insert() {

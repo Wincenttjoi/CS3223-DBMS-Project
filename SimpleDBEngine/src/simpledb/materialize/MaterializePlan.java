@@ -38,10 +38,15 @@ public class MaterializePlan implements Plan {
       TempTable temp = new TempTable(tx, sch);
       Scan src = srcplan.open();
       UpdateScan dest = temp.open();
+      boolean isTupleExist = false;
       while (src.next()) {
+    	  isTupleExist = true;
          dest.insert();
          for (String fldname : sch.fields())
             dest.setVal(fldname, src.getVal(fldname));
+      }
+      if (isTupleExist) {
+    	  ((TableScan) dest).setTupleExist(isTupleExist);
       }
       src.close();
       dest.beforeFirst();
