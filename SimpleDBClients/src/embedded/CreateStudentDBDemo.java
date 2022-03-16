@@ -85,9 +85,9 @@ public class CreateStudentDBDemo {
          System.out.println("Table DEPT created.");
 
          // Create index
-         s = "create index dname_index on dept (dname) using btree";
+         s = "create index did_index on dept (did) using hash";
          stmt.executeUpdate(s);
-         System.out.println("Dname index created");
+         System.out.println("Did index created");
          
          s = "insert into DEPT(DId, DName) values ";
          String[] deptvals = {
@@ -211,6 +211,11 @@ public class CreateStudentDBDemo {
          s = "create table SECTION(SectId int, CourseId int, Prof varchar(25), YearOffered int)";
          stmt.executeUpdate(s);
          System.out.println("Table SECTION created.");
+         
+         // Create index
+         s = "create index yearoffered_idx on section (yearoffered) using btree";
+         stmt.executeUpdate(s);
+         System.out.println("yearoffered btree index created");
 
          s = "insert into SECTION(SectId, CourseId, Prof, YearOffered) values ";
          String[] sectvals = {

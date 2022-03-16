@@ -158,7 +158,7 @@ public class Lab4Test {
 //                  art      7      30     30
 //                  bob      5      30     30
     	  
-    	  Test.doTest(stmt, "indexjoin select sname, sid, majorid, did from student, dept where did <= majorid");
+    	  Test.doTest(stmt, "indexjoin select sname, sid, majorid, did from student, dept where did <= majorid and did<=majorid");
 // TEST10 - Less than (rhs index) 
 //          sname    sid majorid    did
 //          ---------------------------------

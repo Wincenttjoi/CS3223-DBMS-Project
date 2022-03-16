@@ -86,6 +86,7 @@ public class IndexSelectPlan implements Plan {
     */
    public void printPlan() {
 	   System.out.println("Index Select Plan used for table " + ((TablePlan) p).getTableName() +
-			   " of field " + ii.getFieldName());
+			   " of field " + ii.getFieldName() + opr + val + ", index accessed: " 
+			   + ii.getIdxName() + ", index type: " + ii.getIdxType());
    }
 }
