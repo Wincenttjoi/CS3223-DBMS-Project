@@ -17,7 +17,13 @@ public class DemoFourWayJoin {
       
       try (Connection conn = d.connect(s, null);
           Statement stmt = conn.createStatement()) {
-
+    	  
+    	  // For querying all tables in demodb
+//    	  Test.doQuery(stmt, "select SId, SName, MajorId, GradYear from student");
+//    	  Test.doQuery(stmt, "select EId, StudentId, SectionId, Grade from enroll where grade = 'A-'");
+//    	  Test.doQuery(stmt, "select DId, DName from dept");
+//    	  Test.doQuery(stmt, "select CId, Title, DeptId from course");
+    	  
     	  // TEST1: Four Way table queries, showing different sname and prof for each course subject
     	  Test.doJoinAlgoTest(stmt, "select sname, majorid, did, deptid, dname, title, cid, courseid, prof "
     	  		+ "from student, dept, course, section "
@@ -91,6 +97,48 @@ public class DemoFourWayJoin {
 //    	       140    140    140                     Music                Music and Media    142      142
 //    	       200    200    200               Real Estate   Land Use and Property Rights    202      202
 //    	       180    180    180               Real Estate                       RE Taxes    182      182
+
+    	  // TEST3: Four Way table queries, with all successful indexjoins
+    	  Test.doJoinAlgoTest(stmt, "select grade, title from enroll, student, section, course "
+    	  		+ "where grade = 'A-' and studentid = sid and courseid > majorid and courseid = cid and yearOffered = gradyear"
+    	  		+ "order by title");
+//    	  grade                          title
+//    	  -------------------------------------
+//    	      A-              Basic Programming
+//    	      A-               Brand Management
+//    	      A-               Brand Management
+//    	      A-              Corporate Finance
+//    	      A-                 Data Structure
+//    	      A-                      Databases
+//    	      A-                      Databases
+//    	      A-                Economic Policy
+//    	      A-                Economic Policy
+//    	      A-                Economic Policy
+//    	      A-              Equity and Trusts
+//    	      A-              Financial Markets
+//    	      A-                Fluid Mechanics
+//    	      A-                     IDE Design
+//    	      A-                     IDE Design
+//    	      A-                     IDE Design
+//    	      A-   Land Use and Property Rights
+//    	      A-                  Legal Studies
+//    	      A-                  Legal Studies
+//    	      A-                  Legal Studies
+//    	      A-                  Legal Studies
+//    	      A-                Market Research
+//    	      A-                    Performance
+//    	      A-                Process Control
+//    	      A-                Process Control
+//    	      A-           Quantitative Methods
+//    	      A-                       RE Taxes
+//    	      A-        Residential Real Estate
+//    	      A-              Retail Management
+//    	      A-              Retail Management
+//    	      A-              Retail Management
+//    	      A-              Retail Management
+//    	      A-          Sustainable Marketing
+//    	      A-          Sustainable Marketing
+//    	      A-                 Thermodynamics
       }
       catch (SQLException e) {
          e.printStackTrace();
