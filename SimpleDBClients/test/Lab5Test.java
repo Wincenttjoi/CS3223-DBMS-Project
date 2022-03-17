@@ -47,6 +47,7 @@ public class Lab5Test {
 //		      20          8081          4       2020.25
 //		      30          4041          2       2020.50
 			
+			// TEST5
 			Test.doTest(stmt, "select gradyear from student group by gradyear");
 //		  gradyear
 //	      --------
@@ -55,6 +56,7 @@ public class Lab5Test {
 //			  2021
 //			  2022		
 			
+			// TEST6
 			Test.doTest(stmt, "select gradyear, majorid, count(sid) from student group by gradyear, majorid order by gradyear desc, majorid");
 //		 gradyear majorid countofsid
 //		 ---------------------------
@@ -66,18 +68,110 @@ public class Lab5Test {
 //		      2020      30         1
 //		      2019      20         1
 			
+			// TEST7
 			Test.doTest(stmt, "select distinct gradyear, count(sid) from student where gradyear < 2021 group by gradyear order by countofsid desc");
 //		 gradyear countofsid
 //		 -------------------
 //		     2020          3
 //		     2019          1
 			
+			// TEST8
 			Test.doTest(stmt, "select distinct gradyear, avg(sid) from student where majorid = 10 group by gradyear order by avgofsid desc");
 //		 gradyear avgofsid
 //		 -----------------
 //		     2021     5.00
 //		     2022     3.00
-
+			
+			// TEST9
+			Test.doTest(stmt, "hashjoin select sid, studentid from student, enroll where studentid = sid");
+//		    sid studentid
+//		    -----------------
+//		          1         1
+//		          1         1
+//		          2         2
+//		          4         4
+//		          4         4
+//		          6         6
+			
+			// TEST10
+			Test.doTest(stmt, "hashjoin select distinct sid, studentid from student, enroll where studentid = sid");
+//		    sid studentid
+//		    -----------------
+//		          1         1
+//		          2         2
+//		          4         4
+//		          6         6
+			
+			// TEST11
+			Test.doTest(stmt, "hashjoin select sid, studentid from student, enroll where studentid = sid order by studentid desc");
+//		    sid studentid
+//		    -----------------
+//		          6         6
+//		          4         4
+//		          4         4
+//		          2         2
+//		          1         1
+//		          1         1
+			
+			// TEST12
+			Test.doTest(stmt, "hashjoin select majorid, did, deptid, cid, courseid from student, dept, course, section"
+					+ " where majorid = did and did = deptid and cid = courseid");
+//			 majorid    did deptid    cid courseid
+//			 --------------------------------------
+//			       30     30     30     62       62
+//			       30     30     30     62       62
+//			       10     10     10     12       12
+//			       10     10     10     12       12
+//			       10     10     10     12       12
+//			       10     10     10     12       12
+//			       10     10     10     12       12
+//			       10     10     10     12       12
+//			       20     20     20     32       32
+//			       20     20     20     32       32
+//			       20     20     20     32       32
+//			       20     20     20     32       32
+//			       20     20     20     32       32
+//			       20     20     20     32       32
+//			       20     20     20     32       32
+//			       20     20     20     32       32
+			
+			// TEST13
+			Test.doTest(stmt, "hashjoin select eid, sid, studentid, sectionid, sectid "
+					+ "from student, enroll, section"
+					+ " where studentid = sid and sectionid = sectid");
+//		    eid    sid studentid sectionid sectid
+//		    -----------------------------------------
+//		         24      1         1        43     43
+//		         14      1         1        13     13
+//		         34      2         2        43     43
+//		         54      4         4        53     53
+//		         44      4         4        33     33
+//		         64      6         6        53     53
+			
+			// TEST14
+			Test.doTest(stmt, "hashjoin select count(sid) "
+					+ "from student, enroll, section "
+					+ "where studentid = sid and sectionid = sectid "
+					+ "group by sid");
+//		    sid countofsid
+//		    ------------------
+//		          1          2
+//		          2          1
+//		          4          2
+//		          6          1
+			
+			// TEST15
+			Test.doTest(stmt, "hashjoin select count(sid) "
+					+ "from student, enroll, section "
+					+ "where studentid = sid and sectionid = sectid "
+					+ "group by sid "
+					+ "order by countofsid desc");
+//		    sid countofsid
+//		    ------------------
+//		          4          2
+//		          1          2
+//		          6          1
+//		          2          1
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

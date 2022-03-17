@@ -181,16 +181,17 @@ public class Parser {
 		Boolean sType = true; // sort type is ascending by default
 		if (lex.matchSortType()) {
 			sType = lex.eatSortType();
-		} else if (!lex.matchDelim(',') && !lex.matchEnd()) {
-			throw new BadSyntaxException();
 		}
 		M.put(sField, sType);
 		if (lex.matchDelim(',')) {
 			lex.eatDelim(',');
 			M.putAll(sortList());
+		} else {
+			lex.eatEnd();
 		}
 		return M;
 	}
+
 
 // Methods for parsing the various update commands
 

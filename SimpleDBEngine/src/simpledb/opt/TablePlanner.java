@@ -270,7 +270,7 @@ class TablePlanner {
     * @return a hashjoin plan of the specified plan and this table
     */
    private Plan makeHashJoin(Plan current, Schema currsch) {
-       Predicate joinpred = mypred.joinSubPred(currsch, myschema);
+     Predicate joinpred = mypred.joinSubPred(currsch, myschema);
 	   Plan p;
 	   for (Term joinTerm : joinpred.getTerms()) {
 		   Term reversedTerm = joinTerm.reverse();
@@ -290,7 +290,7 @@ class TablePlanner {
 		   }
 		      
 		   int b = tx.availableBuffs();
-		   int numPart = b - 1; // max # of partitions <= B - 1
+		   int numPart = b - 1; // # of partitions <= B - 1
 		   p = new HashJoinPlan(tx, current, myplan, joinValLHS, joinValRHS, opr, numPart);
 		   if (b < Math.sqrt(p.blocksAccessed())) {
 		       System.out.println(
@@ -302,8 +302,7 @@ class TablePlanner {
 		 	   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
 		   return p;
 	   }
-       System.out.println(
-	           "Hashjoin failed: using productjoin instead");
+     System.out.println("Hashjoin failed: using productjoin instead");
 	   return null;
    }
    
