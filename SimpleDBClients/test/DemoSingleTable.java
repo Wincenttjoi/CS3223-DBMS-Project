@@ -298,8 +298,85 @@ public class DemoSingleTable {
 //    	       53      452                 Jan Stott        2020
 //    	       13      102              Moon Geonsik        2020
     	  
-    	  // TODO: Add tests of aggregate function with/without group,
-    	  // aggn fn with/without group combined with order by and distinct
+    	  // TEST10: Showcase student table for next test
+    	  Test.doTest(stmt, "select sid, sname, gradyear, majorid from student");
+//    	    sid                     sname gradyear majorid
+//    	    --------------------------------------------------
+//    	          1               Rick Werner     2017     400
+//    	          2            Shiloh Hartman     2021     310
+//    	          3                 Damon Kim     2020     430
+//    	          4           Cerys Armstrong     2018     110
+//    	          5          Layla-Mae Barker     2016     240
+//    	          6             Tevin Wallace     2016     430
+//    	          7            Kamile Wilkins     2021     430
+//    	          8             Rohaan Keenan     2016     200
+//    	          9         Demi-Leigh Gamble     2016     300
+//    	         10           Lilly-Ann Joyce     2018      10
+//    	         11              Jadene Oneil     2017     350
+//    	         12             Samad Hawkins     2016      40
+//    	         13            Scott Goulding     2020      10
+//    	         14         Riley-Jay Freeman     2019      40
+//    	         15               Sayed Marsh     2020     100
+//    	         16            Amiya Caldwell     2017     200
+//    	         17             Huzaifa Wiley     2017      20
+//    	         18              Jemima Davey     2016     250
+//    	         19                 Rhia Bird     2019     110
+//    	         20              Romy Delaney     2021      90
+//    	         21                Dania Kerr     2017      90
+//    	         22            Milana Barrera     2020     470
+//    	         23              Ilyas Dudley     2019     150
+//    	         24               Aqsa Rivera     2019     350
+//    	         25                 Nana Lott     2021     350
+//    	         26              Darci Hodson     2021     100
+//    	         27             Weronika Bain     2019     380
+//    	         28            Callan Derrick     2016      30
+//    	         29               Otis Devlin     2017      50
+//    	         30             Millie Curtis     2020     480
+//    	         31            Sanah Morrison     2018     410
+//    	         32              Rania Alcock     2017     140
+//    	         33                  Jay Pike     2020     450
+//    	         34              Misha Mendez     2016     150
+//    	         35            Marcos Whitley     2016     300
+//    	         36         Tierney Mcdonnell     2016     170
+//    	         37              Maiya Rhodes     2017     290
+//    	         38        Darcie-Mae Winters     2019      20
+//    	         39                 Marwah Yu     2021     250
+//    	         40             Aniela Suarez     2019     120
+//    	         41              Corinne Hill     2021     320
+//    	         42         Philippa Nicholls     2017     300
+//    	         43                 Elif Mayo     2017     200
+//    	         44        Tonisha Strickland     2018     150
+//    	         45             Wilfred Betts     2016     460
+//    	         46            Cassius Spence     2019     390
+//    	         47              Amiee Oliver     2017     180
+//    	         48             Imaad Wickens     2019      20
+//    	         49             Caio Cottrell     2018     290
+//    	         50                Ethan Bate     2017     120
+    	  
+    	  // TEST11: Group By aggn functions, support for avg float
+    	  Test.doTest(stmt, "select count(gradyear), min(majorid), max(majorid), avg(sid) "
+    	  		+ "from student group by gradyear");
+//    	  gradyear countofgradyear minofmajorid maxofmajorid avgofsid
+//    	  ------------------------------------------------------------
+//    	       2016              11           30          460    21.45
+//    	       2017              12           20          400    28.83
+//    	       2018               5           10          410    27.60
+//    	       2019               9           20          390    31.00
+//    	       2020               6           10          480    19.33
+//    	       2021               7           90          430    22.86
+    	  
+    	  // TEST12: Add in integration with order by 
+    	  Test.doTest(stmt, "select count(gradyear), min(majorid), max(majorid), avg(sid) "
+    	  		+ "from student group by gradyear "
+    	  		+ "order by avgofsid desc");
+//    	  gradyear countofgradyear minofmajorid maxofmajorid avgofsid
+//    	  ------------------------------------------------------------
+//    	       2019               9           20          390    31.00
+//    	       2017              12           20          400    28.83
+//    	       2018               5           10          410    27.60
+//    	       2021               7           90          430    22.86
+//    	       2016              11           30          460    21.45
+//    	       2020               6           10          480    19.33
       }
       catch (SQLException e) {
          e.printStackTrace();
