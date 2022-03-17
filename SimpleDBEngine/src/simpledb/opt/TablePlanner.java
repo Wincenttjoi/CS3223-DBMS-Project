@@ -329,6 +329,6 @@ class TablePlanner {
 	  p = addSelectPred(p);
 	  p = addJoinPred(p,currsch);
 	  mypred.conjoinWith(new Predicate(joinTerm));
-	  return p;
-   }
+		return p;
+	}
 }

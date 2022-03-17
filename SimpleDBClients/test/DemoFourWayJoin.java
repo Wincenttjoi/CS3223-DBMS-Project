@@ -101,7 +101,7 @@ public class DemoFourWayJoin {
     	  // TEST3: Four Way table queries, with all successful indexjoins
     	  Test.doJoinAlgoTest(stmt, "select grade, title from enroll, student, section, course "
     	  		+ "where grade = 'A-' and studentid = sid and courseid > majorid and courseid = cid and yearOffered = gradyear"
-    	  		+ "order by title");
+    	  		+ " order by title");
 //    	  grade                          title
 //    	  -------------------------------------
 //    	      A-              Basic Programming
