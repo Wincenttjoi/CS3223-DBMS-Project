@@ -230,7 +230,7 @@ public class Lab1Test {
 //                  bob      5      30
     	  
     	  Test.doTest(stmt, "select sid, studentid, sname, grade from student, enroll where sid = 1 and studentid = 1");
-// TEST21 - 2 indexes
+// TEST22 - 2 indexes
 //    	    sid studentid      sname grade
 //    	    ----------------------------------
 //    	          1         1        joe     A

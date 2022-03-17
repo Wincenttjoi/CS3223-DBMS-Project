@@ -18,7 +18,7 @@ public class DemoSingleTable {
       try (Connection conn = d.connect(s, null);
           Statement stmt = conn.createStatement()) {
     	  
-    	  // TEST1: Basic query showing duplicates, hash index
+    	  // TEST1: Basic query showing duplicates
     	  Test.doTest(stmt, "select did, dname from dept");
 //    	    did                     dname
 //    	    ---------------------------------
@@ -254,9 +254,10 @@ public class DemoSingleTable {
 //				  Chemical Engineering
 //					        Accounting
     	  
+    	  
     	  // TEST8: Order By of multiple attributes and non-inequality >, yearoffered index used
     	  Test.doTest(stmt, "select sectid, courseid, prof, yearoffered from section "
-    	  		+ "where yearoffered > 2019 order by yearoffered asc, sectid desc");
+    	  		+ "where yearoffered >= 2020 order by yearoffered asc, sectid desc");
 //    	  sectid courseid                      prof yearoffered
 //    	  ------------------------------------------------------
 //    	      503      502               Kelvin Wong        2020
@@ -280,28 +281,22 @@ public class DemoSingleTable {
 //    	       93      132             Hakim Collins        2021
 //    	       23      222               Kelvin Wong        2021
     	 
-    	  // TEST9: Order By of multiple attributes and non-inequality <> < with index desc order
+    	  // TEST9: Multiple non-inequality <> < with desc order of attribute
     	  Test.doTest(stmt, "select sectid, courseid, prof, yearoffered from section "
-    	  		+ "where yearoffered < 2020 and courseid <> 332 order by yearoffered desc, sectid desc");
+    	  		+ "where yearoffered >= 2020 and yearoffered <> 2021 order by sectid desc");
 //    	  sectid courseid                      prof yearoffered
 //    	  ------------------------------------------------------
-//    	      363      142             Beatrix Oneal        2018
-//    	      303      252                Rohan Drew        2018
-//    	      253      462             Kelise Berger        2018
-//    	      173      102               Sheikh Rowe        2018
-//    	      113      502             Raihan Baxter        2018
-//    	      513      372              Wincent Tjoi        2017
-//    	      463      372             Cecil Derrick        2017
-//    	      383      302            Haidar Merrill        2017
-//    	      313      112           Beatriz Shields        2017
-//    	      233       12            Gracey Peacock        2017
-//    	      433       52                Jibril Ali        2016
-//    	      343      512               Maya Tucker        2016
-//    	      323      132              Sianna Reyes        2016
-//    	      143      472                   Cole Li        2016
-//    	       63      472           Garfield Hebert        2016
-//    	       43      112               Dina Warner        2016
-//    	       33      242              Wincent Tjoi        2016
+//    	      503      502               Kelvin Wong        2020
+//    	      493       72              Moon Geonsik        2020
+//    	      453      252                 Ali Heath        2020
+//    	      423       62                 Kade Ward        2020
+//    	      333       22               Alisa David        2020
+//    	      193       32             Layan Bonilla        2020
+//    	      153      392           Shelbie Knowles        2020
+//    	       83      382              Heena Herman        2020
+//    	       73      162               Ayaz Horner        2020
+//    	       53      452                 Jan Stott        2020
+//    	       13      102              Moon Geonsik        2020
     	  
     	  // TODO: Add tests of aggregate function with/without group,
     	  // aggn fn with/without group combined with order by and distinct
