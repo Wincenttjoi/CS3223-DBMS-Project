@@ -99,46 +99,46 @@ public class DemoFourWayJoin {
 //    	       180    180    180               Real Estate                       RE Taxes    182      182
 
     	  // TEST3: Four Way table queries, with all successful indexjoins
-    	  Test.doJoinAlgoTest(stmt, "select grade, title from enroll, student, section, course "
-    	  		+ "where grade = 'A-' and studentid = sid and courseid > majorid and courseid = cid and yearOffered = gradyear "
-    	  		+ "order by title");
-//    	  grade                          title
-//    	  -------------------------------------
-//    	      A-              Basic Programming
-//    	      A-               Brand Management
-//    	      A-               Brand Management
-//    	      A-              Corporate Finance
-//    	      A-                 Data Structure
-//    	      A-                      Databases
-//    	      A-                      Databases
-//    	      A-                Economic Policy
-//    	      A-                Economic Policy
-//    	      A-                Economic Policy
-//    	      A-              Equity and Trusts
-//    	      A-              Financial Markets
-//    	      A-                Fluid Mechanics
-//    	      A-                     IDE Design
-//    	      A-                     IDE Design
-//    	      A-                     IDE Design
-//    	      A-   Land Use and Property Rights
-//    	      A-                  Legal Studies
-//    	      A-                  Legal Studies
-//    	      A-                  Legal Studies
-//    	      A-                  Legal Studies
-//    	      A-                Market Research
-//    	      A-                    Performance
-//    	      A-                Process Control
-//    	      A-                Process Control
-//    	      A-           Quantitative Methods
-//    	      A-                       RE Taxes
-//    	      A-        Residential Real Estate
-//    	      A-              Retail Management
-//    	      A-              Retail Management
-//    	      A-              Retail Management
-//    	      A-              Retail Management
-//    	      A-          Sustainable Marketing
-//    	      A-          Sustainable Marketing
-//    	      A-                 Thermodynamics
+    	  Test.doJoinAlgoTest(stmt, "select grade, studentid, sid, title, courseid, cid, majorid, yearoffered, gradyear from enroll, student, section, course "
+    	  		+ "where grade = 'A-' and studentid = sid and courseid > majorid and courseid = cid and yearOffered = gradyear"
+    	  		+ " order by title");
+//    	  grade studentid    sid                          title courseid    cid majorid yearoffered gradyear
+//    	  ---------------------------------------------------------------------------------------------------
+//    	      A-        14     14              Basic Programming      242    242      40        2019     2019
+//    	      A-        24     24               Brand Management      382    382     350        2019     2019
+//    	      A-        14     14               Brand Management      382    382      40        2019     2019
+//    	      A-        14     14              Corporate Finance      102    102      40        2019     2019
+//    	      A-        26     26                 Data Structure      222    222     100        2021     2021
+//    	      A-        26     26                      Databases      252    252     100        2021     2021
+//    	      A-        14     14                      Databases      252    252      40        2019     2019
+//    	      A-        46     46                Economic Policy      442    442     390        2019     2019
+//    	      A-        24     24                Economic Policy      442    442     350        2019     2019
+//    	      A-        14     14                Economic Policy      442    442      40        2019     2019
+//    	      A-        14     14              Equity and Trusts       52     52      40        2019     2019
+//    	      A-        14     14              Financial Markets       72     72      40        2019     2019
+//    	      A-         3      3                Fluid Mechanics      502    502     430        2020     2020
+//    	      A-        46     46                     IDE Design      402    402     390        2019     2019
+//    	      A-        24     24                     IDE Design      402    402     350        2019     2019
+//    	      A-        14     14                     IDE Design      402    402      40        2019     2019
+//    	      A-        14     14   Land Use and Property Rights      202    202      40        2019     2019
+//    	      A-         7      7                  Legal Studies      452    452     430        2021     2021
+//    	      A-         3      3                  Legal Studies      452    452     430        2020     2020
+//    	      A-        41     41                  Legal Studies      452    452     320        2021     2021
+//    	      A-        26     26                  Legal Studies      452    452     100        2021     2021
+//    	      A-        26     26                Market Research      262    262     100        2021     2021
+//    	      A-        26     26                    Performance      132    132     100        2021     2021
+//    	      A-        45     45                Process Control      472    472     460        2016     2016
+//    	      A-        45     45                Process Control      472    472     460        2016     2016
+//    	      A-        32     32           Quantitative Methods      302    302     140        2017     2017
+//    	      A-        14     14                       RE Taxes      182    182      40        2019     2019
+//    	      A-        14     14        Residential Real Estate      162    162      40        2019     2019
+//    	      A-        24     24              Retail Management      372    372     350        2019     2019
+//    	      A-        32     32              Retail Management      372    372     140        2017     2017
+//    	      A-        32     32              Retail Management      372    372     140        2017     2017
+//    	      A-        14     14              Retail Management      372    372      40        2019     2019
+//    	      A-        41     41          Sustainable Marketing      362    362     320        2021     2021
+//    	      A-        26     26          Sustainable Marketing      362    362     100        2021     2021
+//    	      A-        45     45                 Thermodynamics      512    512     460        2016     2016
       }
       catch (SQLException e) {
          e.printStackTrace();

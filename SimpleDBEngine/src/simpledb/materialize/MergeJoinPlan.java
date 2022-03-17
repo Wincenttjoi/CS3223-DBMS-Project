@@ -16,6 +16,7 @@ public class MergeJoinPlan implements Plan {
    private String fldname1, fldname2;
    private Schema sch = new Schema();
    private String opr;
+   private boolean isCurrentPlanOnRHS;
    
    /**
     * Creates a mergejoin plan for the two specified queries.
@@ -28,7 +29,7 @@ public class MergeJoinPlan implements Plan {
     * @param opr the relational operator between join fields
     * @param tx the calling transaction
     */
-   public MergeJoinPlan(Transaction tx, Plan p1, Plan p2, String fldname1, String fldname2, String opr) {
+   public MergeJoinPlan(Transaction tx, Plan p1, Plan p2, String fldname1, String fldname2, String opr, boolean isCurrentPlanOnRHS) {
       this.fldname1 = fldname1;
       List<String> sortlist1 = Arrays.asList(fldname1);
       this.p1 = new SortPlan(tx, p1, sortlist1);
@@ -40,6 +41,7 @@ public class MergeJoinPlan implements Plan {
       this.opr = opr;
       sch.addAll(p1.schema());
       sch.addAll(p2.schema());
+      this.isCurrentPlanOnRHS = isCurrentPlanOnRHS;
    }
    
    /** The method first sorts its two underlying scans
@@ -48,8 +50,15 @@ public class MergeJoinPlan implements Plan {
      * @see simpledb.plan.Plan#open()
      */
    public Scan open() {
-	  Scan s1 = p1.open();
-      SortScan s2 = (SortScan) p2.open();
+	  Scan s1;
+	  SortScan s2;
+	  if (isCurrentPlanOnRHS) {
+		  s2 = (SortScan) p2.open();
+		  s1 = p1.open();
+	  } else {
+		  s1 = p1.open();
+		  s2 = (SortScan) p2.open();
+	  }
       printPlan();
       return new MergeJoinScan(s1, s2, fldname1, fldname2, opr);
    }
