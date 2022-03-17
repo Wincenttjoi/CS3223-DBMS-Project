@@ -247,7 +247,6 @@ public class Lab4Test {
     	  Test.doJoinAlgoTest(stmt, "select sname, sid, majorid, did from "
         	  		+ "student, dept where did > majorid");
     	  
-    	  Test.doTest(stmt, "hashjoin select majorid, did, deptid, cid, courseid from student, dept, course, section where majorid = did and did = deptid and cid = courseid");
       }
       catch (SQLException e) {
          e.printStackTrace();
