@@ -214,12 +214,12 @@ class TablePlanner {
 		   
 		   if (opr.equals(">")) {
 			   opr = "<";
-			   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
+			   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr, !isCurrentPlanOnRHS);
 		   } else if (opr.equals(">=")) {
 			   opr = "<=";
-			   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
+			   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr, !isCurrentPlanOnRHS);
 		   } else if (opr.equals("=") || opr.equals("<") || opr.equals("<=")) {
-			   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+			   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr, isCurrentPlanOnRHS);
 		   } else {
 			   System.out.println("Mergejoin: " + joinValLHS + opr + joinValRHS + " not supported");
 			   continue;
@@ -243,21 +243,20 @@ class TablePlanner {
    private Plan makeNestedJoin(Plan current, Schema currsch) {
 	   Predicate joinpred = mypred.joinSubPred(currsch, myschema);
 	   Term joinTerm = joinpred.getTerms().get(0);
+	   Term reversedTerm = joinTerm.reverse();
+	   
 	   String joinValLHS = joinTerm.getLHS().asFieldName();
 	   String joinValRHS = joinTerm.getRHS().asFieldName();
 	   String opr = joinTerm.getOpr();
 	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-	   
-	   Plan lhsPlan, rhsPlan;
+	  
 	   if (isCurrentPlanOnRHS) {
-		   lhsPlan = myplan;
-		   rhsPlan = current;
-	   } else {
-		   lhsPlan = current;
-		   rhsPlan = myplan;
+		   joinValLHS = reversedTerm.getLHS().asFieldName();
+		   joinValRHS = reversedTerm.getRHS().asFieldName();
+		   opr = reversedTerm.getOpr();
 	   }
 	   
-       Plan p = new NestedJoinPlan(lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+       Plan p = new NestedJoinPlan(current, myplan, joinValLHS, joinValRHS, opr);
        System.out.println(tab + "Nestedjoin blocks accessed = " + p.blocksAccessed());
        joinTermsToRemove[JoinAlgoSelector.NESTEDJOIN_PLAN.ordinal()] = 
     		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
@@ -274,28 +273,25 @@ class TablePlanner {
        Predicate joinpred = mypred.joinSubPred(currsch, myschema);
 	   Plan p;
 	   for (Term joinTerm : joinpred.getTerms()) {
+		   Term reversedTerm = joinTerm.reverse();
+		   
 		   String joinValLHS = joinTerm.getLHS().asFieldName();
 		   String joinValRHS = joinTerm.getRHS().asFieldName();
 		   String opr = joinTerm.getOpr();
 		   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-		
-		   Plan lhsPlan, rhsPlan;
-		   if (isCurrentPlanOnRHS) {
-		     lhsPlan = myplan;
-		     rhsPlan = current;
-		   } else {
-		     lhsPlan = current;
-		     rhsPlan = myplan;
-		   }
 		      
 		   if (!opr.equals("=")) {
 		     System.out.println("Hashjoin: " + joinValLHS + opr + joinValRHS + " not supported");
 		     continue;
 		   }
+		   if (isCurrentPlanOnRHS) {
+			   joinValLHS = reversedTerm.getLHS().asFieldName();
+			   joinValRHS = reversedTerm.getRHS().asFieldName();
+		   }
 		      
 		   int b = tx.availableBuffs();
 		   int numPart = b - 1; // max # of partitions <= B - 1
-		   p = new HashJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr, numPart);
+		   p = new HashJoinPlan(tx, current, myplan, joinValLHS, joinValRHS, opr, numPart);
 		   if (b < Math.sqrt(p.blocksAccessed())) {
 		       System.out.println(
 			           "Hashjoin: Not enough buffer size available for " + joinValLHS + opr + joinValRHS);

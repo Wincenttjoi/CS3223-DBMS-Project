@@ -1,6 +1,5 @@
 package simpledb.materialize;
 
-import simpledb.materialize.NestedJoinScan;
 import simpledb.query.Scan;
 import simpledb.record.Schema;
 import simpledb.plan.Plan;

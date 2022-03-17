@@ -151,6 +151,18 @@ public class Term {
       }
    }
    
+   public Term reverse() {
+	  String reversedOpr;
+      switch (opr) {
+		      case "<" -> { reversedOpr = ">"; }
+		      case "<=" -> { reversedOpr = ">="; }
+		      case ">" -> { reversedOpr = "<"; }
+		      case ">=" -> { reversedOpr = "<="; }
+		      default -> { reversedOpr = opr; }
+      }
+      return new Term(rhs, lhs, reversedOpr);
+   }
+   
    /**
     * Returns true if this term's lhs, rhs and opr matches other term in either order
     * @param the term to compare with
