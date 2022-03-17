@@ -157,7 +157,8 @@ public class Term {
     */
    public boolean matches(Term t) {
 	  String reversedOpr;
-      switch (opr) {
+	  String otherOp = t.getOpr();
+      switch (otherOp) {
 		      case "<" -> { reversedOpr = ">"; }
 		      case "<=" -> { reversedOpr = ">="; }
 		      case ">" -> { reversedOpr = "<"; }
@@ -172,14 +173,14 @@ public class Term {
       if (otherRhsIsField) {
     	  sameOrder = lhs.isFieldName() && lhs.asFieldName().equals(otherLHS.asFieldName()) && 
    			   rhs.isFieldName() && rhs.asFieldName().equals(otherRHS.asFieldName()) &&
-   			   this.opr.equals(opr);
+   			   this.opr.equals(otherOp);
     	  reversedOrder = lhs.isFieldName() && lhs.asFieldName().equals(otherRHS.asFieldName()) && 
    			   rhs.isFieldName() && rhs.asFieldName().equals(otherLHS.asFieldName()) &&
    			   this.opr.equals(reversedOpr);
       } else {
     	  sameOrder = lhs.isFieldName() && lhs.asFieldName().equals(otherLHS.asFieldName()) && 
    			   !rhs.isFieldName() && rhs.asConstant().equals(otherRHS.asConstant()) &&
-   			   this.opr.equals(opr);
+   			   this.opr.equals(otherOp);
     	  reversedOrder = !lhs.isFieldName() && lhs.asConstant().equals(otherRHS.asConstant()) && 
    			   rhs.isFieldName() && rhs.asFieldName().equals(otherLHS.asFieldName()) &&
    			   this.opr.equals(reversedOpr);
