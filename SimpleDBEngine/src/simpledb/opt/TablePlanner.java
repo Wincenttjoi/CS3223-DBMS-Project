@@ -196,38 +196,41 @@ class TablePlanner {
    
    private Plan makeMergeJoin(Plan current, Schema currsch) {
 	   Predicate joinpred = mypred.joinSubPred(currsch, myschema);
-	   Term joinTerm = joinpred.getTerms().get(0);
-	   String joinValLHS = joinTerm.getLHS().asFieldName();
-	   String joinValRHS = joinTerm.getRHS().asFieldName();
-	   String opr = joinTerm.getOpr();
-	   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-
-	   Plan lhsPlan, rhsPlan;
-	   if (isCurrentPlanOnRHS) {
-		   lhsPlan = myplan;
-		   rhsPlan = current;
-	   } else {
-		   lhsPlan = current;
-		   rhsPlan = myplan;
-	   }
-	   
 	   Plan p;
-	   if (opr.equals(">")) {
-		   opr = "<";
-		   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
-	   } else if (opr.equals(">=")) {
-		   opr = "<=";
-		   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
-	   } else if (opr.equals("=") || opr.equals("<") || opr.equals("<=")) {
-		   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
-	   } else {
-	       System.out.println(tab + "Mergejoin failed: " + opr + " not supported, using productjoin instead");
-		   return null;
+	   for (Term joinTerm : joinpred.getTerms()) {
+		   String joinValLHS = joinTerm.getLHS().asFieldName();
+		   String joinValRHS = joinTerm.getRHS().asFieldName();
+		   String opr = joinTerm.getOpr();
+		   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
+	
+		   Plan lhsPlan, rhsPlan;
+		   if (isCurrentPlanOnRHS) {
+			   lhsPlan = myplan;
+			   rhsPlan = current;
+		   } else {
+			   lhsPlan = current;
+			   rhsPlan = myplan;
+		   }
+		   
+		   if (opr.equals(">")) {
+			   opr = "<";
+			   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
+		   } else if (opr.equals(">=")) {
+			   opr = "<=";
+			   p = new MergeJoinPlan(tx, rhsPlan, lhsPlan, joinValRHS, joinValLHS, opr);
+		   } else if (opr.equals("=") || opr.equals("<") || opr.equals("<=")) {
+			   p = new MergeJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr);
+		   } else {
+			   System.out.println("Mergejoin: " + joinValLHS + opr + joinValRHS + " not supported");
+			   continue;
+		   }
+	       System.out.println(tab + "Mergejoin blocks accessed = " + p.blocksAccessed());
+	       joinTermsToRemove[JoinAlgoSelector.MERGEJOIN_PLAN.ordinal()] = 
+	    		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), joinTerm.getOpr());
+		   return p;
 	   }
-       System.out.println(tab + "Mergejoin blocks accessed = " + p.blocksAccessed());
-       joinTermsToRemove[JoinAlgoSelector.MERGEJOIN_PLAN.ordinal()] = 
-    		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), joinTerm.getOpr());
-	   return p;
+       System.out.println(tab + "Mergejoin failed: Using productjoin instead");
+	   return null;
    }
    
    private Plan makeProductJoin(Plan current, Schema currsch) {
@@ -268,39 +271,44 @@ class TablePlanner {
     * @return a hashjoin plan of the specified plan and this table
     */
    private Plan makeHashJoin(Plan current, Schema currsch) {
-      Predicate joinpred = mypred.joinSubPred(currsch, myschema);
-      Term joinTerm = joinpred.getTerms().get(0);
-      String joinValLHS = joinTerm.getLHS().asFieldName();
-      String joinValRHS = joinTerm.getRHS().asFieldName();
-      String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
-      boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
-
-      Plan lhsPlan, rhsPlan;
-      if (isCurrentPlanOnRHS) {
-        lhsPlan = myplan;
-        rhsPlan = current;
-      } else {
-        lhsPlan = current;
-        rhsPlan = myplan;
-      }
-      
-      if (!opr.equals("=")) {
-        System.out.println("Hashjoin failed: " + opr + " not supported by hashjoin, using productjoin instead");
-        return null;
-      }
-      
-      int b = tx.availableBuffs();
-      int numPart = b - 1; // max # of partitions <= B - 1
-      Plan p = new HashJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr, numPart);
-      if (b < Math.sqrt(p.blocksAccessed())) {
-          System.out.println(
-              "Hashjoin failed: not enough buffer size available for hashjoin, using productjoin instead");
-          return null;
-      }
-      System.out.println(tab + "Hashjoin blocks accessed = " + p.blocksAccessed());
-      joinTermsToRemove[JoinAlgoSelector.HASHJOIN_PLAN.ordinal()] = 
-   		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
-      return p;
+       Predicate joinpred = mypred.joinSubPred(currsch, myschema);
+	   Plan p;
+	   for (Term joinTerm : joinpred.getTerms()) {
+		   String joinValLHS = joinTerm.getLHS().asFieldName();
+		   String joinValRHS = joinTerm.getRHS().asFieldName();
+		   String opr = joinTerm.getOpr();
+		   boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
+		
+		   Plan lhsPlan, rhsPlan;
+		   if (isCurrentPlanOnRHS) {
+		     lhsPlan = myplan;
+		     rhsPlan = current;
+		   } else {
+		     lhsPlan = current;
+		     rhsPlan = myplan;
+		   }
+		      
+		   if (!opr.equals("=")) {
+		     System.out.println("Hashjoin: " + joinValLHS + opr + joinValRHS + " not supported");
+		     continue;
+		   }
+		      
+		   int b = tx.availableBuffs();
+		   int numPart = b - 1; // max # of partitions <= B - 1
+		   p = new HashJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr, numPart);
+		   if (b < Math.sqrt(p.blocksAccessed())) {
+		       System.out.println(
+			           "Hashjoin: Not enough buffer size available for " + joinValLHS + opr + joinValRHS);
+		       continue;
+		   }
+		   System.out.println(tab + "Hashjoin blocks accessed = " + p.blocksAccessed());
+		   joinTermsToRemove[JoinAlgoSelector.HASHJOIN_PLAN.ordinal()] = 
+		 	   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
+		   return p;
+	   }
+       System.out.println(
+	           "Hashjoin failed: using productjoin instead");
+	   return null;
    }
    
    private Plan addSelectPred(Plan p) {
