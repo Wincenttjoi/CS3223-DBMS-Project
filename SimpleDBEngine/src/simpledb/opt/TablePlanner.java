@@ -31,7 +31,6 @@ class TablePlanner {
    private String tab = ">>";
    private Term[] joinTermsToRemove = new Term[4];
    private Term selectTermToRemove;
-   private Term joinTermSelectedToRemove;
 
    /**
     * Creates a new table planner.
@@ -60,13 +59,12 @@ class TablePlanner {
    public Plan makeSelectPlan() {
       Plan p = makeIndexSelect();
       if (p == null) {
-         p = myplan;
+         p = addSelectPred(myplan);
 	  }  else {
 		 // create a plan without the select term first, before restoring it.
-	     Term termToRestore = selectTermToRemove;
-	     removeSelectTerm();
+		 mypred.removeTerm(selectTermToRemove);
 	     p = addSelectPred(p);
-	     mypred.conjoinWith(new Predicate(termToRestore));
+	     mypred.conjoinWith(new Predicate(selectTermToRemove));
 	  }
       return p;
    }
@@ -98,38 +96,30 @@ class TablePlanner {
 	    		 .filter((p1) -> p1 != null)
 	    		 .sorted((p1, p2) -> Integer.compare(p1.blocksAccessed(), p2.blocksAccessed()));
 	      Plan bestPlan = plansStream.collect(Collectors.toList()).get(0);
-	      joinTermSelectedToRemove = joinTermsToRemove[plans.indexOf(bestPlan)];
+	      Term joinTermSelectedToRemove = joinTermsToRemove[plans.indexOf(bestPlan)];
+	      bestPlan = addSubpredicatesWithoutJoinTerm(bestPlan, joinTermSelectedToRemove, currsch);
 	      return bestPlan;
       }
       
       switch (joinAlgoSelected) {
 	      case INDEXJOIN_PLAN:
 	    	  p = makeIndexJoin(current, currsch);
-	    	  Term joinTermIndex = joinTermsToRemove[joinAlgoSelected.ordinal()];
-	    	  if (p == null) {
-	    		  p = makeProductJoin(current, currsch);
-	    	  } else {
-	    		  p = addSubpredicatesWithoutJoinTerm(p, joinTermIndex, currsch);
-	    	  }
+	    	  if (p == null)
+	    		  return makeProductJoin(current, currsch);
 	    	  break;
 	      case MERGEJOIN_PLAN:
 	    	  p = makeMergeJoin(current, currsch);
-	    	  Term joinTermMerge = joinTermsToRemove[joinAlgoSelected.ordinal()];
-	    	  if (p == null) {
-	    		  p = makeProductJoin(current, currsch);
-	    	  } else {
-	    		  p = addSubpredicatesWithoutJoinTerm(p, joinTermMerge, currsch);
-	    	  }
+	    	  if (p == null)
+	    		  return makeProductJoin(current, currsch);
 	    	  break;
 	      case NESTEDJOIN_PLAN:
 	    	  p = makeNestedJoin(current, currsch);
-	    	  Term joinTermNested = joinTermsToRemove[joinAlgoSelected.ordinal()];
-    		  p = addSubpredicatesWithoutJoinTerm(p, joinTermNested, currsch);
 	    	  break;
 	      default:
 	    	  throw new RuntimeException();
       }
-
+	  Term joinTermUsed = joinTermsToRemove[joinAlgoSelected.ordinal()];
+	  p = addSubpredicatesWithoutJoinTerm(p, joinTermUsed, currsch);
       return p;
    }
    
@@ -288,19 +278,6 @@ class TablePlanner {
 	  p = addSelectPred(p);
 	  p = addJoinPred(p,currsch);
 	  mypred.conjoinWith(new Predicate(joinTerm));
-	  joinTermSelectedToRemove = joinTerm;
 	  return p;
-   }
-   
-   public void removeSelectTerm() {
-	   if (selectTermToRemove != null) {
-		   mypred.removeTerm(selectTermToRemove);
-	   }
-   }
-   
-   public void removeJoinTerm() {
-	   if (joinTermSelectedToRemove != null) {
-		   mypred.removeTerm(joinTermSelectedToRemove);
-	   }
    }
 }
