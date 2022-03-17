@@ -77,7 +77,6 @@ public class Parser {
 	}
 
 // Methods for parsing queries
-
 	public QueryData query() {
 		JoinAlgoSelector joinAlgoSelected = null;
 		for (JoinAlgoSelector selector : JoinAlgoSelector.values()) {
@@ -87,13 +86,13 @@ public class Parser {
 				break;
 			}
 		}
+
 		lex.eatKeyword("select");
 		boolean isDistinct = false;
 		if (lex.matchKeyword("distinct")) {
 			isDistinct = true;
 			lex.eatKeyword("distinct");
 		}
-
 		List<List<String>> selects = selectList();
 		List<String> fields = new ArrayList<>();
 		List<AggregationFn> aggFns = new ArrayList<>();
@@ -109,9 +108,12 @@ public class Parser {
 
 		lex.eatKeyword("from");
 		Predicate pred = new Predicate();
+
 		Collection<String> tables = tableList();
 		pred.conjoinWith(currPred);
 		currPred = new Predicate();
+
+		Map<String, Boolean> sortMap = new LinkedHashMap<>();
 		if (lex.matchKeyword("where")) {
 			lex.eatKeyword("where");
 			pred.conjoinWith(predicate());
@@ -124,7 +126,6 @@ public class Parser {
 			groupFields = groupList();
 		}
 
-		Map<String, Boolean> sortMap = new LinkedHashMap<>();
 		if (lex.matchKeyword("order")) {
 			lex.eatKeyword("order");
 			lex.eatKeyword("by");
@@ -180,13 +181,13 @@ public class Parser {
 		Boolean sType = true; // sort type is ascending by default
 		if (lex.matchSortType()) {
 			sType = lex.eatSortType();
+		} else if (!lex.matchDelim(',') && !lex.matchEnd()) {
+			throw new BadSyntaxException();
 		}
 		M.put(sField, sType);
 		if (lex.matchDelim(',')) {
 			lex.eatDelim(',');
 			M.putAll(sortList());
-		} else {
-			lex.eatEnd();
 		}
 		return M;
 	}

@@ -62,7 +62,6 @@ public class Test {
 				}
 				System.out.println();
 			}
-
 		} catch (SQLException e) {
 			System.out.println("SQL Exception: " + e.getMessage());
 		}
