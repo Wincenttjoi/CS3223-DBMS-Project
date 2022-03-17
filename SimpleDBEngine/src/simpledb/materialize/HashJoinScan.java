@@ -11,7 +11,6 @@ import java.util.stream.IntStream;
  */
 public class HashJoinScan implements Scan {
 	private Scan s1, s2;
-	private String fldname1, fldname2;
 	private Map<Integer, TempTable> part1, part2;
 	private int k;
 	private HashComparator comp;
@@ -24,8 +23,6 @@ public class HashJoinScan implements Scan {
 	 * 
 	 * @param part1    the LHS partitions (temporary tables)
 	 * @param part2    the RHS partitions (temporary tables)
-	 * @param fldname1 the LHS join field
-	 * @param fldname2 the RHS join field
 	 * @param opr      the relational operator between join fields
 	 * @param k        the number of partitions
 	 */
@@ -33,8 +30,6 @@ public class HashJoinScan implements Scan {
 			int k) {
 		this.s1 = (UpdateScan) part1.get(partId).open();
 		this.s2 = (UpdateScan) part2.get(partId).open();
-		this.fldname1 = fldname1;
-		this.fldname2 = fldname2;
 		this.part1 = part1;
 		this.part2 = part2;
 		this.k = k;

@@ -293,17 +293,20 @@ class TablePlanner {
         lhsPlan = current;
         rhsPlan = myplan;
       }
-
-      if (tx.availableBuffs() < Math.sqrt(lhsPlan.blocksAccessed())) {
-        System.out.println(
-            "Hashjoin failed: not enough buffer size available for hashjoin, using productjoin instead");
-        return null;
-      } else if (!opr.equals("=")) {
+      
+      if (!opr.equals("=")) {
         System.out.println("Hashjoin failed: " + opr + " not supported by hashjoin, using productjoin instead");
         return null;
       }
-      int numPart = tx.availableBuffs() - 1; // max # of partitions <= B - 1
+      
+      int b = tx.availableBuffs();
+      int numPart = b - 1; // max # of partitions <= B - 1
       Plan p = new HashJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr, numPart);
+      if (b < Math.sqrt(p.blocksAccessed())) {
+          System.out.println(
+              "Hashjoin failed: not enough buffer size available for hashjoin, using productjoin instead");
+          return null;
+      }
       System.out.println(tab + "Hashjoin blocks accessed = " + p.blocksAccessed());
       p = addSelectPred(p);
       return addJoinPred(p, currsch);
