@@ -149,6 +149,10 @@ public class CreateStudentDBDemo {
          s = "create table COURSE(CId int, Title varchar(30), DeptId int)";
          stmt.executeUpdate(s);
          System.out.println("Table COURSE created.");
+         
+         s = "create index cid_idx on course (cid) using hash";
+         stmt.executeUpdate(s);
+         System.out.println("cid hash index created");
 
          s = "insert into COURSE(CId, Title, DeptId) values ";
          String[] coursevals = {
@@ -216,10 +220,6 @@ public class CreateStudentDBDemo {
          s = "create index yearoffered_idx on section (yearoffered) using btree";
          stmt.executeUpdate(s);
          System.out.println("yearoffered btree index created");
-         
-         s = "create index courseid_idx on section(courseid) using btree";
-         stmt.executeUpdate(s);
-         System.out.println("courseid hash index created");
 
          s = "insert into SECTION(SectId, CourseId, Prof, YearOffered) values ";
          String[] sectvals = {
@@ -282,7 +282,11 @@ public class CreateStudentDBDemo {
          s = "create table ENROLL(EId int, StudentId int, SectionId int, Grade varchar(2))";
          stmt.executeUpdate(s);
          System.out.println("Table ENROLL created.");
-
+         
+         s = "create index enroll_idx on enroll (studentid) using btree";
+         stmt.executeUpdate(s);
+         System.out.println("studentid index created");
+         
          s = "insert into ENROLL(EId, StudentId, SectionId, Grade) values ";
          String[] enrollvals = {
         		 "(14, 33, 253,'C')",
