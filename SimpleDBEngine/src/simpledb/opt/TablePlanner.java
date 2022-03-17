@@ -272,7 +272,7 @@ class TablePlanner {
       Term joinTerm = joinpred.getTerms().get(0);
       String joinValLHS = joinTerm.getLHS().asFieldName();
       String joinValRHS = joinTerm.getRHS().asFieldName();
-      String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
+      String opr = joinTerm.getOpr();
       boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
 
       Plan lhsPlan, rhsPlan;

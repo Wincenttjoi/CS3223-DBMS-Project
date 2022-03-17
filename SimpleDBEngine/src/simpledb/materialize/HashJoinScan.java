@@ -21,10 +21,10 @@ public class HashJoinScan implements Scan {
 	 * Create a hashjoin scan having the two underlying scans on the first set of
 	 * partitions.
 	 * 
-	 * @param part1    the LHS partitions (temporary tables)
-	 * @param part2    the RHS partitions (temporary tables)
-	 * @param opr      the relational operator between join fields
-	 * @param k        the number of partitions
+	 * @param part1 the LHS partitions (temporary tables)
+	 * @param part2 the RHS partitions (temporary tables)
+	 * @param opr   the relational operator between join fields
+	 * @param k     the number of partitions
 	 */
 	public HashJoinScan(Map<Integer, TempTable> part1, Map<Integer, TempTable> part2, String fldname1, String fldname2,
 			int k) {
@@ -33,7 +33,7 @@ public class HashJoinScan implements Scan {
 		this.part1 = part1;
 		this.part2 = part2;
 		this.k = k;
-		this.comp = new HashComparator(fldname1, fldname2, (k - 1)); // hash to hash table using different hash function
+		this.comp = new HashComparator(fldname1, fldname2, 15485863); // hash to hash table using different hash function
 		this.nomore1 = false;
 		this.partId = 0;
 		beforeFirst();

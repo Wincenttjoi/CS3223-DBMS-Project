@@ -126,8 +126,10 @@ public class HashJoinPlan implements Plan {
 		int offset = val.hashCode() % k;
 		TempTable currenttemp = temps.get(offset);
 		UpdateScan currentscan = currenttemp.open();
-		while (copy(src, currentscan, sch)) { // hashes the current record into a partition
-			// retrieve another partition if the next record hashes to a different partition
+		// hashes the current record into a partition
+		while (copy(src, currentscan, sch)) {
+			// retrieve another partition
+			// if the next record hashes to a different partition
 			if (comp.compare(src, currentscan) != 0) {
 				currentscan.close();
 				Constant newVal = src.getVal(fldname);
