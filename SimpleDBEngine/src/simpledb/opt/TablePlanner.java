@@ -118,12 +118,12 @@ class TablePlanner {
 	      case NESTEDJOIN_PLAN:
 	    	  p = makeNestedJoin(current, currsch);
 	    	  break;
-        case HASHJOIN_PLAN:
-			    p = makeHashJoin(current, currsch);
-          if (p == null) {
-            p = makeProductJoin(current, currsch);
-          }
-          break;
+          case HASHJOIN_PLAN:
+			  p = makeHashJoin(current, currsch);
+		      if (p == null) {
+		         return makeProductJoin(current, currsch);
+		      }
+              break;
 	      default:
 	    	  throw new RuntimeException();
       }
@@ -298,8 +298,9 @@ class TablePlanner {
           return null;
       }
       System.out.println(tab + "Hashjoin blocks accessed = " + p.blocksAccessed());
-      p = addSelectPred(p);
-      return addJoinPred(p, currsch);
+      joinTermsToRemove[JoinAlgoSelector.HASHJOIN_PLAN.ordinal()] = 
+   		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
+      return p;
    }
    
    private Plan addSelectPred(Plan p) {
