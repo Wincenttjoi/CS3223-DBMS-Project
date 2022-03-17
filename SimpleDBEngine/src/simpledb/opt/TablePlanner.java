@@ -14,11 +14,13 @@ import simpledb.metadata.*;
 import simpledb.index.planner.*;
 import simpledb.materialize.MergeJoinPlan;
 import simpledb.materialize.NestedJoinPlan;
+import simpledb.materialize.HashJoinPlan;
 import simpledb.multibuffer.MultibufferProductPlan;
 import simpledb.plan.*;
 
 /**
  * This class contains methods for planning a single table.
+ * 
  * @author Edward Sciore
  */
 class TablePlanner {
@@ -89,8 +91,9 @@ class TablePlanner {
 	      Plan indexJoinPlan = makeIndexJoin(current, currsch);
 	      Plan mergeJoinPlan = makeMergeJoin(current, currsch);
 	      Plan nestedJoinPlan = makeNestedJoin(current, currsch);
+        Plan hashJoinPlan = makeHashJoin(current, currsch);
     	  List <Plan> plans = new ArrayList<Plan>(Arrays.asList(
-    			  indexJoinPlan, mergeJoinPlan, nestedJoinPlan));
+    			  indexJoinPlan, mergeJoinPlan, nestedJoinPlan, hashJoinPlan));
     	  
 	      Stream<Plan> plansStream = plans.stream()
 	    		 .filter((p1) -> p1 != null)
@@ -115,6 +118,12 @@ class TablePlanner {
 	      case NESTEDJOIN_PLAN:
 	    	  p = makeNestedJoin(current, currsch);
 	    	  break;
+          case HASHJOIN_PLAN:
+			  p = makeHashJoin(current, currsch);
+		      if (p == null) {
+		         return makeProductJoin(current, currsch);
+		      }
+              break;
 	      default:
 	    	  throw new RuntimeException();
       }
@@ -250,6 +259,48 @@ class TablePlanner {
        joinTermsToRemove[JoinAlgoSelector.NESTEDJOIN_PLAN.ordinal()] = 
     		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
 	   return p;
+   }
+  
+   /**
+    * Constructs a hashjoin plan of the specified plan and this table.
+    * 
+    * @param current the specified plan
+    * @return a hashjoin plan of the specified plan and this table
+    */
+   private Plan makeHashJoin(Plan current, Schema currsch) {
+      Predicate joinpred = mypred.joinSubPred(currsch, myschema);
+      Term joinTerm = joinpred.getTerms().get(0);
+      String joinValLHS = joinTerm.getLHS().asFieldName();
+      String joinValRHS = joinTerm.getRHS().asFieldName();
+      String opr = mypred.getOperatorFromFieldComparison(joinValLHS);
+      boolean isCurrentPlanOnRHS = current.schema().fields().contains(joinValRHS);
+
+      Plan lhsPlan, rhsPlan;
+      if (isCurrentPlanOnRHS) {
+        lhsPlan = myplan;
+        rhsPlan = current;
+      } else {
+        lhsPlan = current;
+        rhsPlan = myplan;
+      }
+      
+      if (!opr.equals("=")) {
+        System.out.println("Hashjoin failed: " + opr + " not supported by hashjoin, using productjoin instead");
+        return null;
+      }
+      
+      int b = tx.availableBuffs();
+      int numPart = b - 1; // max # of partitions <= B - 1
+      Plan p = new HashJoinPlan(tx, lhsPlan, rhsPlan, joinValLHS, joinValRHS, opr, numPart);
+      if (b < Math.sqrt(p.blocksAccessed())) {
+          System.out.println(
+              "Hashjoin failed: not enough buffer size available for hashjoin, using productjoin instead");
+          return null;
+      }
+      System.out.println(tab + "Hashjoin blocks accessed = " + p.blocksAccessed());
+      joinTermsToRemove[JoinAlgoSelector.HASHJOIN_PLAN.ordinal()] = 
+   		   new Term(new Expression(joinValLHS), new Expression(joinValRHS), opr);
+      return p;
    }
    
    private Plan addSelectPred(Plan p) {

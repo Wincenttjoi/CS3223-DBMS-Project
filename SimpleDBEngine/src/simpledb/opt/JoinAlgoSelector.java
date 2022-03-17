@@ -3,7 +3,8 @@ package simpledb.opt;
 public enum JoinAlgoSelector {
    	INDEXJOIN_PLAN("indexjoin"),
     MERGEJOIN_PLAN("mergejoin"),
-    NESTEDJOIN_PLAN("nestedjoin");
+    NESTEDJOIN_PLAN("nestedjoin"),
+	HASHJOIN_PLAN("hashjoin");
    
    	private String join_algo_name;
 

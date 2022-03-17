@@ -5,7 +5,7 @@ import java.util.*;
 import simpledb.query.*;
 
 /**
- * The Scan class for the <i>Distinct</i> operator.
+ * The Scan class for the <i>distinct</i> operator.
  * @author Edward Sciore
  */
 /**
