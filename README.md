@@ -35,7 +35,7 @@ This project will focus primarily on query processing (and related topics, e.g.,
 ## Bonus Implemented
 
 1. Support range search for merge join, index join and index select.
-2. Avoiding redundant select plan execution after index select and index joins, while supporting for multiple indexes in the predicate in a single query
+2. Better query optimizer
 3. Support float data type which supports group by avg
 4. Support joining an empty table with no tuples to another table
 
