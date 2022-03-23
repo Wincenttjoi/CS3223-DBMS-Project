@@ -93,7 +93,7 @@ class TablePlanner {
 	      Plan nestedJoinPlan = makeNestedJoin(current, currsch);
         Plan hashJoinPlan = makeHashJoin(current, currsch);
     	  List <Plan> plans = new ArrayList<Plan>(Arrays.asList(
-    			  indexJoinPlan, mergeJoinPlan, nestedJoinPlan, hashJoinPlan));
+    			  mergeJoinPlan, hashJoinPlan));
     	  
 	      Stream<Plan> plansStream = plans.stream()
 	    		 .filter((p1) -> p1 != null)

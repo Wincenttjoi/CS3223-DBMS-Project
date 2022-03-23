@@ -85,7 +85,7 @@ public class CreateStudentDBDemo {
          System.out.println("Table DEPT created.");
 
          // Create index
-         s = "create index did_index on dept (did) using hash";
+         s = "create index did_index on dept (did) using btree";
          stmt.executeUpdate(s);
          System.out.println("Did index created");
          
