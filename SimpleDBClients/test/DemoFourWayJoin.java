@@ -22,87 +22,20 @@ public class DemoFourWayJoin {
 //    	  Test.doQuery(stmt, "select SId, SName, MajorId, GradYear from student");
 //    	  Test.doQuery(stmt, "select EId, StudentId, SectionId, Grade from enroll where grade = 'A-'");
 //    	  Test.doQuery(stmt, "select DId, DName from dept");
+//    	  Test.doQuery(stmt, "select SectId, courseid, prof, yearoffered from section");
 //    	  Test.doQuery(stmt, "select CId, Title, DeptId from course");
     	  
-    	  // TEST1: Four Way table queries, showing different sname and prof for each course subject
-    	  Test.doJoinAlgoTest(stmt, "select sname, majorid, did, deptid, dname, title, cid, courseid, prof "
-    	  		+ "from student, dept, course, section "
-    	  		+ "where majorid = did and did = deptid and cid = courseid order by dname asc, title asc");
-//          sname majorid    did deptid                     dname                          title    cid courseid                      prof
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-//   Darci Hodson     100    100    100                Accounting              Corporate Finance    102      102              Moon Geonsik
-//   Darci Hodson     100    100    100                Accounting              Corporate Finance    102      102               Sheikh Rowe
-//   Darci Hodson     100    100    100                Accounting              Corporate Finance    102      102              Amara Tanner
-//    Sayed Marsh     100    100    100                Accounting              Corporate Finance    102      102              Moon Geonsik
-//    Sayed Marsh     100    100    100                Accounting              Corporate Finance    102      102               Sheikh Rowe
-//    Sayed Marsh     100    100    100                Accounting              Corporate Finance    102      102              Amara Tanner
-// Kamile Wilkins     430    430    430      Chemical Engineering            Polymer Engineering    462      462             Kelise Berger
-//  Tevin Wallace     430    430    430      Chemical Engineering            Polymer Engineering    462      462             Kelise Berger
-//      Damon Kim     430    430    430      Chemical Engineering            Polymer Engineering    462      462             Kelise Berger
-// Kamile Wilkins     430    430    430      Chemical Engineering                Process Control    472      472           Garfield Hebert
-// Kamile Wilkins     430    430    430      Chemical Engineering                Process Control    472      472                   Cole Li
-//  Tevin Wallace     430    430    430      Chemical Engineering                Process Control    472      472           Garfield Hebert
-//  Tevin Wallace     430    430    430      Chemical Engineering                Process Control    472      472                   Cole Li
-//      Damon Kim     430    430    430      Chemical Engineering                Process Control    472      472           Garfield Hebert
-//      Damon Kim     430    430    430      Chemical Engineering                Process Control    472      472                   Cole Li
-//Layla-Mae Barker     240    240    240          Computer Science              Basic Programming    242      242           Zakariyah Power
-//Layla-Mae Barker     240    240    240          Computer Science              Basic Programming    242      242              Wincent Tjoi
-//      Marwah Yu     250    250    250          Computer Science                      Databases    252      252               Chase Wyatt
-//      Marwah Yu     250    250    250          Computer Science                      Databases    252      252                 Ali Heath
-//      Marwah Yu     250    250    250          Computer Science                      Databases    252      252            Ritchie Cairns
-//   Jemima Davey     250    250    250          Computer Science                      Databases    252      252               Chase Wyatt
-//   Jemima Davey     250    250    250          Computer Science                      Databases    252      252                 Ali Heath
-//   Jemima Davey     250    250    250          Computer Science                      Databases    252      252            Ritchie Cairns
-//      Marwah Yu     250    250    250          Computer Science                      Databases    252      252                Rohan Drew
-//   Jemima Davey     250    250    250          Computer Science                      Databases    252      252                Rohan Drew
-// Shiloh Hartman     310    310    310         Industrial Design                     IDE Design    402      402            Nellie Wiggins
-//Lilly-Ann Joyce      10     10     10                       Law                   Criminal Law     12       12            Korban Fleming
-//Lilly-Ann Joyce      10     10     10                       Law                   Criminal Law     12       12            Gracey Peacock
-// Scott Goulding      10     10     10                       Law                   Criminal Law     12       12            Korban Fleming
-// Scott Goulding      10     10     10                       Law                   Criminal Law     12       12            Gracey Peacock
-//    Otis Devlin      50     50     50                       Law              Equity and Trusts     52       52                Jibril Ali
-//    Otis Devlin      50     50     50                       Law              Equity and Trusts     52       52               Zaina Myers
-//    Otis Devlin      50     50     50                       Law              Equity and Trusts     52       52             Rosina Lucero
-// Callan Derrick      30     30     30                       Law            The Law of Contract     32       32             Layan Bonilla
-//  Imaad Wickens      20     20     20                       Law                   law of Torts     22       22               Alisa David
-//Darcie-Mae Winters      20     20     20                       Law                   law of Torts     22       22               Alisa David
-//  Huzaifa Wiley      20     20     20                       Law                   law of Torts     22       22               Alisa David
-//      Rhia Bird     110    110    110                     Music             Introductory Music    112      112               Dina Warner
-//      Rhia Bird     110    110    110                     Music             Introductory Music    112      112           Beatriz Shields
-//Cerys Armstrong     110    110    110                     Music             Introductory Music    112      112               Dina Warner
-//Cerys Armstrong     110    110    110                     Music             Introductory Music    112      112           Beatriz Shields
-//   Rania Alcock     140    140    140                     Music                Music and Media    142      142             Beatrix Oneal
-//      Elif Mayo     200    200    200               Real Estate   Land Use and Property Rights    202      202             Charlie Dixon
-//  Rohaan Keenan     200    200    200               Real Estate   Land Use and Property Rights    202      202             Charlie Dixon
-// Amiya Caldwell     200    200    200               Real Estate   Land Use and Property Rights    202      202             Charlie Dixon
-//   Amiee Oliver     180    180    180               Real Estate                       RE Taxes    182      182              Ifan Squires
+    	  String query;
 
-    	  // TEST2: Four Way table queries, with distinct and double order by
-    	  Test.doJoinAlgoTest(stmt, "select distinct majorid, did, deptid, dname, title, cid, courseid "
-    	  		+ "from student, dept, course, section "
-    	  		+ "where majorid = did and did = deptid and cid = courseid order by dname, title");
-//    	  majorid    did deptid                     dname                          title    cid courseid
-//    	  -----------------------------------------------------------------------------------------------
-//    	       100    100    100                Accounting              Corporate Finance    102      102
-//    	       430    430    430      Chemical Engineering            Polymer Engineering    462      462
-//    	       430    430    430      Chemical Engineering                Process Control    472      472
-//    	       240    240    240          Computer Science              Basic Programming    242      242
-//    	       250    250    250          Computer Science                      Databases    252      252
-//    	       310    310    310         Industrial Design                     IDE Design    402      402
-//    	        10     10     10                       Law                   Criminal Law     12       12
-//    	        50     50     50                       Law              Equity and Trusts     52       52
-//    	        30     30     30                       Law            The Law of Contract     32       32
-//    	        20     20     20                       Law                   law of Torts     22       22
-//    	       110    110    110                     Music             Introductory Music    112      112
-//    	       140    140    140                     Music                Music and Media    142      142
-//    	       200    200    200               Real Estate   Land Use and Property Rights    202      202
-//    	       180    180    180               Real Estate                       RE Taxes    182      182
-
-    	  // TEST3: Four Way table queries, with all successful indexjoins
-    	  Test.doJoinAlgoTest(stmt, "select grade, studentid, sid, title, courseid, cid, majorid, yearoffered, gradyear from enroll, student, section, course "
-    	  		+ "where grade = 'A-' and studentid = sid and courseid > majorid and courseid = cid and yearOffered = gradyear"
-    	  		+ " order by title");
-//    	  grade studentid    sid                          title courseid    cid majorid yearoffered gradyear
+    	  // TEST1: Four Way table queries, with join order to showcase all successful indexjoin. 
+    	  // 		Also note the yearOffered = gradyear isn't duplicated in select
+    	  query = "select grade, studentid, sid, title, courseid, cid, majorid, yearoffered, gradyear "
+    	  		+ "from enroll, student, section, course "
+        	  	+ "where grade = 'A-' and studentid = sid and courseid > majorid and courseid = cid and yearOffered = gradyear "
+          	  	+ "order by title";
+    	  Test.doTest(stmt, query);
+    	  Test.doJoinAlgoTest(stmt, query);
+    	  //    	  grade studentid    sid                          title courseid    cid majorid yearoffered gradyear
 //    	  ---------------------------------------------------------------------------------------------------
 //    	      A-        14     14              Basic Programming      242    242      40        2019     2019
 //    	      A-        24     24               Brand Management      382    382     350        2019     2019
@@ -139,6 +72,78 @@ public class DemoFourWayJoin {
 //    	      A-        41     41          Sustainable Marketing      362    362     320        2021     2021
 //    	      A-        26     26          Sustainable Marketing      362    362     100        2021     2021
 //    	      A-        45     45                 Thermodynamics      512    512     460        2016     2016
+    	  
+    	  
+    	  // TEST2: Same as Test 1, but with inequality conditions (check indexjoin, nestedjoin, mergejoin)
+    	  query = "select grade, studentid, sid, title, courseid, cid, majorid, yearoffered, gradyear "
+    			+ "from enroll, student, section, course "
+      	  		+ "where grade = 'A-' and studentid = sid and courseid > majorid and courseid = cid and yearOffered < gradyear and gradYear = 2019 "
+      	  		+ "order by title";
+    	  Test.doTest(stmt, query);
+    	  Test.doJoinAlgoTest(stmt, query);
+    	  
+//    	  grade studentid    sid                          title courseid    cid majorid yearoffered gradyear
+//    	  ---------------------------------------------------------------------------------------------------
+//    	      A-        14     14              Basic Programming      242    242      40        2016     2019
+//    	      A-        14     14              Corporate Finance      102    102      40        2018     2019
+//    	      A-        14     14                      Databases      252    252      40        2018     2019
+//    	      A-        14     14               Decision Science      332    332      40        2016     2019
+//    	      A-        14     14              Equity and Trusts       52     52      40        2016     2019
+//    	      A-        14     14                Fluid Mechanics      502    502      40        2018     2019
+//    	      A-        24     24                Fluid Mechanics      502    502     350        2018     2019
+//    	      A-        46     46                Fluid Mechanics      502    502     390        2018     2019
+//    	      A-        14     14             Introductory Music      112    112      40        2017     2019
+//    	      A-        14     14             Introductory Music      112    112      40        2016     2019
+//    	      A-        14     14                Music and Media      142    142      40        2018     2019
+//    	      A-        14     14                    Performance      132    132      40        2016     2019
+//    	      A-        24     24            Polymer Engineering      462    462     350        2018     2019
+//    	      A-        46     46            Polymer Engineering      462    462     390        2018     2019
+//    	      A-        14     14            Polymer Engineering      462    462      40        2018     2019
+//    	      A-        14     14                Process Control      472    472      40        2016     2019
+//    	      A-        14     14                Process Control      472    472      40        2016     2019
+//    	      A-        24     24                Process Control      472    472     350        2016     2019
+//    	      A-        24     24                Process Control      472    472     350        2016     2019
+//    	      A-        46     46                Process Control      472    472     390        2016     2019
+//    	      A-        46     46                Process Control      472    472     390        2016     2019
+//    	      A-        14     14           Quantitative Methods      302    302      40        2017     2019
+//    	      A-        14     14              Retail Management      372    372      40        2017     2019
+//    	      A-        24     24              Retail Management      372    372     350        2017     2019
+//    	      A-        24     24              Retail Management      372    372     350        2017     2019
+//    	      A-        14     14              Retail Management      372    372      40        2017     2019
+//    	      A-        46     46                 Thermodynamics      512    512     390        2016     2019
+//    	      A-        24     24                 Thermodynamics      512    512     350        2016     2019
+//    	      A-        14     14                 Thermodynamics      512    512      40        2016     2019
+    	  
+    	  // TEST3: Four Way table queries, with group by and order by
+    	  query = "select title, count(sid) from enroll, student, section, course "
+        	  		+ "where grade = 'A-' and studentid = sid and courseid > majorid and courseid = cid and yearOffered = gradyear "
+          	  		+ "group by title "
+        	  		+ "order by title";
+    	  Test.doTest(stmt, query);
+    	  Test.doJoinAlgoTest(stmt, query);    	  
+//			title countofsid
+//			------------------------------------------
+//			Basic Programming          1
+//			Brand Management          2
+//			Corporate Finance          1
+//			Data Structure          1
+//			Databases          2
+//			Economic Policy          3
+//			Equity and Trusts          1
+//			Financial Markets          1
+//			Fluid Mechanics          1
+//			IDE Design          3
+//			Land Use and Property Rights          1
+//			Legal Studies          4
+//			Market Research          1
+//			Performance          1
+//			Process Control          2
+//			Quantitative Methods          1
+//			RE Taxes          1
+//			Residential Real Estate          1
+//			Retail Management          4
+//			Sustainable Marketing          2
+//			 Thermodynamics          1
       }
       catch (SQLException e) {
          e.printStackTrace();
